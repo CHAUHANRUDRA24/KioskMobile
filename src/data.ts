@@ -5,11 +5,13 @@ export const CATEGORIES = [
   "Pregnancy",
   "Sexual Wellness",
   "Hygiene",
-  "First Aid"
+  "First Aid",
+  "Nutrition",
+  "Essentials"
 ];
 
 export const PRODUCTS: Product[] = [
-  // Women's Health
+  // Women's Health (6 items)
   {
     id: 'w1',
     name: 'Regular Sanitary Pad',
@@ -42,8 +44,24 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid'
   },
+  {
+    id: 'w5',
+    name: 'Panty Liners (Pack of 20)',
+    price: 75,
+    category: "Women's Health",
+    imageEmoji: '🩸',
+    type: 'fluid'
+  },
+  {
+    id: 'w6',
+    name: 'Menstrual Relief Patch',
+    price: 110,
+    category: "Women's Health",
+    imageEmoji: '🩹',
+    type: 'other'
+  },
 
-  // Pregnancy
+  // Pregnancy (2 items)
   {
     id: 'p1',
     name: 'Pregnancy Detection Kit',
@@ -60,16 +78,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '💊',
     type: 'pill'
   },
-  {
-    id: 'p3',
-    name: 'Ovulation Test Strips',
-    price: 180,
-    category: 'Pregnancy',
-    imageEmoji: '📏',
-    type: 'other'
-  },
 
-  // Sexual Wellness
+  // Sexual Wellness (4 items)
   {
     id: 's1',
     name: 'Condoms (Pack of 3)',
@@ -94,8 +104,16 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧪',
     type: 'other'
   },
+  {
+    id: 's4',
+    name: 'Female Condoms (Pack of 3)',
+    price: 90,
+    category: 'Sexual Wellness',
+    imageEmoji: '🛡️',
+    type: 'other'
+  },
 
-  // Hygiene
+  // Hygiene (2 items)
   {
     id: 'h1',
     name: 'Hand Sanitizer',
@@ -112,16 +130,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧻',
     type: 'other'
   },
-  {
-    id: 'h3',
-    name: 'Intimate Wash',
-    price: 120,
-    category: 'Hygiene',
-    imageEmoji: '🧴',
-    type: 'other'
-  },
 
-  // First Aid
+  // First Aid (3 items)
   {
     id: 'f1',
     name: 'Emergency Bandages',
@@ -145,5 +155,41 @@ export const PRODUCTS: Product[] = [
     category: 'First Aid',
     imageEmoji: '💨',
     type: 'spray'
+  },
+
+  // Nutrition (1 item)
+  {
+    id: 'n1',
+    name: 'Multivitamin Gummies',
+    price: 150,
+    category: 'Nutrition',
+    imageEmoji: '🍬',
+    type: 'pill'
+  },
+
+  // Essentials (3 items)
+  {
+    id: 'e1',
+    name: 'Face Mask (Pack of 5)',
+    price: 50,
+    category: 'Essentials',
+    imageEmoji: '😷',
+    type: 'other'
+  },
+  {
+    id: 'e2',
+    name: 'Digital Thermometer',
+    price: 220,
+    category: 'Essentials',
+    imageEmoji: '🌡️',
+    type: 'other'
+  },
+  {
+    id: 'e3',
+    name: 'Disposable Gloves (Pair)',
+    price: 15,
+    category: 'Essentials',
+    imageEmoji: '🧤',
+    type: 'other'
   }
 ];

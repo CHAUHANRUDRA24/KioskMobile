@@ -24,9 +24,76 @@ import { PRODUCTS, CATEGORIES } from './data';
 import { Product, CartItem, ScreenType } from './types';
 import logoImg from '@/assets/creator_lab_logo.jpg';
 
+const TRANSLATIONS = {
+  en: {
+    welcome: "Welcome",
+    tagline: "Your Private 24/7 Health Dispenser",
+    description: "Purchase personal health and wellness products anonymously through the Creator Lab Smart Kiosk.",
+    startShopping: "Start Shopping",
+    whyChooseUs: "Why choose us",
+    anonymousTitle: "Anonymous",
+    anonymousDesc: "No tracking. Complete isolation of your medical transaction records.",
+    touchlessTitle: "Touchless",
+    touchlessDesc: "Hygienic use. Conduct purchase on your screen, collect directly.",
+    upiQrTitle: "UPI & QR",
+    upiQrDesc: "Fast, secure payments. Instant scan code and pick.",
+    realTimeTitle: "Real-Time",
+    realTimeDesc: "Always accurate. Showing live dispenser inventory of products.",
+    howItWorks: "How It Works",
+    step1Title: "Scan QR",
+    step1Desc: "Start your session anonymously at the physical kiosk screen.",
+    step2Title: "Select",
+    step2Desc: "Choose your medical products on your own phone or kiosk screen.",
+    step3Title: "Pay",
+    step3Desc: "Secure touchless mobile payment (UPI, cards, or digital wallets).",
+    step4Title: "Collect",
+    step4Desc: "Your items dispense instantly in the kiosk's private pick-up tray.",
+    secureTitle: "100% Secure",
+    secureDesc: "Encrypted",
+    privacyTitle: "Total Privacy",
+    privacyDesc: "Verified",
+    guideBtn: "GUIDE",
+    needHelp: "Need help? 1800-111-2222",
+    safetyHelpline: "Women's Safety Helpline: 1091",
+  },
+  hi: {
+    welcome: "स्वागत है",
+    tagline: "आपका निजी 24/7 स्वास्थ्य डिस्पेंसर",
+    description: "द क्रिएटर लैब स्मार्ट कियोस्क के माध्यम से गुमनाम रूप से व्यक्तिगत स्वास्थ्य और कल्याण उत्पाद खरीदें।",
+    startShopping: "खरीदारी शुरू करें",
+    whyChooseUs: "हमारा चयन क्यों करें",
+    anonymousTitle: "गुमनाम",
+    anonymousDesc: "कोई ट्रैकिंग नहीं। आपके चिकित्सा लेनदेन रिकॉर्ड का पूर्ण अलगाव।",
+    touchlessTitle: "स्पर्श रहित",
+    touchlessDesc: "हाइजीनिक उपयोग। अपनी स्वयं की स्क्रीन पर खरीदारी करें, सीधे कलेक्ट करें।",
+    upiQrTitle: "UPI और QR",
+    upiQrDesc: "तेज़, सुरक्षित भुगतान। तुरंत कोड स्कैन करें और चुनें।",
+    realTimeTitle: "रियल-टाइम",
+    realTimeDesc: "हमेशा सटीक। उत्पादों की लाइव डिस्पेंसर इन्वेंट्री दिखा रहा है।",
+    howItWorks: "यह कैसे काम करता है",
+    step1Title: "QR स्कैन करें",
+    step1Desc: "भौतिक कियोस्क स्क्रीन पर गुमनाम रूप से अपना सत्र शुरू करें।",
+    step2Title: "उत्पाद चुनें",
+    step2Desc: "अपने फोन या कियोस्क स्क्रीन पर अपने चिकित्सा उत्पाद चुनें।",
+    step3Title: "भुगतान करें",
+    step3Desc: "सुरक्षित स्पर्श रहित मोबाइल भुगतान (UPI, कार्ड, या डिजिटल वॉलेट)।",
+    step4Title: "सामान प्राप्त करें",
+    step4Desc: "आपकी वस्तुएं तुरंत कियोस्क की निजी पिक-अप ट्रे में डिस्पेंस हो जाएंगी।",
+    secureTitle: "100% सुरक्षित",
+    secureDesc: "एन्क्रिप्टेड",
+    privacyTitle: "पूर्ण गोपनीयता",
+    privacyDesc: "सत्यापित",
+    guideBtn: "गाइड",
+    needHelp: "सहायता चाहिए? 1800-111-2222",
+    safetyHelpline: "महिला सुरक्षा हेल्पलाइन: 1091",
+  }
+};
+
 export default function App() {
   // Navigation & Cart States
   const [screen, setScreen] = useState<ScreenType>('landing');
+  const [lang, setLang] = useState<'en' | 'hi'>('en');
+  const [aboutOpen, setAboutOpen] = useState<boolean>(false);
   const [cart, setCart] = useState<CartItem[]>([
     {
       product: PRODUCTS.find(p => p.id === 'w2') || PRODUCTS[1], // XL Sanitary Pad (₹20)
@@ -54,27 +121,8 @@ export default function App() {
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(5);
 
-  // Custom states for Digital Clock and Guide modal
-  const [time, setTime] = useState<string>('');
+  // Custom state for Guide modal
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
-
-  // Clock Effect
-  useEffect(() => {
-    const updateClock = () => {
-      const now = new Date();
-      let hours = now.getHours();
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      const seconds = String(now.getSeconds()).padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      hours = hours % 12;
-      hours = hours ? hours : 12; // 0 should be 12
-      const hoursStr = String(hours).padStart(2, '0');
-      setTime(`${hoursStr}:${minutes}:${seconds} ${ampm}`);
-    };
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Cart operations
   const addToCart = (product: Product) => {
@@ -171,7 +219,7 @@ export default function App() {
   };
 
   return (
-    <div className="w-full max-w-[430px] min-h-screen bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-outline-variant/30 my-0 md:my-6 pb-20">
+    <div className="w-full max-w-[430px] h-screen md:h-[92vh] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto pb-16">
       
       {/* BLACK DYNAMIC ISLAND NOTCH */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#1f2022] rounded-b-xl flex items-center justify-center gap-1.5 z-50">
@@ -181,9 +229,9 @@ export default function App() {
 
       {/* FLOATING GREEN SAGE STATUS BAR */}
       <div className="mx-4 mt-7 mb-2 bg-[#c9d9cb] border border-[#b7c6b9] rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-sm z-40">
-        <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-[#2d3e30]">
-          <Clock size={14} className="text-[#2d3e30] stroke-[2.5]" />
-          <span>{time || '11:10:05 AM'}</span>
+        <div className="flex items-center gap-2 font-sans font-bold text-xs text-[#2d3e30]">
+          <span className="material-symbols-outlined text-[18px] text-[#16A34A]">health_metrics</span>
+          <span>PrivaCare</span>
         </div>
         <button 
           onClick={() => setGuideOpen(true)}
@@ -194,12 +242,12 @@ export default function App() {
             <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
             <line x1="12" y1="17" x2="12.01" y2="17" />
           </svg>
-          GUIDE
+          {TRANSLATIONS[lang].guideBtn}
         </button>
       </div>
 
       {/* HEADER BAR */}
-      <header className="w-full pt-3 pb-4 px-5 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-outline-variant/20 flex items-center justify-between transition-all">
+      <header className="w-full pt-3 pb-4 px-5 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all">
         <div className="flex items-center gap-3">
           {screen !== 'landing' && (
             <button 
@@ -208,7 +256,7 @@ export default function App() {
                 else if (screen === 'cart') setScreen('products');
                 else if (screen === 'products') setScreen('landing');
               }}
-              className="text-primary hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container"
+              className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container"
             >
               <ArrowLeft size={22} className="stroke-[2.5px]" />
             </button>
@@ -216,10 +264,12 @@ export default function App() {
           
           <div className="flex items-center gap-2">
             {screen === 'landing' ? (
-              <>
-                <img src={logoImg} className="w-8 h-8 rounded-lg object-cover border border-outline-variant/20" alt="Logo" />
-                <span className="font-sans font-bold text-xl tracking-tight text-primary">the Creator Lab</span>
-              </>
+              <div className="flex items-center gap-1.5">
+                <span className="material-symbols-outlined text-[#16A34A] text-2xl">health_metrics</span>
+                <h1 className="font-sans font-bold text-2xl tracking-tight text-[#16A34A]">
+                  PrivaCare
+                </h1>
+              </div>
             ) : (
               <h1 className="font-sans font-bold text-2xl tracking-tight text-primary">
                 {screen === 'products' ? 'Products' : screen === 'cart' ? 'My Cart' : 'Payment'}
@@ -229,13 +279,57 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2">
+          {screen === 'landing' && (
+            <>
+              {/* English / Hindi Switcher */}
+              <div className="flex bg-slate-100 rounded-full p-0.5 border border-slate-200 shadow-inner mr-1.5">
+                <button 
+                  onClick={() => setLang('en')}
+                  className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all cursor-pointer ${
+                    lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  EN
+                </button>
+                <button 
+                  onClick={() => setLang('hi')}
+                  className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all cursor-pointer ${
+                    lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                  }`}
+                >
+                  हिं
+                </button>
+              </div>
+
+              {/* Account Profile Circle Button */}
+              <button 
+                onClick={() => setAboutOpen(true)}
+                className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-secondary-container/50 transition-colors active:scale-95 text-[#16A34A] border border-[#d9e6dd]"
+              >
+                <span className="material-symbols-outlined text-[24px]">account_circle</span>
+              </button>
+            </>
+          )}
           {screen === 'products' && (
-            <button 
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="text-primary hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container"
-            >
-              <Search size={22} className="stroke-[2.5]" />
-            </button>
+            <>
+              <button 
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="text-primary hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container cursor-pointer"
+              >
+                <Search size={22} className="stroke-[2.5]" />
+              </button>
+              <button 
+                onClick={() => setScreen('cart')}
+                className="relative text-primary hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container cursor-pointer"
+              >
+                <ShoppingCart size={22} className="stroke-[2.5]" />
+                {getCartCount() > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-extrabold w-4 h-4 flex items-center justify-center rounded-full border border-white">
+                    {getCartCount()}
+                  </span>
+                )}
+              </button>
+            </>
           )}
         </div>
       </header>
@@ -268,8 +362,11 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col p-5 overflow-y-auto">
+      <main className={`flex-1 flex flex-col p-5 overflow-y-auto ${
+        (screen === 'products' && getCartCount() > 0) || (screen === 'cart' && cart.length > 0)
+          ? 'pb-36' 
+          : ''
+      }`}>
         <AnimatePresence mode="wait">
           
           {/* SCREEN 1: LANDING */}
@@ -282,116 +379,188 @@ export default function App() {
               transition={{ duration: 0.25 }}
               className="flex flex-col gap-6"
             >
-              {/* Hero Image Section */}
-              <div className="relative w-full rounded-[24px] overflow-hidden soft-shadow bg-white aspect-[43/28] group">
-                <img 
-                  alt="the Creator Lab Logo" 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  src={logoImg}
-                />
-                <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow-md">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="font-sans font-bold text-[11px] text-primary tracking-wider uppercase">24x7 Available</span>
+              {/* Hero Section */}
+              <section className="bg-gradient-to-tr from-[#F0FDF4] via-[#DCFCE7] to-white px-5 pt-8 pb-10 text-center rounded-[28px] overflow-hidden relative border border-emerald-100/50 shadow-sm flex flex-col items-center">
+                <div className="flex justify-center mb-6 relative z-10">
+                  {/* Vending Machine SVG */}
+                  <svg fill="none" height="130" viewBox="0 0 130 150" width="130" xmlns="http://www.w3.org/2000/svg">
+                    <rect fill="#16A34A" height="130" rx="12" width="80" x="25" y="10"></rect>
+                    <rect fill="#16A34A" height="15" rx="8" width="80" x="25" y="10"></rect>
+                    <circle cx="90" cy="40" fill="#22C55E" r="4"></circle>
+                    <circle cx="90" cy="52" fill="#22C55E" r="4"></circle>
+                    <rect fill="#064E3B" height="35" rx="6" width="45" x="35" y="35"></rect>
+                    {/* Heart Accent */}
+                    <path d="M57.5 58C57.5 58 54.5 54 51.5 54C48.5 54 47.5 56 47.5 57.5C47.5 59 49.5 61 57.5 65C65.5 61 67.5 59 67.5 57.5C67.5 56 66.5 54 63.5 54C60.5 54 57.5 58 57.5 58Z" fill="#10B981"></path>
+                    <rect fill="#064E3B" height="8" rx="4" width="50" x="40" y="110"></rect>
+                    {/* Leaf Accent */}
+                    <path d="M100 15C100 15 110 5 115 15C115 25 105 30 100 15Z" fill="#4ADE80"></path>
+                  </svg>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-5">
-                  <h2 className="font-sans font-extrabold text-2xl text-white leading-tight">Private Healthcare,<br/>Anytime.</h2>
+
+                <p className="font-bold text-[11px] tracking-[3px] text-[#16A34A] mb-3 uppercase">
+                  PRIVACARE
+                </p>
+                <h2 className="font-sans font-bold text-2xl text-[#0F172A] mb-2 leading-tight">
+                  {lang === 'en' ? 'Your Private Health Store' : 'आपका निजी स्वास्थ्य स्टोर'}
+                </h2>
+                <p className="font-sans text-sm text-[#6B7280] mb-6 max-w-[280px] mx-auto leading-relaxed">
+                  {lang === 'en' ? 'Buy health products anytime, privately, without talking to anyone.' : 'किसी से बात किए बिना, निजी तौर पर, कभी भी स्वास्थ्य उत्पाद खरीदें।'}
+                </p>
+
+                {/* Status Badges */}
+                <div className="flex justify-center gap-2 flex-wrap">
+                  <span className="px-3.5 py-1.5 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                    <span className="material-symbols-outlined text-[16px]">lock</span> {lang === 'en' ? 'Private' : 'निजी'}
+                  </span>
+                  <span className="px-3.5 py-1.5 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                    <span className="material-symbols-outlined text-[16px]">bolt</span> {lang === 'en' ? 'Instant' : 'तुरंत'}
+                  </span>
+                  <span className="px-3.5 py-1.5 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-xs font-semibold flex items-center gap-1.5 shadow-sm">
+                    <span className="material-symbols-outlined text-[16px]">spa</span> {lang === 'en' ? '24×7' : '२४×७'}
+                  </span>
+                </div>
+              </section>
+
+              {/* Get Started Card */}
+              <button 
+                onClick={() => setScreen('products')}
+                className="w-full bg-[#16A34A] hover:bg-[#15803d] text-white rounded-2xl p-4 shadow-lg shadow-emerald-700/10 active:scale-[0.97] transition-all group flex items-center justify-between"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center text-2xl">🛒</div>
+                  <div className="text-left font-sans">
+                    <p className="text-[18px] font-bold">{lang === 'en' ? 'Start Shopping' : 'खरीदारी शुरू करें'}</p>
+                    <p className="text-white/80 text-xs font-medium">{lang === 'en' ? 'Browse 20+ products' : '२०+ उत्पाद देखें'}</p>
+                  </div>
+                </div>
+                <span className="material-symbols-outlined transition-transform group-hover:translate-x-1">arrow_forward</span>
+              </button>
+
+              {/* How It Works Section */}
+              <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="h-px flex-1 bg-gray-100"></div>
+                  <h3 className="text-[11px] font-bold tracking-[2px] text-[#6B7280] uppercase">
+                    {lang === 'en' ? 'HOW IT WORKS' : 'यह कैसे काम करता है'}
+                  </h3>
+                  <div className="h-px flex-1 bg-gray-100"></div>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Step 1 */}
+                  <div className="flex gap-4 items-center">
+                    <div className="w-12 h-12 bg-[#FEF9C3] rounded-full flex-shrink-0 flex items-center justify-center text-xl">👆</div>
+                    <div className="text-left">
+                      <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
+                        {lang === 'en' ? 'Choose Products' : 'उत्पाद चुनें'}
+                      </h4>
+                      <p className="font-sans text-xs text-[#6B7280]">
+                        {lang === 'en' ? 'Browse menu and tap what you need.' : 'मेन्यू ब्राउज़ करें और अपनी ज़रूरत की चीज़ों पर टैप करें।'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 2 */}
+                  <div className="flex gap-4 items-center">
+                    <div className="w-12 h-12 bg-[#F0FDF4] rounded-full flex-shrink-0 flex items-center justify-center text-xl">💳</div>
+                    <div className="text-left">
+                      <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
+                        {lang === 'en' ? 'Pay with UPI' : 'UPI से भुगतान'}
+                      </h4>
+                      <p className="font-sans text-xs text-[#6B7280]">
+                        {lang === 'en' ? 'Scan the QR code with any UPI app.' : 'किसी भी UPI ऐप से QR कोड स्कैन करें।'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Step 3 */}
+                  <div className="flex gap-4 items-center">
+                    <div className="w-12 h-12 bg-[#EFF6FF] rounded-full flex-shrink-0 flex items-center justify-center text-xl">📦</div>
+                    <div className="text-left">
+                      <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
+                        {lang === 'en' ? 'Collect Your Items' : 'सामान प्राप्त करें'}
+                      </h4>
+                      <p className="font-sans text-xs text-[#6B7280]">
+                        {lang === 'en' ? 'The machine gives your items instantly.' : 'मशीन आपको तुरंत सामान प्रदान करती है।'}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* Subtext description */}
-              <p className="font-sans text-sm md:text-base text-on-surface-variant text-center px-4 leading-relaxed">
-                Purchase personal health and wellness products anonymously through the Creator Lab Smart Kiosk.
-              </p>
+              {/* Trust Section */}
+              <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                <h3 className="text-[11px] font-bold tracking-[2px] text-[#6B7280] mb-5 uppercase text-center">
+                  {lang === 'en' ? 'WHY TRUST PRIVACARE' : 'प्रिवाकेयर पर भरोसा क्यों करें'}
+                </h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
+                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">lock</span>
+                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Fully Private' : 'पूर्ण गोपनीय'}</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
+                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">schedule</span>
+                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Always Open' : 'हमेशा खुला'}</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
+                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">qr_code_2</span>
+                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Easy Payment' : 'आसान भुगतान'}</p>
+                  </div>
+                  <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
+                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">bolt</span>
+                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Super Fast' : 'अत्यधिक तेज़'}</p>
+                  </div>
+                </div>
+              </div>
 
-              {/* Browse Products CTA Button */}
-              <div className="flex flex-col gap-3">
+              {/* Products We Offer */}
+              <div>
+                <h3 className="text-[11px] font-bold tracking-[2px] text-[#6B7280] mb-4 uppercase text-center">
+                  {lang === 'en' ? 'PRODUCTS WE OFFER' : 'हमारे उत्पाद'}
+                </h3>
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
+                  {CATEGORIES.map((category, index) => {
+                    const count = PRODUCTS.filter(p => p.category === category).length;
+                    const emoji = category === "Women's Health" ? "🩸"
+                      : category === "Pregnancy" ? "🤰"
+                      : category === "Sexual Wellness" ? "💊"
+                      : category === "Hygiene" ? "🧴"
+                      : category === "First Aid" ? "🩹"
+                      : category === "Nutrition" ? "🍬"
+                      : "😷";
+                    return (
+                      <div 
+                        key={category}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setScreen('products');
+                        }}
+                        className={`flex items-center justify-between p-4 active:bg-gray-50 transition-colors cursor-pointer text-left ${
+                          index !== CATEGORIES.length - 1 ? 'border-b border-gray-50' : ''
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{emoji}</span>
+                          <span className="font-bold text-[15px] text-[#111827]">{category}</span>
+                        </div>
+                        <span className="text-[10px] bg-[#F0FDF4] text-[#16A34A] px-2.5 py-0.5 rounded-full font-bold uppercase">
+                          {count} {count === 1 ? (lang === 'en' ? 'item' : 'आइटम') : (lang === 'en' ? 'items' : 'आइटम्स')}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+                
                 <button 
                   onClick={() => setScreen('products')}
-                  className="w-full h-14 rounded-full bg-primary text-white font-sans font-bold text-base shadow-lg active-shadow hover:bg-primary-hover active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="mt-4 flex items-center justify-between w-full bg-[#F0FDF4] hover:bg-[#dcfce7] p-4 rounded-xl border border-[#BBF7D0] text-[#16A34A] font-bold active:scale-[0.97] transition-all"
                 >
-                  <ShoppingBag size={18} />
-                  Browse Products
+                  <span>{lang === 'en' ? 'View All Products' : 'सभी उत्पाद देखें'}</span>
+                  <span className="material-symbols-outlined">arrow_forward</span>
                 </button>
               </div>
 
-              {/* Why Choose Us */}
-              <div className="mt-4">
-                <h3 className="font-sans font-extrabold text-lg text-on-surface mb-3 tracking-tight">Why choose us</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col gap-2 items-start">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center text-primary">
-                      <EyeOff size={20} className="stroke-[2.5]" />
-                    </div>
-                    <h4 className="font-sans font-bold text-[15px] text-on-surface">Anonymous</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-normal">No tracking. Complete isolation of your medical transaction records.</p>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col gap-2 items-start">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center text-primary">
-                      <Check size={20} className="stroke-[2.5]" />
-                    </div>
-                    <h4 className="font-sans font-bold text-[15px] text-on-surface">Touchless</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-normal">Hygienic use. Conduct purchase on your screen, collect directly.</p>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col gap-2 items-start">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center text-primary">
-                      <QrCode size={20} className="stroke-[2.5]" />
-                    </div>
-                    <h4 className="font-sans font-bold text-[15px] text-on-surface">UPI &amp; QR</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-normal">Fast, secure payments. Instant scan code and pick.</p>
-                  </div>
-
-                  <div className="bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col gap-2 items-start">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100/80 flex items-center justify-center text-primary">
-                      <Clock size={20} className="stroke-[2.5]" />
-                    </div>
-                    <h4 className="font-sans font-bold text-[15px] text-on-surface">Real-Time</h4>
-                    <p className="font-sans text-xs text-on-surface-variant leading-normal">Always accurate. Showing live dispenser inventory of products.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* How It Works */}
-              <div className="bg-white p-5 rounded-[24px] soft-shadow border border-slate-100">
-                <h3 className="font-sans font-extrabold text-lg text-on-surface mb-4 tracking-tight">How It Works</h3>
-                <div className="relative pl-6 border-l-2 border-emerald-100 flex flex-col gap-5">
-                  <div className="relative">
-                    <span className="absolute -left-[35px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">1</span>
-                    <h4 className="font-sans font-bold text-sm text-on-surface">Scan QR</h4>
-                    <p className="font-sans text-xs text-on-surface-variant">Start your session anonymously at the physical kiosk kiosk screen.</p>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute -left-[35px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">2</span>
-                    <h4 className="font-sans font-bold text-sm text-on-surface">Select</h4>
-                    <p className="font-sans text-xs text-on-surface-variant">Choose your medical products on your own phone or kiosk screen.</p>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute -left-[35px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">3</span>
-                    <h4 className="font-sans font-bold text-sm text-on-surface">Pay</h4>
-                    <p className="font-sans text-xs text-on-surface-variant">Secure touchless mobile payment (UPI, cards, or digital wallets).</p>
-                  </div>
-                  <div className="relative">
-                    <span className="absolute -left-[35px] top-0 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shadow-sm">4</span>
-                    <h4 className="font-sans font-bold text-sm text-on-surface">Collect</h4>
-                    <p className="font-sans text-xs text-on-surface-variant">Your items dispense instantly in the kiosk's private pick-up tray.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Trust Section Badges */}
-              <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
-                <div className="min-w-[170px] flex-1 bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col items-center text-center">
-                  <span className="text-3xl mb-2">🔒</span>
-                  <h4 className="font-sans font-bold text-sm text-on-surface">100% Secure</h4>
-                  <span className="mt-1.5 px-3 py-0.5 bg-emerald-100 text-primary text-[10px] font-bold rounded-full uppercase tracking-wide">Encrypted</span>
-                </div>
-                <div className="min-w-[170px] flex-1 bg-white p-4 rounded-[20px] soft-shadow border border-slate-100 flex flex-col items-center text-center">
-                  <span className="text-3xl mb-2">🛡️</span>
-                  <h4 className="font-sans font-bold text-sm text-on-surface">Total Privacy</h4>
-                  <span className="mt-1.5 px-3 py-0.5 bg-emerald-100 text-primary text-[10px] font-bold rounded-full uppercase tracking-wide">Verified</span>
-                </div>
-              </div>
+              <div className="h-4" />
             </motion.div>
           )}
 
@@ -823,110 +992,151 @@ export default function App() {
       </main>
 
       {/* STICKY BOTTOM ACTIONS ROW */}
-      <div className="fixed bottom-0 left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-outline-variant/10 px-5 py-4 pb-safe flex justify-center shadow-lg rounded-t-3xl max-w-[430px] mx-auto">
-        <div className="w-full flex flex-col gap-2">
-          
-          {/* Landing Bottom Action: Start Shopping */}
-          {screen === 'landing' && (
-            <button 
-              onClick={() => setScreen('products')}
-              className="w-full h-14 rounded-full bg-primary text-white font-sans font-bold text-base shadow-lg active-shadow hover:bg-primary-hover active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <ShoppingBag size={18} />
-              Start Shopping
-            </button>
-          )}
+      {((screen === 'products' && getCartCount() > 0) || 
+        (screen === 'cart' && cart.length > 0) || 
+        (screen === 'payment' && !paymentProcessing)) && (
+        <div className={`fixed ${screen === 'payment' ? 'bottom-0' : 'bottom-16'} left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-outline-variant/10 px-5 py-4 pb-safe flex justify-center shadow-lg rounded-t-3xl max-w-[430px] mx-auto`}>
+          <div className="w-full flex flex-col gap-2">
 
-          {/* Catalog Bottom Action: Checkout Summary Pill */}
-          {screen === 'products' && getCartCount() > 0 && (
-            <motion.div 
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 20, opacity: 0 }}
-              className="w-full flex items-center justify-between"
-            >
-              <div className="flex flex-col">
-                <div className="flex items-center text-on-surface-variant text-xs gap-1 font-bold">
-                  <ShoppingBag size={13} className="text-primary" />
-                  {getCartCount()} items
+            {/* Catalog Bottom Action: Checkout Summary Pill */}
+            {screen === 'products' && getCartCount() > 0 && (
+              <motion.div 
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: 20, opacity: 0 }}
+                className="w-full flex items-center justify-between"
+              >
+                <div className="flex flex-col">
+                  <div className="flex items-center text-on-surface-variant text-xs gap-1 font-bold">
+                    <ShoppingBag size={13} className="text-primary" />
+                    {getCartCount()} items
+                  </div>
+                  <div className="font-sans font-extrabold text-lg text-on-surface">
+                    Total: ₹{getCartTotal()}
+                  </div>
                 </div>
-                <div className="font-sans font-extrabold text-lg text-on-surface">
-                  Total: ₹{getCartTotal()}
+                <button 
+                  onClick={() => setScreen('cart')}
+                  className="bg-primary text-white px-6 py-3 rounded-2xl font-sans font-bold text-sm flex items-center gap-2 active-shadow hover:bg-primary-hover active:scale-95 transition-all cursor-pointer shadow-md"
+                >
+                  Proceed to Pay
+                  <ChevronRight size={16} />
+                </button>
+              </motion.div>
+            )}
+
+            {/* Cart Bottom Action: Proceed to Payment */}
+            {screen === 'cart' && cart.length > 0 && (
+              <div className="w-full flex flex-col gap-2">
+                <button 
+                  onClick={() => {
+                    setUpiId('anonymous@gpay');
+                    setScreen('payment');
+                  }}
+                  className="w-full h-14 rounded-2xl bg-primary text-white font-sans font-bold text-base shadow-lg active-shadow hover:bg-primary-hover active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  Proceed to Payment
+                  <ChevronRight size={18} />
+                </button>
+                <div className="flex items-center justify-center gap-1 text-[11px] text-on-surface-variant font-medium">
+                  <Lock size={12} className="text-primary" />
+                  Secure &amp; Anonymous Payment
                 </div>
               </div>
+            )}
+
+            {/* Payment Screen: back to home */}
+            {screen === 'payment' && !paymentProcessing && (
               <button 
                 onClick={() => setScreen('cart')}
-                className="bg-primary text-white px-6 py-3 rounded-2xl font-sans font-bold text-sm flex items-center gap-2 active-shadow hover:bg-primary-hover active:scale-95 transition-all cursor-pointer shadow-md"
+                className="w-full h-12 rounded-2xl bg-slate-100 text-on-surface font-sans font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-200"
               >
-                Proceed to Pay
-                <ChevronRight size={16} />
+                Back to Cart
               </button>
-            </motion.div>
-          )}
-
-          {/* Cart Bottom Action: Proceed to Payment */}
-          {screen === 'cart' && cart.length > 0 && (
-            <div className="w-full flex flex-col gap-2">
-              <button 
-                onClick={() => {
-                  setUpiId('anonymous@gpay');
-                  setScreen('payment');
-                }}
-                className="w-full h-14 rounded-2xl bg-primary text-white font-sans font-bold text-base shadow-lg active-shadow hover:bg-primary-hover active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Proceed to Payment
-                <ChevronRight size={18} />
-              </button>
-              <div className="flex items-center justify-center gap-1 text-[11px] text-on-surface-variant font-medium">
-                <Lock size={12} className="text-primary" />
-                Secure &amp; Anonymous Payment
-              </div>
-            </div>
-          )}
-
-          {/* Payment Screen: back to home */}
-          {screen === 'payment' && !paymentProcessing && (
-            <button 
-              onClick={() => setScreen('cart')}
-              className="w-full h-12 rounded-2xl bg-slate-100 text-on-surface font-sans font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-200"
-            >
-              Back to Cart
-            </button>
-          )}
-
-        </div>
-      </div>
-
-      {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION (only on screens other than landing/payment for high fidelity) */}
-      {screen !== 'landing' && screen !== 'payment' && (
-        <div className="fixed bottom-0 left-0 right-0 w-full max-w-[430px] mx-auto z-30 bg-white border-t border-slate-100 flex justify-around items-center h-20 px-4 pb-safe md:hidden shadow-inner">
-          <button 
-            onClick={() => setScreen('landing')}
-            className={`flex flex-col items-center justify-center transition-all w-16 ${screen === 'landing' ? 'text-primary scale-105 font-bold' : 'text-slate-400'}`}
-          >
-            <span className="text-xl mb-0.5">🏠</span>
-            <span className="text-[10px]">Home</span>
-          </button>
-          <button 
-            onClick={() => { setScreen('products'); setSelectedCategory("Women's Health"); }}
-            className={`flex flex-col items-center justify-center transition-all w-16 ${screen === 'products' ? 'text-primary scale-105 font-bold' : 'text-slate-400'}`}
-          >
-            <span className="text-xl mb-0.5">🛍️</span>
-            <span className="text-[10px]">Catalog</span>
-          </button>
-          <button 
-            onClick={() => setScreen('cart')}
-            className={`relative flex flex-col items-center justify-center transition-all w-16 ${screen === 'cart' ? 'text-primary scale-105 font-bold' : 'text-slate-400'}`}
-          >
-            <span className="text-xl mb-0.5">🛒</span>
-            <span className="text-[10px]">Cart</span>
-            {getCartCount() > 0 && (
-              <span className="absolute top-1 right-2 bg-primary text-white text-[9px] font-bold w-4 h-4 flex items-center justify-center rounded-full">
-                {getCartCount()}
-              </span>
             )}
-          </button>
+
+          </div>
         </div>
+      )}
+
+      {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION */}
+      {screen !== 'payment' && (
+        <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
+          {/* Home */}
+          <button 
+            onClick={() => { setScreen('landing'); setAboutOpen(false); }}
+            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+          >
+            {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#16A34A] rounded-b-full"></div>}
+            <span className={`material-symbols-outlined text-[24px] mb-0.5 ${screen === 'landing' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>home</span>
+            <span className={`text-[10px] font-bold ${screen === 'landing' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>
+              {lang === 'en' ? 'Home' : 'होम'}
+            </span>
+          </button>
+
+          {/* Products */}
+          <button 
+            onClick={() => { setScreen('products'); setAboutOpen(false); }}
+            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+          >
+            {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#16A34A] rounded-b-full"></div>}
+            <span className={`material-symbols-outlined text-[24px] mb-0.5 ${screen === 'products' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>grid_view</span>
+            <span className={`text-[10px] font-bold ${screen === 'products' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>
+              {lang === 'en' ? 'Products' : 'उत्पाद'}
+            </span>
+          </button>
+
+          {/* Cart */}
+          <button 
+            onClick={() => { setScreen('cart'); setAboutOpen(false); }}
+            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+          >
+            {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#16A34A] rounded-b-full"></div>}
+            <div className="relative mb-0.5">
+              <span className={`material-symbols-outlined text-[24px] ${screen === 'cart' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>shopping_cart</span>
+              {getCartCount() > 0 && (
+                <span className="absolute -top-1 -right-1.5 bg-red-500 text-white text-[8px] font-black w-4.5 h-4.5 flex items-center justify-center rounded-full border border-white">
+                  {getCartCount()}
+                </span>
+              )}
+            </div>
+            <span className={`text-[10px] font-bold ${screen === 'cart' ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>
+              {lang === 'en' ? 'Cart' : 'कार्ट'}
+            </span>
+          </button>
+
+          {/* Pay */}
+          <button 
+            onClick={() => {
+              if (cart.length > 0) {
+                setUpiId('anonymous@gpay');
+                setScreen('payment');
+              } else {
+                setSelectedCategory("Women's Health");
+                setScreen('products');
+              }
+              setAboutOpen(false);
+            }}
+            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[#9CA3AF] text-[24px] mb-0.5 hover:text-[#6B7280]">qr_code_scanner</span>
+            <span className="text-[10px] font-bold text-[#9CA3AF]">
+              {lang === 'en' ? 'Pay' : 'भुगतान'}
+            </span>
+          </button>
+
+          {/* About */}
+          <button 
+            onClick={() => setAboutOpen(true)}
+            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+          >
+            {aboutOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#16A34A] rounded-b-full"></div>}
+            <span className={`material-symbols-outlined text-[24px] mb-0.5 ${aboutOpen ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>info</span>
+            <span className={`text-[10px] font-bold ${aboutOpen ? 'text-[#16A34A]' : 'text-[#9CA3AF]'}`}>
+              {lang === 'en' ? 'About' : 'विवरण'}
+            </span>
+          </button>
+        </nav>
       )}
 
 
@@ -959,21 +1169,107 @@ export default function App() {
                 </button>
               </div>
               <div className="text-sm text-on-surface-variant flex flex-col gap-3">
-                <p>Welcome to <strong>the Creator Lab Smart Kiosk</strong>! Follow these steps to purchase products anonymously:</p>
-                <ol className="list-decimal pl-5 space-y-1.5">
+                <p>Welcome to <strong>PrivaCare Smart Kiosk</strong>! Follow these steps to purchase products anonymously:</p>
+                <ol className="list-decimal pl-5 space-y-1.5 text-left">
                   <li>Tap <strong>Start Shopping</strong> to browse our catalog.</li>
                   <li>Add your desired products to your cart.</li>
                   <li>Verify your cart items and proceed to payment.</li>
                   <li>Scan the QR code and pay using any UPI application (GPay, Paytm, etc.).</li>
                   <li>Your products will dispense immediately from the physical tray below.</li>
                 </ol>
-                <p className="text-xs text-primary font-semibold mt-1">🔒 Your privacy is 100% guaranteed. No logs or card records are stored.</p>
+                <p className="text-xs text-primary font-semibold mt-1 text-left">🔒 Your privacy is 100% guaranteed. No logs or card records are stored.</p>
               </div>
               <button 
                 onClick={() => setGuideOpen(false)}
                 className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary-hover active:scale-[0.98] transition-all"
               >
                 Got it, thanks!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ABOUT MODAL (BOTTOM SHEET) */}
+      <AnimatePresence>
+        {aboutOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm z-[999] flex flex-col justify-end"
+          >
+            {/* Backdrop click listener */}
+            <div className="absolute inset-0" onClick={() => setAboutOpen(false)} />
+            
+            {/* Sheet Content */}
+            <motion.div 
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
+              className="bg-white w-full rounded-t-3xl shadow-2xl relative z-10 p-6 pb-8 border-t border-gray-100 flex flex-col gap-5 text-left"
+            >
+              {/* Drag Handle */}
+              <div className="w-full flex justify-center cursor-pointer" onClick={() => setAboutOpen(false)}>
+                <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
+              </div>
+
+              <div>
+                <h3 className="text-xl font-bold text-[#111827]">
+                  {lang === 'en' ? 'About PrivaCare' : 'प्रिवाकेयर के बारे में'}
+                </h3>
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100/50">
+                  <span className="material-symbols-outlined text-[#16A34A] text-2xl mt-0.5">shield_lock</span>
+                  <div className="text-left font-sans">
+                    <h4 className="font-bold text-sm text-[#111827]">
+                      {lang === 'en' ? '100% Confidential' : '100% गोपनीय'}
+                    </h4>
+                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
+                      {lang === 'en' 
+                        ? 'We never share your purchase history or identity details.' 
+                        : 'हम कभी भी आपकी खरीद का इतिहास या पहचान विवरण साझा नहीं करते हैं।'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100/50">
+                  <span className="material-symbols-outlined text-[#16A34A] text-2xl mt-0.5">verified</span>
+                  <div className="text-left font-sans">
+                    <h4 className="font-bold text-sm text-[#111827]">
+                      {lang === 'en' ? 'Genuine Products' : 'असली उत्पाद'}
+                    </h4>
+                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
+                      {lang === 'en' 
+                        ? 'All items are sourced directly from authorized medical distributors.' 
+                        : 'सभी वस्तुएं सीधे अधिकृत चिकित्सा वितरकों से प्राप्त की जाती हैं।'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100/50">
+                  <span className="material-symbols-outlined text-[#16A34A] text-2xl mt-0.5">support_agent</span>
+                  <div className="text-left font-sans">
+                    <h4 className="font-bold text-sm text-[#111827]">
+                      {lang === 'en' ? '24/7 Support' : '24/7 सहायता'}
+                    </h4>
+                    <p className="text-xs text-[#6B7280] mt-1 leading-relaxed">
+                      {lang === 'en' 
+                        ? 'Need help? Email us at support@privacare.in' 
+                        : 'सहायता चाहिए? हमें support@privacare.in पर ईमेल करें।'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button 
+                onClick={() => setAboutOpen(false)}
+                className="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-[#4B5563] font-bold py-3 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm font-sans"
+              >
+                {lang === 'en' ? 'Close' : 'बंद करें'}
               </button>
             </motion.div>
           </motion.div>
