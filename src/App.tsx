@@ -22,6 +22,7 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { PRODUCTS, CATEGORIES } from './data';
 import { Product, CartItem, ScreenType } from './types';
+import logoImg from '@/assets/creator_lab_logo.jpg';
 
 export default function App() {
   // Navigation & Cart States
@@ -52,6 +53,28 @@ export default function App() {
   const [paymentProcessing, setPaymentSuccess] = useState<boolean>(false);
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(5);
+
+  // Custom states for Digital Clock and Guide modal
+  const [time, setTime] = useState<string>('');
+  const [guideOpen, setGuideOpen] = useState<boolean>(false);
+
+  // Clock Effect
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12;
+      hours = hours ? hours : 12; // 0 should be 12
+      const hoursStr = String(hours).padStart(2, '0');
+      setTime(`${hoursStr}:${minutes}:${seconds} ${ampm}`);
+    };
+    updateClock();
+    const interval = setInterval(updateClock, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Cart operations
   const addToCart = (product: Product) => {
@@ -150,8 +173,33 @@ export default function App() {
   return (
     <div className="w-full max-w-[430px] min-h-screen bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-outline-variant/30 my-0 md:my-6 pb-20">
       
+      {/* BLACK DYNAMIC ISLAND NOTCH */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-6 bg-[#1f2022] rounded-b-xl flex items-center justify-center gap-1.5 z-50">
+        <div className="w-2 h-2 rounded-full bg-[#111] shadow-[inset_0_1px_1px_rgba(0,0,0,0.5)]"></div>
+        <div className="w-1.5 h-1.5 rounded-full bg-[#10b981]"></div>
+      </div>
+
+      {/* FLOATING GREEN SAGE STATUS BAR */}
+      <div className="mx-4 mt-7 mb-2 bg-[#c9d9cb] border border-[#b7c6b9] rounded-2xl px-4 py-2.5 flex items-center justify-between shadow-sm z-40">
+        <div className="flex items-center gap-1.5 font-mono font-bold text-xs text-[#2d3e30]">
+          <Clock size={14} className="text-[#2d3e30] stroke-[2.5]" />
+          <span>{time || '11:10:05 AM'}</span>
+        </div>
+        <button 
+          onClick={() => setGuideOpen(true)}
+          className="bg-[#b7c6b9]/40 border border-[#aab9ad] text-[#2d3e30] rounded-full px-3 py-1 text-[11px] font-bold flex items-center gap-1 hover:bg-[#b7c6b9]/60 active:scale-95 transition-all cursor-pointer"
+        >
+          <svg className="w-3.5 h-3.5 stroke-[2.5]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          GUIDE
+        </button>
+      </div>
+
       {/* HEADER BAR */}
-      <header className="w-full pt-5 pb-4 px-5 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-outline-variant/20 flex items-center justify-between transition-all">
+      <header className="w-full pt-3 pb-4 px-5 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-outline-variant/20 flex items-center justify-between transition-all">
         <div className="flex items-center gap-3">
           {screen !== 'landing' && (
             <button 
@@ -165,9 +213,19 @@ export default function App() {
               <ArrowLeft size={22} className="stroke-[2.5px]" />
             </button>
           )}
-          <h1 className="font-sans font-bold text-2xl tracking-tight text-primary">
-            {screen === 'landing' ? 'HealthKiosk' : screen === 'products' ? 'Products' : screen === 'cart' ? 'My Cart' : 'Payment'}
-          </h1>
+          
+          <div className="flex items-center gap-2">
+            {screen === 'landing' ? (
+              <>
+                <img src={logoImg} className="w-8 h-8 rounded-lg object-cover border border-outline-variant/20" alt="Logo" />
+                <span className="font-sans font-bold text-xl tracking-tight text-primary">the Creator Lab</span>
+              </>
+            ) : (
+              <h1 className="font-sans font-bold text-2xl tracking-tight text-primary">
+                {screen === 'products' ? 'Products' : screen === 'cart' ? 'My Cart' : 'Payment'}
+              </h1>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
@@ -177,20 +235,6 @@ export default function App() {
               className="text-primary hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container"
             >
               <Search size={22} className="stroke-[2.5]" />
-            </button>
-          )}
-          
-          {screen !== 'payment' && (
-            <button 
-              onClick={() => setScreen('cart')}
-              className="relative text-primary hover:opacity-80 transition-opacity active:scale-90 p-2 rounded-full hover:bg-secondary-container"
-            >
-              <ShoppingCart size={22} className="stroke-[2.5]" />
-              {getCartCount() > 0 && (
-                <span className="absolute top-0 right-0 bg-primary-container text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full border-2 border-white animate-bounce-short">
-                  {getCartCount()}
-                </span>
-              )}
             </button>
           )}
         </div>
@@ -241,10 +285,9 @@ export default function App() {
               {/* Hero Image Section */}
               <div className="relative w-full rounded-[24px] overflow-hidden soft-shadow bg-white aspect-[43/28] group">
                 <img 
-                  alt="Sleek, futuristic white health kiosk with glowing green screen" 
+                  alt="the Creator Lab Logo" 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwcAvwTGZGw-NDfrNOve3LtOR9faug4f51RrMtlJcvppaSsNFXpCwAGkV1j--rDR6Ns8H6EAz8LyOA7p0LEMhcnIdEmVlekzdpofroK65dR8Z2SyweKVXrjuFIypicpUVmSKGym2q7mu9G7Hb_S6_-VLDVr8InXFXTobGkuq1zgm6hOPF4f3tHOHdUUFqeJwnOVblagE7gE93_u2-NZPTxEr14en6l8pwJD6oMOzUz7-2stw6IA3qzcmF3sqUgQwBGBG98g2DKKE-y"
-                  referrerPolicy="no-referrer"
+                  src={logoImg}
                 />
                 <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5 shadow-md">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -257,7 +300,7 @@ export default function App() {
 
               {/* Subtext description */}
               <p className="font-sans text-sm md:text-base text-on-surface-variant text-center px-4 leading-relaxed">
-                Purchase personal health and wellness products anonymously through our Smart Privacy Health Kiosk.
+                Purchase personal health and wellness products anonymously through the Creator Lab Smart Kiosk.
               </p>
 
               {/* Browse Products CTA Button */}
@@ -887,6 +930,55 @@ export default function App() {
       )}
 
 
+
+      {/* GUIDE MODAL */}
+      <AnimatePresence>
+        {guideOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl p-6 w-full max-w-[380px] shadow-2xl border border-outline-variant/30 flex flex-col gap-4"
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">📖</span>
+                  <h3 className="font-sans font-bold text-lg text-primary">Kiosk Guide</h3>
+                </div>
+                <button 
+                  onClick={() => setGuideOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 font-bold text-lg p-1"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="text-sm text-on-surface-variant flex flex-col gap-3">
+                <p>Welcome to <strong>the Creator Lab Smart Kiosk</strong>! Follow these steps to purchase products anonymously:</p>
+                <ol className="list-decimal pl-5 space-y-1.5">
+                  <li>Tap <strong>Start Shopping</strong> to browse our catalog.</li>
+                  <li>Add your desired products to your cart.</li>
+                  <li>Verify your cart items and proceed to payment.</li>
+                  <li>Scan the QR code and pay using any UPI application (GPay, Paytm, etc.).</li>
+                  <li>Your products will dispense immediately from the physical tray below.</li>
+                </ol>
+                <p className="text-xs text-primary font-semibold mt-1">🔒 Your privacy is 100% guaranteed. No logs or card records are stored.</p>
+              </div>
+              <button 
+                onClick={() => setGuideOpen(false)}
+                className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary-hover active:scale-[0.98] transition-all"
+              >
+                Got it, thanks!
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
     </div>
   );
