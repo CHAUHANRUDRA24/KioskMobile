@@ -2,194 +2,268 @@ import { Product } from './types';
 
 export const CATEGORIES = [
   "Women's Health",
-  "Pregnancy",
+  "Pregnancy & Fertility",
   "Sexual Wellness",
-  "Hygiene",
-  "First Aid",
-  "Nutrition",
-  "Essentials"
+  "Hygiene & Personal Care",
+  "First Aid & Emergency",
+  "Health & Nutrition",
+  "Travel & Convenience"
 ];
 
 export const PRODUCTS: Product[] = [
-  // Women's Health (6 items)
+  // Women's Health
   {
     id: 'w1',
+    idCode: 'WOMEN-01',
     name: 'Regular Sanitary Pad',
-    price: 15,
+    price: 150,
     category: "Women's Health",
     imageEmoji: '🩸',
-    type: 'fluid'
+    type: 'fluid',
+    description: 'Soft & comfortable protection',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 'w2',
+    idCode: 'WOMEN-02',
     name: 'XL Sanitary Pad',
-    price: 20,
+    price: 180,
     category: "Women's Health",
     imageEmoji: '🩸',
-    type: 'fluid'
+    type: 'fluid',
+    description: 'Extra long night protection',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 'w3',
-    name: 'Painkiller Meftal-Spas',
-    price: 30,
+    idCode: 'WOMEN-03',
+    name: 'Overnight Sanitary Pad',
+    price: 220,
     category: "Women's Health",
-    imageEmoji: '💊',
-    type: 'pill'
+    imageEmoji: '🩸',
+    type: 'fluid',
+    description: 'All-night peaceful sleep',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 'w4',
-    name: 'Menstrual Cup',
-    price: 120,
+    idCode: 'WOMEN-04',
+    name: 'Tampon',
+    price: 280,
     category: "Women's Health",
     imageEmoji: '🩸',
-    type: 'fluid'
+    type: 'fluid',
+    description: 'Super active comfortable leak-lock',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 'w5',
-    name: 'Panty Liners (Pack of 20)',
-    price: 75,
+    idCode: 'WOMEN-05',
+    name: 'Heating patch',
+    price: 120,
     category: "Women's Health",
-    imageEmoji: '🩸',
-    type: 'fluid'
+    imageEmoji: '🩹',
+    type: 'other',
+    description: 'Fast menstrual cramp relief',
+    stockStatus: 'LOW STOCK'
   },
   {
     id: 'w6',
-    name: 'Menstrual Relief Patch',
-    price: 110,
+    idCode: 'WOMEN-06',
+    name: 'Menstrual Cup',
+    price: 350,
     category: "Women's Health",
-    imageEmoji: '🩹',
-    type: 'other'
+    imageEmoji: '🩸',
+    type: 'fluid',
+    description: 'Reusable eco-friendly protection',
+    stockStatus: 'IN STOCK'
   },
 
-  // Pregnancy (2 items)
+  // Pregnancy & Fertility
   {
     id: 'p1',
-    name: 'Pregnancy Detection Kit',
-    price: 50,
-    category: 'Pregnancy',
+    idCode: 'PREG-01',
+    name: 'Pregnancy Test Kit',
+    price: 60,
+    category: 'Pregnancy & Fertility',
     imageEmoji: '🧪',
-    type: 'other'
+    type: 'other',
+    description: '99% accurate instant results',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 'p2',
-    name: 'Folic Acid Tablets',
-    price: 90,
-    category: 'Pregnancy',
-    imageEmoji: '💊',
-    type: 'pill'
+    idCode: 'PREG-02',
+    name: 'Ovulation Test Strip',
+    price: 50,
+    category: 'Pregnancy & Fertility',
+    imageEmoji: '🧪',
+    type: 'other',
+    description: 'Track your fertility window',
+    stockStatus: 'IN STOCK'
   },
 
-  // Sexual Wellness (4 items)
+  // Sexual Wellness
   {
     id: 's1',
-    name: 'Condoms (Pack of 3)',
+    idCode: 'SEX-01',
+    name: 'Condom Pack (3 pcs)',
     price: 40,
     category: 'Sexual Wellness',
     imageEmoji: '🛡️',
-    type: 'other'
+    type: 'other',
+    description: 'Ultra-thin premium protection',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 's2',
-    name: 'Emergency Contraceptive Pill',
-    price: 110,
+    idCode: 'SEX-02',
+    name: 'Flavoured Condom - Strawberry',
+    price: 50,
     category: 'Sexual Wellness',
-    imageEmoji: '💊',
-    type: 'pill'
+    imageEmoji: '🍓',
+    type: 'other',
+    description: 'Sweet strawberry fragrance',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 's3',
-    name: 'Personal Lubricant',
-    price: 150,
+    idCode: 'SEX-03',
+    name: 'Flavoured Condom - Chocolate',
+    price: 50,
     category: 'Sexual Wellness',
-    imageEmoji: '🧪',
-    type: 'other'
+    imageEmoji: '🍫',
+    type: 'other',
+    description: 'Rich chocolate flavour',
+    stockStatus: 'IN STOCK'
   },
   {
     id: 's4',
-    name: 'Female Condoms (Pack of 3)',
-    price: 90,
+    idCode: 'SEX-04',
+    name: 'Water-Based Lubricant',
+    price: 150,
     category: 'Sexual Wellness',
-    imageEmoji: '🛡️',
-    type: 'other'
+    imageEmoji: '🧪',
+    type: 'other',
+    description: 'Smooth silk long-lasting lube',
+    stockStatus: 'IN STOCK'
   },
 
-  // Hygiene (2 items)
+  // Hygiene & Personal Care
   {
-    id: 'h1',
-    name: 'Hand Sanitizer',
-    price: 30,
-    category: 'Hygiene',
-    imageEmoji: '🧴',
-    type: 'spray'
-  },
-  {
-    id: 'h2',
-    name: 'Wet Wipes (Pack of 15)',
-    price: 45,
-    category: 'Hygiene',
+    id: 'hc1',
+    idCode: 'HYG-01',
+    name: 'Wet Wipes Pack',
+    price: 35,
+    category: 'Hygiene & Personal Care',
     imageEmoji: '🧻',
-    type: 'other'
+    type: 'other',
+    description: 'Gentle refreshing wet wipes',
+    stockStatus: 'IN STOCK'
+  },
+  {
+    id: 'hc2',
+    idCode: 'HYG-02',
+    name: 'Tissue Pack',
+    price: 20,
+    category: 'Hygiene & Personal Care',
+    imageEmoji: '🧻',
+    type: 'other',
+    description: 'Soft 3-ply pocket tissue',
+    stockStatus: 'IN STOCK'
   },
 
-  // First Aid (3 items)
+  // First Aid & Emergency
   {
-    id: 'f1',
-    name: 'Emergency Bandages',
+    id: 'fa1',
+    idCode: 'AID-01',
+    name: 'Band-Aid Pack',
     price: 25,
-    category: 'First Aid',
+    category: 'First Aid & Emergency',
     imageEmoji: '🩹',
-    type: 'other'
+    type: 'other',
+    description: 'Flexible waterproof bandages',
+    stockStatus: 'IN STOCK'
   },
   {
-    id: 'f2',
-    name: 'Antiseptic Liquid',
-    price: 60,
-    category: 'First Aid',
-    imageEmoji: '🧴',
-    type: 'other'
+    id: 'fa2',
+    idCode: 'AID-02',
+    name: 'Antiseptic Wipe',
+    price: 15,
+    category: 'First Aid & Emergency',
+    imageEmoji: '🧼',
+    type: 'other',
+    description: 'Quick wound cleaning wipes',
+    stockStatus: 'IN STOCK'
   },
   {
-    id: 'f3',
-    name: 'Pain Relief Spray',
-    price: 140,
-    category: 'First Aid',
-    imageEmoji: '💨',
-    type: 'spray'
+    id: 'fa3',
+    idCode: 'AID-03',
+    name: 'Gauze Pad',
+    price: 30,
+    category: 'First Aid & Emergency',
+    imageEmoji: '🩹',
+    type: 'other',
+    description: 'Sterile absorbent cotton pads',
+    stockStatus: 'IN STOCK'
+  },
+  {
+    id: 'fa4',
+    idCode: 'AID-04',
+    name: 'Soframycin',
+    price: 45,
+    category: 'First Aid & Emergency',
+    imageEmoji: '🧪',
+    type: 'other',
+    description: 'Antibacterial skin ointment',
+    stockStatus: 'IN STOCK'
   },
 
-  // Nutrition (1 item)
+  // Health & Nutrition
   {
     id: 'n1',
-    name: 'Multivitamin Gummies',
-    price: 150,
-    category: 'Nutrition',
+    idCode: 'NUT-01',
+    name: 'Glucose Tablet',
+    price: 40,
+    category: 'Health & Nutrition',
     imageEmoji: '🍬',
-    type: 'pill'
+    type: 'pill',
+    description: 'Instant energy chewable tablets',
+    stockStatus: 'IN STOCK'
   },
 
-  // Essentials (3 items)
+  // Travel & Convenience
   {
-    id: 'e1',
-    name: 'Face Mask (Pack of 5)',
-    price: 50,
-    category: 'Essentials',
-    imageEmoji: '😷',
-    type: 'other'
+    id: 'tc1',
+    idCode: 'TRAV-01',
+    name: 'Disposable Razor',
+    price: 25,
+    category: 'Travel & Convenience',
+    imageEmoji: '🪒',
+    type: 'other',
+    description: 'Smooth glide dual-blade razor',
+    stockStatus: 'IN STOCK'
   },
   {
-    id: 'e2',
-    name: 'Digital Thermometer',
-    price: 220,
-    category: 'Essentials',
-    imageEmoji: '🌡️',
-    type: 'other'
+    id: 'tc2',
+    idCode: 'TRAV-02',
+    name: 'Hand Sanitizer',
+    price: 30,
+    category: 'Travel & Convenience',
+    imageEmoji: '🧴',
+    type: 'spray',
+    description: 'Kills 99.9% germs on-the-go',
+    stockStatus: 'IN STOCK'
   },
   {
-    id: 'e3',
-    name: 'Disposable Gloves (Pair)',
-    price: 15,
-    category: 'Essentials',
-    imageEmoji: '🧤',
-    type: 'other'
+    id: 'tc3',
+    idCode: 'BAG-01',
+    name: 'Discreet Packing Bag',
+    price: 5,
+    category: 'Travel & Convenience',
+    imageEmoji: '🛍️',
+    type: 'other',
+    description: 'Eco-friendly opaque carry bag',
+    stockStatus: 'IN STOCK'
   }
 ];

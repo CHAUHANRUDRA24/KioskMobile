@@ -23,10 +23,12 @@
   --color-error-container: #ffdad6;
 }
 
-body {
+html, body {
   background-color: #F0FDF4;
   font-family: "Manrope", sans-serif;
   color: #0b1c30;
+  overflow: hidden;
+  height: 100%;
 }
 
 .glass-panel {
