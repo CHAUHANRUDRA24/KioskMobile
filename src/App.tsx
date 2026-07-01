@@ -428,71 +428,43 @@ export default function App() {
           )}
           
           <div className="flex items-center gap-2 min-w-0">
-            {screen === 'landing' ? (
-              <div className="flex items-center gap-2 min-w-0">
-                <Logo 
-                  className="w-8 h-8 rounded-md border border-[#006e2f]/20 shadow-sm flex-shrink-0" 
-                />
-                <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
-                  Smart Kiosk
-                </h1>
-              </div>
-            ) : (
-              <h1 className="font-sans font-bold text-xl tracking-tight text-primary truncate">
-                {screen === 'products' ? 'Products' : screen === 'cart' ? 'My Cart' : 'Payment'}
-              </h1>
-            )}
+            <Logo 
+              className="w-8 h-8 rounded-md border border-[#006e2f]/20 shadow-sm flex-shrink-0" 
+            />
+            <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
+              Smart Kiosk
+            </h1>
           </div>
         </div>
 
         <div className="flex items-center gap-2 flex-shrink-0">
-          {screen === 'landing' && (
-            /* English / Hindi / Gujarati Switcher */
-            <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner">
-              <button 
-                onClick={() => setLang('en')}
-                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                  lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                EN
-              </button>
-              <button 
-                onClick={() => setLang('hi')}
-                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                  lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                हिं
-              </button>
-              <button 
-                onClick={() => setLang('gu')}
-                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                  lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-                }`}
-              >
-                ગુ
-              </button>
-            </div>
-          )}
-
-
-
-          {screen === 'products' && (
-            <>
-              <button 
-                onClick={() => setScreen('cart')}
-                className="relative text-primary hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container cursor-pointer"
-              >
-                <ShoppingCart size={20} className="stroke-[2.5]" />
-                {getCartCount() > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 bg-rose-500 text-white text-[9px] font-extrabold w-4 h-4 flex items-center justify-center rounded-full border border-white">
-                    {getCartCount()}
-                  </span>
-                )}
-              </button>
-            </>
-          )}
+          {/* English / Hindi / Gujarati Switcher */}
+          <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner">
+            <button 
+              onClick={() => setLang('en')}
+              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              EN
+            </button>
+            <button 
+              onClick={() => setLang('hi')}
+              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              हिं
+            </button>
+            <button 
+              onClick={() => setLang('gu')}
+              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              ગુ
+            </button>
+          </div>
         </div>
       </header>
 
@@ -1236,100 +1208,94 @@ export default function App() {
       </main>
 
       {/* STICKY BOTTOM ACTIONS ROW */}
-      {((screen === 'cart' && cart.length > 0) || 
-        (screen === 'payment' && !paymentProcessing)) && (
-        <div className={`absolute ${screen === 'payment' ? 'bottom-0' : 'bottom-16'} left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-[#bdcaba]/30 px-5 py-4 flex justify-center shadow-lg rounded-t-3xl`}>
+      {screen === 'cart' && cart.length > 0 && (
+        <div className="absolute bottom-16 left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-[#bdcaba]/30 px-5 py-4 flex justify-center shadow-lg rounded-t-3xl">
           <div className="w-full flex flex-col gap-2">
 
             {/* Cart Bottom Action: Proceed to Payment */}
-            {screen === 'cart' && cart.length > 0 && (
-              <div className="w-full flex flex-col gap-2">
-                <button 
-                  onClick={() => {
-                    setUpiId('anonymous@gpay');
-                    setScreen('payment');
-                  }}
-                  className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg active-shadow hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer"
-                >
-                  <span className="flex items-center gap-1.5 font-extrabold">
-                    Proceed to Pay
-                  </span>
-                  <span className="flex items-center gap-0.5 bg-white/15 px-3 py-1 rounded-xl text-sm font-black tracking-wide">
-                    ₹{getCartTotal()}
-                    <ChevronRight size={15} className="ml-0.5 stroke-[3.5]" />
-                  </span>
-                </button>
-                <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#5e6d5b] font-semibold mt-1">
-                  <Lock size={12} className="text-[#006e2f] stroke-[2.5]" />
-                  Secure &amp; Anonymous Checkout
-                </div>
+            <div className="w-full flex flex-col gap-2">
+              <button 
+                onClick={() => {
+                  setUpiId('anonymous@gpay');
+                  setScreen('payment');
+                }}
+                className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg active-shadow hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5 font-extrabold">
+                  Proceed to Pay
+                </span>
+                <span className="flex items-center gap-0.5 bg-white/15 px-3 py-1 rounded-xl text-sm font-black tracking-wide">
+                  ₹{getCartTotal()}
+                  <ChevronRight size={15} className="ml-0.5 stroke-[3.5]" />
+                </span>
+              </button>
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#5e6d5b] font-semibold mt-1">
+                <Lock size={12} className="text-[#006e2f] stroke-[2.5]" />
+                Secure &amp; Anonymous Checkout
               </div>
-            )}
-
+            </div>
 
           </div>
         </div>
       )}
 
       {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION */}
-      {screen !== 'payment' && (
-        <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
-          {/* Home */}
-          <button 
-            onClick={() => { setScreen('landing'); setAccountOpen(false); }}
-            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-          >
-            {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-            <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-            <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {t('home')}
-            </span>
-          </button>
- 
-          {/* Products */}
-          <button 
-            onClick={() => { setScreen('products'); setAccountOpen(false); }}
-            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-          >
-            {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-            <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-            <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {t('products')}
-            </span>
-          </button>
- 
-          {/* Cart */}
-          <button 
-            onClick={() => { setScreen('cart'); setAccountOpen(false); }}
-            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-          >
-            {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-            <div className="relative mb-0.5">
-              <ShoppingCart size={20} className={`mb-0.5 transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-              {getCartCount() > 0 && (
-                <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border border-white">
-                  {getCartCount()}
-                </span>
-              )}
-            </div>
-            <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {t('cart')}
-            </span>
-          </button>
- 
-          {/* Account */}
-          <button 
-            onClick={() => setAccountOpen(true)}
-            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-          >
-            {accountOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-            <User size={20} className={`mb-1 transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-            <span className={`text-[10px] font-bold transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {t('account')}
-            </span>
-          </button>
-        </nav>
-      )}
+      <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
+        {/* Home */}
+        <button 
+          onClick={() => { setScreen('landing'); setAccountOpen(false); }}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('home')}
+          </span>
+        </button>
+
+        {/* Products */}
+        <button 
+          onClick={() => { setScreen('products'); setAccountOpen(false); }}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('products')}
+          </span>
+        </button>
+
+        {/* Cart */}
+        <button 
+          onClick={() => { setScreen('cart'); setAccountOpen(false); }}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <div className="relative mb-0.5">
+            <ShoppingCart size={20} className={`mb-0.5 transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+            {getCartCount() > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border border-white">
+                {getCartCount()}
+              </span>
+            )}
+          </div>
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('cart')}
+          </span>
+        </button>
+
+        {/* Account */}
+        <button 
+          onClick={() => setAccountOpen(true)}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {accountOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <User size={20} className={`mb-1 transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('account')}
+          </span>
+        </button>
+      </nav>
 
 
 
