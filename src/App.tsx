@@ -213,6 +213,7 @@ export default function App() {
   const [paymentProcessing, setPaymentSuccess] = useState<boolean>(false);
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(5);
+  const [pickupCode, setPickupCode] = useState<string>('');
 
   // Custom state for Guide modal
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
@@ -278,6 +279,7 @@ export default function App() {
       setPaymentFinished(false);
       setCountdown(5);
       setUpiId('');
+      setPickupCode('');
     }
     return () => clearTimeout(timer);
   }, [paymentFinished, countdown]);
@@ -285,6 +287,8 @@ export default function App() {
   const handleSimulatePayment = (e: React.FormEvent) => {
     e.preventDefault();
     setPaymentSuccess(true);
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    setPickupCode(code);
     setTimeout(() => {
       setPaymentFinished(true);
     }, 1800); // 1.8 seconds processing time
@@ -1063,6 +1067,8 @@ export default function App() {
                             e.preventDefault();
                           }
                           setPaymentSuccess(true);
+                          const code = Math.floor(100000 + Math.random() * 900000).toString();
+                          setPickupCode(code);
                           setTimeout(() => {
                             setPaymentFinished(true);
                           }, 1800);
@@ -1134,7 +1140,7 @@ export default function App() {
                       <motion.div 
                         initial={{ scale: 0.95, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        className="flex flex-col items-center text-center"
+                        className="flex flex-col items-center text-center w-full"
                       >
                         {/* Animated success checkmark */}
                         <div className="w-18 h-18 bg-[#ecf3ec] border-2 border-[#cbd7ca] rounded-full flex items-center justify-center text-[#006e2f] mb-4 shadow-sm">
@@ -1146,6 +1152,19 @@ export default function App() {
                         <p className="font-sans text-sm text-[#5e6d5b] font-semibold mt-1.5 max-w-[280px]">
                           Your items are now dispensing in the private tray below.
                         </p>
+                        
+                        {/* Pickup Code Display */}
+                        {pickupCode && (
+                          <div className="mt-4 p-4 bg-[#f0fdf4] border border-[#cbd7ca]/40 rounded-2xl flex flex-col items-center w-full max-w-[280px]">
+                            <span className="text-[10px] font-black uppercase tracking-wider text-[#5e6d5b]">
+                              Kiosk Collection Code
+                            </span>
+                            <span className="text-2xl font-black font-mono text-[#006e2f] mt-1 tracking-widest">
+                              {pickupCode.slice(0, 3)} {pickupCode.slice(3)}
+                            </span>
+                          </div>
+                        )}
+
                         <div className="mt-5.5 px-4.5 py-2 bg-[#006e2f] text-white rounded-2xl text-xs font-black tracking-wide uppercase shadow-sm">
                           Returning to Home in {countdown}s
                         </div>
