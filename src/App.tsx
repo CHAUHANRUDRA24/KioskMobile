@@ -420,6 +420,7 @@ export default function App() {
                 if (screen === 'payment') setScreen('cart');
                 else if (screen === 'cart') setScreen('products');
                 else if (screen === 'products') setScreen('landing');
+                else if (screen === 'account') setScreen('landing');
               }}
               className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container flex-shrink-0"
             >
@@ -1204,177 +1205,16 @@ export default function App() {
             </motion.div>
           )}
 
-        </AnimatePresence>
-      </main>
-
-      {/* STICKY BOTTOM ACTIONS ROW */}
-      {screen === 'cart' && cart.length > 0 && (
-        <div className="absolute bottom-16 left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-[#bdcaba]/30 px-5 py-4 flex justify-center shadow-lg rounded-t-3xl">
-          <div className="w-full flex flex-col gap-2">
-
-            {/* Cart Bottom Action: Proceed to Payment */}
-            <div className="w-full flex flex-col gap-2">
-              <button 
-                onClick={() => {
-                  setUpiId('anonymous@gpay');
-                  setScreen('payment');
-                }}
-                className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg active-shadow hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer"
-              >
-                <span className="flex items-center gap-1.5 font-extrabold">
-                  Proceed to Pay
-                </span>
-                <span className="flex items-center gap-0.5 bg-white/15 px-3 py-1 rounded-xl text-sm font-black tracking-wide">
-                  ₹{getCartTotal()}
-                  <ChevronRight size={15} className="ml-0.5 stroke-[3.5]" />
-                </span>
-              </button>
-              <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#5e6d5b] font-semibold mt-1">
-                <Lock size={12} className="text-[#006e2f] stroke-[2.5]" />
-                Secure &amp; Anonymous Checkout
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION */}
-      <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
-        {/* Home */}
-        <button 
-          onClick={() => { setScreen('landing'); setAccountOpen(false); }}
-          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-        >
-          {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-          <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-            {t('home')}
-          </span>
-        </button>
-
-        {/* Products */}
-        <button 
-          onClick={() => { setScreen('products'); setAccountOpen(false); }}
-          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-        >
-          {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-          <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-            {t('products')}
-          </span>
-        </button>
-
-        {/* Cart */}
-        <button 
-          onClick={() => { setScreen('cart'); setAccountOpen(false); }}
-          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-        >
-          {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-          <div className="relative mb-0.5">
-            <ShoppingCart size={20} className={`mb-0.5 transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-            {getCartCount() > 0 && (
-              <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border border-white">
-                {getCartCount()}
-              </span>
-            )}
-          </div>
-          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-            {t('cart')}
-          </span>
-        </button>
-
-        {/* Account */}
-        <button 
-          onClick={() => setAccountOpen(true)}
-          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-        >
-          {accountOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
-          <User size={20} className={`mb-1 transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`} />
-          <span className={`text-[10px] font-bold transition-colors duration-200 ${accountOpen ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-            {t('account')}
-          </span>
-        </button>
-      </nav>
-
-
-
-      {/* GUIDE MODAL */}
-      <AnimatePresence>
-        {guideOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5"
-          >
-            <motion.div 
-              initial={{ scale: 0.95, y: 15 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.95, y: 15 }}
-              className="bg-white rounded-3xl p-6 w-full max-w-[380px] shadow-2xl border border-outline-variant/30 flex flex-col gap-4"
+          {/* SCREEN 5: ACCOUNT */}
+          {screen === 'account' && (
+            <motion.div
+              key="account"
+              initial={{ opacity: 0, x: 15 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -15 }}
+              transition={{ duration: 0.2 }}
+              className="flex flex-col gap-4 text-left"
             >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">📖</span>
-                  <h3 className="font-sans font-bold text-lg text-primary">Kiosk Guide</h3>
-                </div>
-                <button 
-                  onClick={() => setGuideOpen(false)}
-                  className="text-slate-400 hover:text-slate-600 font-bold text-lg p-1"
-                >
-                  ✕
-                </button>
-              </div>
-              <div className="text-sm text-on-surface-variant flex flex-col gap-3">
-                <p>Welcome to <strong>Smart Kiosk</strong>! Follow these steps to purchase products anonymously:</p>
-                <ol className="list-decimal pl-5 space-y-1.5 text-left">
-                  <li>Tap <strong>Start Shopping</strong> to browse our catalog.</li>
-                  <li>Add your desired products to your cart.</li>
-                  <li>Verify your cart items and proceed to payment.</li>
-                  <li>Scan the QR code and pay using any UPI application (GPay, Paytm, etc.).</li>
-                  <li>Your products will dispense immediately from the physical tray below.</li>
-                </ol>
-                <p className="text-xs text-primary font-semibold mt-1 text-left">🔒 Your privacy is 100% guaranteed. No logs or card records are stored.</p>
-              </div>
-              <button 
-                onClick={() => setGuideOpen(false)}
-                className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary-hover active:scale-[0.98] transition-all"
-              >
-                Got it, thanks!
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* ACCOUNT MODAL (FULL SCREEN VIEW) */}
-      <AnimatePresence>
-        {accountOpen && (
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="absolute inset-0 bg-[#f8f9fa] z-[999] flex flex-col overflow-hidden text-left"
-          >
-            {/* Header */}
-            <header className="flex items-center justify-between px-5 py-4 bg-white border-b border-slate-100 shrink-0">
-              <button 
-                onClick={() => setAccountOpen(false)}
-                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
-              >
-                <span className="material-symbols-outlined font-black text-xl">arrow_back</span>
-              </button>
-              <h3 className="text-base font-black text-[#12240f] uppercase tracking-wide">
-                {lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું'}
-              </h3>
-              <div className="w-10 h-10" /> {/* Spacer for centering */}
-            </header>
-
-            {/* Scrollable Content */}
-            <div className="flex-1 overflow-y-auto no-scrollbar p-5 flex flex-col gap-4">
-              
               {/* Profile Card */}
               <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4">
                 <div className="flex items-center gap-4">
@@ -1514,20 +1354,154 @@ export default function App() {
                   {t('confidential')}
                 </span>
               </div>
+            </motion.div>
+          )}
+
+        </AnimatePresence>
+      </main>
+
+      {/* STICKY BOTTOM ACTIONS ROW */}
+      {screen === 'cart' && cart.length > 0 && (
+        <div className="absolute bottom-16 left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-[#bdcaba]/30 px-5 py-4 flex justify-center shadow-lg rounded-t-3xl">
+          <div className="w-full flex flex-col gap-2">
+
+            {/* Cart Bottom Action: Proceed to Payment */}
+            <div className="w-full flex flex-col gap-2">
+              <button 
+                onClick={() => {
+                  setUpiId('anonymous@gpay');
+                  setScreen('payment');
+                }}
+                className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg active-shadow hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer"
+              >
+                <span className="flex items-center gap-1.5 font-extrabold">
+                  Proceed to Pay
+                </span>
+                <span className="flex items-center gap-0.5 bg-white/15 px-3 py-1 rounded-xl text-sm font-black tracking-wide">
+                  ₹{getCartTotal()}
+                  <ChevronRight size={15} className="ml-0.5 stroke-[3.5]" />
+                </span>
+              </button>
+              <div className="flex items-center justify-center gap-1.5 text-[11px] text-[#5e6d5b] font-semibold mt-1">
+                <Lock size={12} className="text-[#006e2f] stroke-[2.5]" />
+                Secure &amp; Anonymous Checkout
+              </div>
             </div>
 
-            {/* Footer Close Button */}
-            <footer className="px-5 py-4 bg-white border-t border-slate-100 shrink-0">
+          </div>
+        </div>
+      )}
+
+      {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION */}
+      <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
+        {/* Home */}
+        <button 
+          onClick={() => setScreen('landing')}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('home')}
+          </span>
+        </button>
+
+        {/* Products */}
+        <button 
+          onClick={() => setScreen('products')}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('products')}
+          </span>
+        </button>
+
+        {/* Cart */}
+        <button 
+          onClick={() => setScreen('cart')}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <div className="relative mb-0.5">
+            <ShoppingCart size={20} className={`mb-0.5 transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+            {getCartCount() > 0 && (
+              <span className="absolute -top-1.5 -right-2 bg-red-500 text-white text-[8px] font-black w-[18px] h-[18px] flex items-center justify-center rounded-full border border-white">
+                {getCartCount()}
+              </span>
+            )}
+          </div>
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('cart')}
+          </span>
+        </button>
+
+        {/* Account */}
+        <button 
+          onClick={() => setScreen('account')}
+          className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
+        >
+          {screen === 'account' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          <User size={20} className={`mb-1 transition-colors duration-200 ${screen === 'account' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
+          <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'account' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
+            {t('account')}
+          </span>
+        </button>
+      </nav>
+
+
+
+      {/* GUIDE MODAL */}
+      <AnimatePresence>
+        {guideOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-5"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 15 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 15 }}
+              className="bg-white rounded-3xl p-6 w-full max-w-[380px] shadow-2xl border border-outline-variant/30 flex flex-col gap-4"
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">📖</span>
+                  <h3 className="font-sans font-bold text-lg text-primary">Kiosk Guide</h3>
+                </div>
+                <button 
+                  onClick={() => setGuideOpen(false)}
+                  className="text-slate-400 hover:text-slate-600 font-bold text-lg p-1"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="text-sm text-on-surface-variant flex flex-col gap-3">
+                <p>Welcome to <strong>Smart Kiosk</strong>! Follow these steps to purchase products anonymously:</p>
+                <ol className="list-decimal pl-5 space-y-1.5 text-left">
+                  <li>Tap <strong>Start Shopping</strong> to browse our catalog.</li>
+                  <li>Add your desired products to your cart.</li>
+                  <li>Verify your cart items and proceed to payment.</li>
+                  <li>Scan the QR code and pay using any UPI application (GPay, Paytm, etc.).</li>
+                  <li>Your products will dispense immediately from the physical tray below.</li>
+                </ol>
+                <p className="text-xs text-primary font-semibold mt-1 text-left">🔒 Your privacy is 100% guaranteed. No logs or card records are stored.</p>
+              </div>
               <button 
-                onClick={() => setAccountOpen(false)}
-                className="w-full h-12 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-sm shadow-md hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                onClick={() => setGuideOpen(false)}
+                className="w-full py-3 bg-primary text-white rounded-2xl font-bold text-sm hover:bg-primary-hover active:scale-[0.98] transition-all"
               >
-                {t('close')}
+                Got it, thanks!
               </button>
-            </footer>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+
 
     </div>
   );
