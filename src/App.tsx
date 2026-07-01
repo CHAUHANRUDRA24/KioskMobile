@@ -215,6 +215,23 @@ export default function App() {
   const [countdown, setCountdown] = useState<number>(10);
   const [pickupCode, setPickupCode] = useState<string>('');
 
+  // Real-time Session Account States
+  const [sessionTransactions, setSessionTransactions] = useState<Array<{
+    id: string;
+    itemsCount: number;
+    total: number;
+    date: string;
+  }>>([]);
+
+  const [carePoints, setCarePoints] = useState<number>(100); // starts with Welcome Bonus
+  const [pointsHistory, setPointsHistory] = useState<Array<{
+    name: string;
+    date: string;
+    points: number;
+  }>>([
+    { name: 'Welcome Bonus', date: '01 Jul 2026', points: 100 }
+  ]);
+
   // Custom state for Guide modal
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
 
@@ -283,6 +300,33 @@ export default function App() {
     }
     return () => clearTimeout(timer);
   }, [paymentFinished, countdown]);
+
+  // Effect to record transaction and rewards points in real-time
+  useEffect(() => {
+    if (paymentFinished) {
+      const cartTotal = getCartTotal();
+      const cartCount = getCartCount();
+      if (cartTotal > 0 && cartCount > 0) {
+        // Generate real-time transaction ID (e.g. TX-9874)
+        const txId = `TX-${Math.floor(1000 + Math.random() * 9000)}`;
+        const dateStr = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        
+        // Record transaction
+        setSessionTransactions(prev => [
+          { id: txId, itemsCount: cartCount, total: cartTotal, date: dateStr },
+          ...prev
+        ]);
+        
+        // Calculate and add rewards points
+        const earnedPoints = Math.max(10, Math.round(cartTotal / 10));
+        setCarePoints(prev => prev + earnedPoints);
+        setPointsHistory(prev => [
+          { name: 'Kiosk Purchase', date: dateStr, points: earnedPoints },
+          ...prev
+        ]);
+      }
+    }
+  }, [paymentFinished]);
 
   const handleSimulatePayment = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1282,16 +1326,18 @@ export default function App() {
                     <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">CarePoints Rewards</h4>
                     <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Earn points on every purchase</p>
                   </div>
-                  <span className="text-lg font-black text-[#006e2f] font-mono">120 pts</span>
+                  <span className="text-lg font-black text-[#006e2f] font-mono">{carePoints} pts</span>
                 </div>
                 
                 {/* Progress Bar */}
                 <div className="flex flex-col gap-1.5">
                   <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-[#006e2f] h-full rounded-full" style={{ width: '60%' }} />
+                    <div className="bg-[#006e2f] h-full rounded-full" style={{ width: `${Math.min(100, (carePoints / 200) * 100)}%` }} />
                   </div>
                   <span className="text-[10px] font-semibold text-slate-500">
-                    80 more points to get a free hygiene sample
+                    {carePoints >= 200 
+                      ? 'You qualify for a free hygiene sample!' 
+                      : `${200 - carePoints} more points to get a free hygiene sample`}
                   </span>
                 </div>
 
@@ -1299,21 +1345,16 @@ export default function App() {
                 <div className="h-px bg-slate-100 w-full my-1"></div>
                 <div>
                   <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2.5">Points History</h5>
-                  <div className="flex flex-col gap-3">
-                    <div className="flex justify-between items-center text-xs">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-extrabold text-[#12240f]">Welcome Bonus</span>
-                        <span className="text-[9.5px] text-slate-400 font-medium">01 Jul 2026</span>
+                  <div className="flex flex-col gap-3 max-h-[160px] overflow-y-auto no-scrollbar">
+                    {pointsHistory.map((item, index) => (
+                      <div key={index} className="flex justify-between items-center text-xs">
+                        <div className="flex flex-col gap-0.5">
+                          <span className="font-extrabold text-[#12240f]">{item.name}</span>
+                          <span className="text-[9.5px] text-slate-400 font-medium">{item.date}</span>
+                        </div>
+                        <span className="font-mono font-black text-[#006e2f]">+{item.points} pts</span>
                       </div>
-                      <span className="font-mono font-black text-[#006e2f]">+100 pts</span>
-                    </div>
-                    <div className="flex justify-between items-center text-xs">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="font-extrabold text-[#12240f]">Kiosk Purchase</span>
-                        <span className="text-[9.5px] text-slate-400 font-medium">01 Jul 2026</span>
-                      </div>
-                      <span className="font-mono font-black text-[#006e2f]">+20 pts</span>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1322,31 +1363,35 @@ export default function App() {
               <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3.5 text-left">
                 <div>
                   <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">Session Transactions</h4>
-                  <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Receipts from this session</p>
+                  <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
+                    {sessionTransactions.length > 0 
+                      ? 'Receipts from this session' 
+                      : 'No transactions in this session yet'}
+                  </p>
                 </div>
                 
-                <div className="flex flex-col gap-2.5">
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
-                    <div className="flex items-center gap-3">
-                      <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-extrabold text-[#12240f]">Receipt #TX-9902</span>
-                        <span className="text-[9.5px] text-slate-400 font-medium">Completed • 3 items</span>
+                <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto no-scrollbar">
+                  {sessionTransactions.map((tx) => (
+                    <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
+                        <div className="flex flex-col gap-0.5">
+                          <span className="text-xs font-extrabold text-[#12240f]">Receipt #{tx.id}</span>
+                          <span className="text-[9.5px] text-slate-400 font-medium">
+                            Completed • {tx.itemsCount} {tx.itemsCount === 1 ? 'item' : 'items'}
+                          </span>
+                        </div>
                       </div>
+                      <span className="text-xs font-black font-mono text-[#12240f]">₹{tx.total}</span>
                     </div>
-                    <span className="text-xs font-black font-mono text-[#12240f]">₹3,470</span>
-                  </div>
+                  ))}
                   
-                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
-                    <div className="flex items-center gap-3">
-                      <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
-                      <div className="flex flex-col gap-0.5">
-                        <span className="text-xs font-extrabold text-[#12240f]">Receipt #TX-9874</span>
-                        <span className="text-[9.5px] text-slate-400 font-medium">Completed • 1 item</span>
-                      </div>
+                  {sessionTransactions.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400">
+                      <span className="material-symbols-outlined text-3xl text-slate-300">receipt_long</span>
+                      <p className="text-[10.5px] font-semibold mt-1">Your purchase receipts will appear here</p>
                     </div>
-                    <span className="text-xs font-black font-mono text-[#12240f]">₹150</span>
-                  </div>
+                  )}
                 </div>
               </div>
 
