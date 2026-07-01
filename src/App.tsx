@@ -212,7 +212,7 @@ export default function App() {
   const [upiId, setUpiId] = useState<string>('');
   const [paymentProcessing, setPaymentSuccess] = useState<boolean>(false);
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(5);
+  const [countdown, setCountdown] = useState<number>(10);
   const [pickupCode, setPickupCode] = useState<string>('');
 
   // Custom state for Guide modal
@@ -277,7 +277,7 @@ export default function App() {
       setScreen('landing');
       setPaymentSuccess(false);
       setPaymentFinished(false);
-      setCountdown(5);
+      setCountdown(10);
       setUpiId('');
       setPickupCode('');
     }
