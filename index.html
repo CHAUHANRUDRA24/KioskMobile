@@ -1,15 +1,427 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PrivaCare - Your Private Health Store</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Smart Kiosk - Email Sign-In</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#f9fff6",
+                        "surface-variant": "#e1e3e4",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#274e3d",
+                        "surface": "#f8f9fa",
+                        "background": "#f8f9fa",
+                        "surface-container-low": "#f3f4f5",
+                        "inverse-primary": "#70dc8f",
+                        "outline": "#6e7a6e",
+                        "surface-dim": "#d9dadb",
+                        "tertiary-fixed-dim": "#95d4b3",
+                        "on-tertiary-fixed": "#002114",
+                        "on-surface": "#191c1d",
+                        "secondary-container": "#beead1",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2e3132",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary-fixed-dim": "#a5d0b9",
+                        "surface-container": "#edeeef",
+                        "tertiary": "#2a684d",
+                        "on-primary-fixed": "#00210c",
+                        "on-secondary-container": "#436b58",
+                        "on-surface-variant": "#3e4a3f",
+                        "on-primary-fixed-variant": "#005227",
+                        "outline-variant": "#bdcabc",
+                        "primary-container": "#008744",
+                        "on-secondary-fixed": "#002114",
+                        "on-tertiary-fixed-variant": "#0e5138",
+                        "secondary": "#3f6653",
+                        "on-background": "#191c1d",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#8cf9a9",
+                        "secondary-fixed": "#c1ecd4",
+                        "tertiary-container": "#458164",
+                        "surface-tint": "#006d36",
+                        "on-tertiary-container": "#fbfff9",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "surface-container-highest": "#e1e3e4",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary-fixed": "#b1f0ce",
+                        "primary": "#006b35",
+                        "error": "#ba1a1a",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#70dc8f",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px",
+                        "24": "24px"
+                    },
+                    "spacing": {
+                        "md": "24px",
+                        "gutter": "24px",
+                        "base": "8px",
+                        "xl": "80px",
+                        "container-max": "1200px",
+                        "sm": "12px",
+                        "xs": "4px",
+                        "lg": "48px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "36px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "600" }]
+                    },
+                    "boxShadow": {
+                        'ambient': '0px 4px 20px rgba(0, 0, 0, 0.05)',
+                        'ambient-hover': '0px 12px 40px rgba(0, 0, 0, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: 100vh;
+    }
+  </style>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
+<body class="bg-background md:bg-surface-container-low min-h-screen flex items-center justify-center font-body-md text-on-surface">
+  <div class="w-full max-w-[430px] h-screen md:h-[92vh] md:max-h-[850px] bg-background flex flex-col relative shadow-none md:shadow-ambient md:rounded-24 overflow-hidden border-0 md:border border-outline-variant/30">
+    <!-- Header (Standalone, simplified for transaction flow) -->
+    <header class="w-full flex justify-between items-center px-4 py-3 bg-transparent shrink-0">
+      <div class="flex items-center gap-2">
+        <img src="/creator_lab_logo.jpg" alt="Creator Lab Logo" class="w-8 h-8 rounded-lg object-cover shadow-sm border border-outline-variant/30" />
+        <h1 class="font-sans font-extrabold text-lg tracking-tight text-[#006e2f]">Smart Kiosk</h1>
+      </div>
+      <div class="flex bg-surface-container-high rounded-full p-0.5" id="lang-switcher">
+        <button data-lang="en" class="px-3 py-1 rounded-full bg-primary-container text-on-primary font-semibold text-[11px] transition-colors cursor-pointer">EN</button>
+        <button data-lang="hi" class="px-3 py-1 rounded-full text-on-surface-variant font-semibold text-[11px] hover:text-primary transition-colors cursor-pointer">हि</button>
+        <button data-lang="gu" class="px-3 py-1 rounded-full text-on-surface-variant font-semibold text-[11px] hover:text-primary transition-colors cursor-pointer">ગુ</button>
+      </div>
+    </header>
 
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col justify-center px-6 py-4 overflow-y-auto">
+      <div class="w-full">
+        <!-- Badge -->
+        <div class="flex justify-center mb-4">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container/30 text-primary font-semibold text-xs">
+            <span class="material-symbols-outlined filled text-[14px]">lock</span>
+            <span data-translate="privateSecure">Private &amp; Secure</span>
+          </span>
+        </div>
+        <!-- Headings -->
+        <div class="text-center mb-6">
+          <h2 data-translate="welcome" class="font-bold text-xl text-on-surface mb-1">Welcome Back</h2>
+          <p data-translate="subtitle" class="text-xs text-on-surface-variant">Sign in to manage your health essentials</p>
+        </div>
+        <!-- Form -->
+        <form class="space-y-4">
+          <!-- Email Field -->
+          <div class="space-y-1">
+            <label data-translate="emailLabel" class="font-semibold text-xs text-on-surface block" for="email">Email Address</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-on-surface-variant pointer-events-none">
+                <span class="material-symbols-outlined text-[18px]">mail</span>
+              </span>
+              <input class="w-full min-h-[48px] pl-9 pr-4 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" id="email" name="email" placeholder="name@example.com" type="email"/>
+            </div>
+          </div>
+          <!-- Password Field -->
+          <div class="space-y-1">
+            <div class="flex justify-between items-center">
+              <label data-translate="passwordLabel" class="font-semibold text-xs text-on-surface block" for="password">Password</label>
+              <a id="forgot-password-link" data-translate="forgotPassword" class="font-semibold text-xs text-primary hover:text-on-primary-fixed-variant transition-colors" href="#">Forgot Password?</a>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-on-surface-variant pointer-events-none">
+                <span class="material-symbols-outlined text-[18px]">key</span>
+              </span>
+              <input class="w-full min-h-[48px] pl-9 pr-9 bg-surface-container-lowest border border-outline-variant rounded-xl text-xs text-on-surface placeholder:text-on-surface-variant focus:border-primary focus:ring-1 focus:ring-primary transition-colors outline-none" id="password" name="password" placeholder="••••••••" type="password"/>
+              <button aria-label="Toggle password visibility" class="absolute inset-y-0 right-0 flex items-center pr-3 text-on-surface-variant hover:text-primary transition-colors" type="button">
+                <span class="material-symbols-outlined text-[18px]">visibility_off</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Status Alert -->
+          <div id="status-alert" class="hidden text-xs font-semibold rounded-xl py-2.5 px-3.5 leading-relaxed text-center border transition-all duration-300"></div>
+
+          <!-- Sign In Button -->
+          <button class="w-full min-h-[48px] bg-primary-container hover:bg-on-primary-fixed-variant text-on-primary font-semibold text-xs rounded-full transition-colors flex items-center justify-center gap-1.5 mt-2 cursor-pointer" type="submit">
+            <span data-translate="signIn">Sign In</span>
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+          </button>
+        </form>
+        <!-- Divider -->
+        <div class="flex items-center gap-3 my-5">
+          <div class="flex-grow h-px bg-outline-variant/50"></div>
+          <span data-translate="or" class="font-semibold text-xs text-on-surface-variant">OR</span>
+          <div class="flex-grow h-px bg-outline-variant/50"></div>
+        </div>
+        <!-- Google Auth -->
+        <button id="google-btn" class="w-full min-h-[48px] bg-surface-container-lowest border border-outline-variant hover:border-outline hover:bg-surface-container-low text-on-surface font-semibold text-xs rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer" type="button">
+          <svg class="w-5 h-5" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+            <path d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" fill="#FFC107"></path>
+            <path d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" fill="#FF3D00"></path>
+            <path d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" fill="#4CAF50"></path>
+            <path d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" fill="#1976D2"></path>
+          </svg>
+          <span data-translate="google">Continue with Google</span>
+        </button>
+      </div>
+      <!-- Trust Micro-copy -->
+      <div class="mt-5 text-center flex flex-col items-center gap-1 shrink-0">
+        <span class="material-symbols-outlined text-outline text-[16px]">verified_user</span>
+        <p data-translate="trust" class="font-semibold text-[10px] text-on-surface-variant max-w-[260px] leading-tight">
+          Your data is strictly confidential and protected by end-to-end encryption.
+        </p>
+      </div>
+    </main>
+
+    <!-- Footer Component -->
+    <footer class="w-full bg-transparent flex flex-col items-center justify-center py-3 text-center gap-0.5 shrink-0">
+      <div class="flex items-center justify-center gap-3 flex-wrap px-4">
+        <a data-translate="privacy" class="text-[10px] text-on-surface-variant/70 hover:text-primary transition-all duration-200 underline" href="#">Privacy Policy</a>
+        <a data-translate="terms" class="text-[10px] text-on-surface-variant/70 hover:text-primary transition-all duration-200 underline" href="#">Terms</a>
+        <a data-translate="security" class="text-[10px] text-on-surface-variant/70 hover:text-primary transition-all duration-200 underline" href="#">Security</a>
+      </div>
+      <p data-translate="copyright" class="text-[10px] font-bold text-primary">© 2024 Smart Kiosk Secure Access</p>
+    </footer>
+  </div>
+
+  <script>
+    const TRANSLATIONS = {
+      en: {
+        privateSecure: "Private & Secure",
+        welcome: "Welcome Back",
+        subtitle: "Sign in to manage your health essentials",
+        emailLabel: "Email Address",
+        passwordLabel: "Password",
+        forgotPassword: "Forgot Password?",
+        signIn: "Sign In",
+        or: "OR",
+        google: "Continue with Google",
+        trust: "Your data is strictly confidential and protected by end-to-end encryption.",
+        privacy: "Privacy Policy",
+        terms: "Terms",
+        security: "Security",
+        copyright: "© 2024 Smart Kiosk Secure Access",
+        invalidCreds: "Invalid credentials. Please use: demo@smartkiosk.com / password123",
+        enterEmail: "Please enter your email address first.",
+        resetSent: "A password reset link has been sent to your email!",
+        emptyFields: "Please fill in all fields."
+      },
+      hi: {
+        privateSecure: "निजी और सुरक्षित",
+        welcome: "वापसी पर स्वागत है",
+        subtitle: "अपने स्वास्थ्य उत्पादों को प्रबंधित करने के लिए साइन इन करें",
+        emailLabel: "ईमेल पता",
+        passwordLabel: "पासवर्ड",
+        forgotPassword: "पासवर्ड भूल गए?",
+        signIn: "साइन इन करें",
+        or: "अथवा",
+        google: "गूगल के साथ जारी रखें",
+        trust: "आपका डेटा पूरी तरह से गोपनीय है और एंड-टू-एंड एन्क्रिप्शन द्वारा सुरक्षित है।",
+        privacy: "गोपनीयता नीति",
+        terms: "सेवा की शर्तें",
+        security: "सुरक्षा श्वेतपत्र",
+        copyright: "© २०२४ स्मार्ट कियोस्क सुरक्षित पहुंच",
+        invalidCreds: "अमान्य क्रेडेंशियल। कृपया उपयोग करें: demo@smartkiosk.com / password123",
+        enterEmail: "कृपया पहले अपना ईमेल दर्ज करें।",
+        resetSent: "आपके ईमेल पर पासवर्ड रीसेट लिंक भेज दिया गया है!",
+        emptyFields: "कृपया सभी फ़ील्ड भरें।"
+      },
+      gu: {
+        privateSecure: "ખાનગી અને સુરક્ષિત",
+        welcome: "આપનું સ્વાગત છે",
+        subtitle: "તમારી સ્વાસ્થ્ય જરૂરિયાતોનું સંચાલન કરવા માટે સાઇન ઇન કરો",
+        emailLabel: "ઈમેલ સરનામું",
+        passwordLabel: "પાસવર્ડ",
+        forgotPassword: "પાસવર્ડ ભૂલી ગયા છો?",
+        signIn: "સાઇન ઇન કરો",
+        or: "અથવા",
+        google: "ગૂગલ સાથે ચાલુ રાખો",
+        trust: "તમારો ડેટા સંપૂર્ણપણે ગુપ્ત છે અને એન્ડ-ટુ-એન્ડ એન્ક્રિપ્શન દ્વારા સુરક્ષિત છે.",
+        privacy: "ગોપનીયતા નીતિ",
+        terms: "સેવાની શરતો",
+        security: "સુરક્ષા શ્વેતપત્ર",
+        copyright: "© ૨૦૨૪ સ્માર્ટ કિઓસ્ક સુરક્ષિત ઍક્સેસ",
+        invalidCreds: "અમાન્ય ઓળખપત્રો. કૃપા કરીને ઉપયોગ કરો: demo@smartkiosk.com / password123",
+        enterEmail: "કૃપા કરીને પહેલા તમારો ઈમેલ દાખલ કરો.",
+        resetSent: "તમારા ઈમેલ પર પાસવર્ડ રીસેટ લિંક મોકલવામાં આવી છે!",
+        emptyFields: "કૃપા કરીને બધી વિગતો ભરો."
+      }
+    };
+
+    let currentLang = localStorage.getItem('lang') || 'en';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+
+      // Update button styles
+      document.querySelectorAll('#lang-switcher button').forEach(btn => {
+        if (btn.getAttribute('data-lang') === lang) {
+          btn.className = "px-3 py-1 rounded-full bg-primary-container text-on-primary font-semibold text-[11px] transition-colors cursor-pointer";
+        } else {
+          btn.className = "px-3 py-1 rounded-full text-on-surface-variant font-semibold text-[11px] hover:text-primary transition-colors cursor-pointer";
+        }
+      });
+
+      // Update DOM translations
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) {
+          el.textContent = TRANSLATIONS[lang][key];
+        }
+      });
+    }
+
+    // Set initial language from storage
+    setLanguage(currentLang);
+
+    // Bind switcher click listeners
+    document.querySelectorAll('#lang-switcher button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        setLanguage(btn.getAttribute('data-lang'));
+      });
+    });
+
+    // Set default credentials
+    document.getElementById('email').value = 'demo@smartkiosk.com';
+    document.getElementById('password').value = 'password123';
+
+    // Toggle password visibility
+    const togglePasswordBtn = document.querySelector('button[aria-label="Toggle password visibility"]');
+    const passwordInput = document.getElementById('password');
+    if (togglePasswordBtn && passwordInput) {
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePasswordBtn.querySelector('.material-symbols-outlined').textContent = isPassword ? 'visibility' : 'visibility_off';
+      });
+    }
+
+    function showStatus(message, isError = true) {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.textContent = message;
+      alertEl.className = `block text-xs font-semibold rounded-xl py-2.5 px-3.5 leading-relaxed text-center border transition-all duration-300 ${
+        isError 
+          ? 'bg-red-50 text-red-700 border-red-200' 
+          : 'bg-emerald-50 text-emerald-700 border-emerald-200'
+      }`;
+      alertEl.classList.remove('hidden');
+    }
+
+    function hideStatus() {
+      const alertEl = document.getElementById('status-alert');
+      alertEl.classList.add('hidden');
+    }
+
+    // Handle form submit and transition to the React app
+    const form = document.querySelector('form');
+    if (form) {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        hideStatus();
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          showStatus(TRANSLATIONS[currentLang].emptyFields, true);
+          return;
+        }
+
+        if (email === 'demo@smartkiosk.com' && password === 'password123') {
+          showStatus(currentLang === 'en' ? 'Signing in...' : currentLang === 'hi' ? 'साइन इन हो रहा है...' : 'સાઇન ઇન થઈ રહ્યું છે...', false);
+          setTimeout(() => {
+            launchReactApp();
+          }, 800);
+        } else {
+          showStatus(TRANSLATIONS[currentLang].invalidCreds, true);
+        }
+      });
+    }
+
+    // Handle forgot password transition
+    const forgotLink = document.getElementById('forgot-password-link');
+    if (forgotLink) {
+      forgotLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        hideStatus();
+
+        const email = document.getElementById('email').value.trim();
+        if (!email) {
+          showStatus(TRANSLATIONS[currentLang].enterEmail, true);
+          return;
+        }
+
+        showStatus(TRANSLATIONS[currentLang].resetSent, false);
+      });
+    }
+
+    // Handle Google login transition
+    const googleBtn = document.getElementById('google-btn');
+    if (googleBtn) {
+      googleBtn.addEventListener('click', () => {
+        hideStatus();
+        showStatus(currentLang === 'en' ? 'Connecting with Google...' : currentLang === 'hi' ? 'गूगल से कनेक्ट किया जा रहा है...' : 'ગૂગલ સાથે કનેક્ટ થઈ રહ્યું છે...', false);
+        setTimeout(() => {
+          launchReactApp();
+        }, 800);
+      });
+    }
+
+    function launchReactApp() {
+      // Clear body class and insert React root
+      document.body.className = '';
+      document.body.innerHTML = '<div id="root"></div>';
+
+      // Load main application script
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = '/src/main.tsx';
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>

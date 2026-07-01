@@ -16,7 +16,6 @@ import {
   BadgeAlert,
   Smartphone,
   CreditCard,
-  QrCode,
   Home,
   Grid
 } from 'lucide-react';
@@ -177,76 +176,21 @@ const TRANSLATIONS = {
 
 export default function App() {
   // Navigation & Cart States
-  const [screen, setScreen] = useState<ScreenType>('signin');
-  const [lang, setLang] = useState<'en' | 'hi' | 'gu'>('en');
+  const [screen, setScreen] = useState<ScreenType>('landing');
+  const [lang, setLangState] = useState<'en' | 'hi' | 'gu'>(() => {
+    return (localStorage.getItem('lang') as 'en' | 'hi' | 'gu') || 'en';
+  });
+
+  const setLang = (newLang: 'en' | 'hi' | 'gu') => {
+    setLangState(newLang);
+    localStorage.setItem('lang', newLang);
+  };
   
   const t = (key: keyof typeof TRANSLATIONS.en) => {
     return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.en[key];
   };
   const [accountOpen, setAccountOpen] = useState<boolean>(false);
   const [privacyMode, setPrivacyMode] = useState<boolean>(false);
-  const [user, setUser] = useState<{ name: string; email: string; points: number } | null>(null);
-  const [emailInput, setEmailInput] = useState<string>('');
-  const [otpInput, setOtpInput] = useState<string>('');
-  const [signInStep, setSignInStep] = useState<'email' | 'otp'>('email');
-  const [signInError, setSignInError] = useState<string>('');
-
-  const handleKeypadPress = (val: string) => {
-    setSignInError('');
-    if (signInStep === 'email') {
-      if (val === 'backspace') {
-        setEmailInput(prev => prev.slice(0, -1));
-      } else if (val === 'clear') {
-        setEmailInput('');
-      } else if (val === 'space') {
-        setEmailInput(prev => prev + ' ');
-      } else {
-        setEmailInput(prev => prev + val);
-      }
-    } else {
-      if (val === 'backspace') {
-        setOtpInput(prev => prev.slice(0, -1));
-      } else if (val === 'clear') {
-        setOtpInput('');
-      } else if (otpInput.length < 4) {
-        setOtpInput(prev => prev + val);
-      }
-    }
-  };
-
-  const handleSendOtp = () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(emailInput)) {
-      setSignInError(lang === 'en' ? 'Enter a valid email address' : 'कृपया सही ईमेल पता दर्ज करें');
-      return;
-    }
-    setSignInStep('otp');
-    setOtpInput('');
-    setSignInError('');
-  };
-
-  const handleVerifyOtp = () => {
-    if (otpInput.length !== 4) {
-      setSignInError(lang === 'en' ? 'Enter 4-digit OTP' : '4-अंकीय ओटीपी दर्ज करें');
-      return;
-    }
-    if (otpInput === '1234') {
-      // Mock login successful
-      const emailPrefix = emailInput.split('@')[0];
-      const displayName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
-      setUser({
-        name: displayName,
-        email: emailInput,
-        points: 320
-      });
-      setEmailInput('');
-      setOtpInput('');
-      setSignInStep('email');
-      setScreen('landing');
-    } else {
-      setSignInError(lang === 'en' ? 'Incorrect OTP. Try 1234' : 'गलत ओटीपी। 1234 आज़माएं');
-    }
-  };
 
   const formatProductName = (name: string) => {
     if (!privacyMode) return name;
@@ -476,13 +420,6 @@ export default function App() {
                 if (screen === 'payment') setScreen('cart');
                 else if (screen === 'cart') setScreen('products');
                 else if (screen === 'products') setScreen('landing');
-                else if (screen === 'signin') {
-                  setScreen('landing');
-                  setEmailInput('');
-                  setOtpInput('');
-                  setSignInStep('email');
-                  setSignInError('');
-                }
               }}
               className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container flex-shrink-0"
             >
@@ -613,52 +550,6 @@ export default function App() {
                   </span>
                 </div>
               </section>
-
-              {/* User Loyalty Greeting Card */}
-              {user ? (
-                <div className="w-full bg-gradient-to-r from-[#006e2f] to-[#16a34a] text-white rounded-2xl p-4.5 shadow-md flex items-center justify-between border border-emerald-800/30 relative overflow-hidden select-none">
-                  <div className="absolute right-0 bottom-0 opacity-10 translate-y-3 translate-x-3 pointer-events-none">
-                    <User size={120} className="stroke-[1]" />
-                  </div>
-                  <div className="flex-1 text-left z-10">
-                    <p className="text-[10px] uppercase tracking-wider font-extrabold text-emerald-100/90 leading-none">
-                      {lang === 'en' ? 'LOYALTY MEMBER' : lang === 'hi' ? 'लॉयल्टी सदस्य' : 'લોયલ્ટી સભ્ય'}
-                    </p>
-                    <h3 className="font-sans font-black text-[17px] mt-1.5 leading-tight truncate max-w-[210px]">
-                      {lang === 'en' ? `Hi, ${user.name.split(' ')[0]}!` : `नमस्ते, ${user.name.split(' ')[0]}!`}
-                    </h3>
-                    <p className="text-xs font-semibold text-emerald-100 mt-1">
-                      {lang === 'en' ? `You have ${user.points} CarePoints` : `आपके पास ${user.points} केयर पॉइंट्स हैं`}
-                    </p>
-                  </div>
-                  <button 
-                    onClick={() => setAccountOpen(true)}
-                    className="shrink-0 bg-white/20 hover:bg-white/30 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl border border-white/10 active:scale-95 transition-all cursor-pointer z-10 shadow-sm"
-                  >
-                    {lang === 'en' ? 'View' : 'देखें'}
-                  </button>
-                </div>
-              ) : (
-                <div className="w-full bg-white border border-[#cbd7ca]/40 rounded-2xl p-4 flex items-center justify-between shadow-sm select-none">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#f4f7f3] border border-[#dae3d9] flex items-center justify-center text-xl shrink-0">🎁</div>
-                    <div className="text-left font-sans">
-                      <h4 className="font-extrabold text-sm text-[#111827]">
-                        {lang === 'en' ? 'Earn CarePoints' : 'केयरपॉइंट्स कमाएं'}
-                      </h4>
-                      <p className="text-xs text-slate-400 font-semibold leading-relaxed mt-0.5">
-                        {lang === 'en' ? 'Sign in to get rewards & benefits' : 'पुरस्कार पाने के लिए साइन इन करें'}
-                      </p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => { setSignInStep('email'); setEmailInput(''); setOtpInput(''); setSignInError(''); setScreen('signin'); }}
-                    className="bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs px-4 py-2.5 rounded-xl active:scale-[0.97] transition-all cursor-pointer shadow-sm shadow-emerald-950/10"
-                  >
-                    {lang === 'en' ? 'Sign In' : 'साइन इन'}
-                  </button>
-                </div>
-              )}
 
               {/* Get Started Card */}
               <button 
@@ -1172,50 +1063,10 @@ export default function App() {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-4"
             >
-              {/* Order Items list */}
-              <section className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm">
-                <div className="flex items-center gap-2 mb-3.5 border-b border-slate-100 pb-3">
-                  <span className="material-symbols-outlined text-[#006e2f] text-[20px] font-bold">receipt_long</span>
-                  <h2 className="font-sans font-black text-xs text-[#12240f] uppercase tracking-wider">
-                    Payment Summary
-                  </h2>
-                </div>
-                <div className="flex flex-col gap-3">
-                  {cart.map(item => (
-                    <div key={item.product.id} className="flex justify-between items-center">
-                      <div className="flex flex-col gap-0.5 min-w-0">
-                        <span className="text-[#12240f] font-bold text-[13.5px] leading-tight truncate text-left">
-                          {formatProductName(item.product.name)}
-                        </span>
-                        <span className="text-[11px] text-[#5e6d5b] text-left font-semibold">
-                          {item.quantity} × ₹{item.product.price}
-                        </span>
-                      </div>
-                      <span className="text-[14px] font-bold font-mono text-[#12240f] shrink-0">
-                        ₹{item.product.price * item.quantity}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                <div className="h-px bg-slate-100 my-3.5 w-full"></div>
-                <div className="flex justify-between items-center">
-                  <span className="font-sans font-black text-[12px] text-[#12240f] uppercase tracking-wider">Total Bill</span>
-                  <span className="text-xl font-black text-[#006e2f]">₹{getCartTotal()}</span>
-                </div>
-              </section>
-
-              {/* Privacy Banner */}
-              <section className="bg-[#ecf3ec] border border-[#cbd7ca]/50 rounded-2xl p-4 flex items-start gap-3">
-                <span className="text-xl shrink-0 mt-0.5">🔒</span>
-                <p className="text-[11.5px] text-[#006e2f] font-semibold leading-normal text-left">
-                  <strong>100% Anonymous Transaction.</strong> No personal information, phone numbers, or transaction logs are collected or saved.
-                </p>
-              </section>
-
               {/* Payment Processing Card */}
               <section className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-6 shadow-sm text-center relative overflow-hidden">
                 {!paymentProcessing ? (
-                  <form onSubmit={handleSimulatePayment} className="flex flex-col gap-4.5">
+                  <div className="flex flex-col gap-4.5">
                     
                     {/* Header */}
                     <div className="flex flex-col items-center gap-1">
@@ -1234,8 +1085,17 @@ export default function App() {
                         href={`upi://pay?pa=rudrachauhan2475@gmail.com&pn=Discreet%20Kiosk&am=${getCartTotal()}&cu=INR&tn=Kiosk%20Purchase`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={(e) => {
+                          if (window.innerWidth > 768) {
+                            e.preventDefault();
+                          }
+                          setPaymentSuccess(true);
+                          setTimeout(() => {
+                            setPaymentFinished(true);
+                          }, 1800);
+                        }}
                         className="relative block border border-[#cbd7ca]/30 rounded-2xl p-4 bg-white mx-auto shadow-[0_4px_15px_rgba(0,110,47,0.04)] select-none overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                        title="Scan or tap to open in UPI application"
+                        title="Scan or tap to open in UPI application / Click to simulate pay"
                       >
                         {/* Decorative corners */}
                         <div className="absolute top-2 left-2 w-4 h-4 border-t-3 border-l-3 border-[#006e2f] rounded-tl-md z-10"></div>
@@ -1270,27 +1130,12 @@ export default function App() {
                           </span>
                           <span className="text-[11px] text-[#006e2f] font-black uppercase tracking-wider">Awaiting UPI Scan</span>
                         </div>
-                        <p className="font-sans text-[10px] text-slate-400 font-medium leading-none">
-                          Tap QR if on mobile to test with payment app
+                        <p className="font-sans text-[10px] text-slate-400 font-semibold leading-normal mt-1 max-w-[240px]">
+                          Click or tap the QR code to simulate payment completion
                         </p>
                       </div>
                     </div>
-
-                    {/* Pay Button */}
-                    <button 
-                      type="submit"
-                      className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer mt-2"
-                    >
-                      <span className="flex items-center gap-1.5 font-extrabold">
-                        <Lock size={16} className="stroke-[3]" />
-                        Confirm Payment
-                      </span>
-                      <span className="flex items-center gap-0.5 bg-white/15 px-3 py-1 rounded-xl text-sm font-black tracking-wide">
-                        ₹{getCartTotal()}
-                        <ChevronRight size={15} className="ml-0.5 stroke-[3.5]" />
-                      </span>
-                    </button>
-                  </form>
+                  </div>
                 ) : (
                   /* Loading and Success States */
                   <div className="flex flex-col items-center justify-center py-6">
@@ -1337,174 +1182,53 @@ export default function App() {
                 )}
               </section>
 
-              {/* Help & Helpline */}
-              <div className="mt-2 text-center flex flex-col gap-1.5">
-                <p className="font-sans text-xs text-[#5e6d5b] font-medium">
-                  Need help? Call Toll-Free: 1800-111-2222
+              {/* Privacy Banner */}
+              <section className="bg-[#ecf3ec] border border-[#cbd7ca]/50 rounded-2xl p-4 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">🔒</span>
+                <p className="text-[11.5px] text-[#006e2f] font-semibold leading-normal text-left">
+                  <strong>100% Anonymous Transaction.</strong> No personal information, phone numbers, or transaction logs are collected or saved.
                 </p>
-              </div>
-            </motion.div>
-          )}
+              </section>
 
-          {/* SCREEN 5: SIGN IN */}
-          {screen === 'signin' && (
-            <motion.div
-              key="signin"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.2 }}
-              className="flex-grow flex flex-col h-full bg-[#f4f7f3] select-none"
-            >
-              {/* Header card inside screen */}
-              <div className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm text-center flex flex-col items-center gap-3 flex-shrink-0">
-                <div className="w-11 h-11 rounded-2xl bg-[#ecf3ec] border border-[#cbd7ca]/50 text-[#006e2f] flex items-center justify-center shadow-inner">
-                  <User size={22} className="stroke-[2.5]" />
+              {/* Order Items list */}
+              <section className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm overflow-hidden">
+                <div className="flex items-center gap-2 mb-3.5 border-b border-slate-100 pb-3">
+                  <span className="material-symbols-outlined text-[#006e2f] text-[20px] font-bold">receipt_long</span>
+                  <h2 className="font-sans font-black text-xs text-[#12240f] uppercase tracking-wider">
+                    Payment Summary
+                  </h2>
                 </div>
-                <div>
-                  <h3 className="font-sans font-black text-sm text-[#12240f] uppercase tracking-wider">
-                    {signInStep === 'email' 
-                      ? (lang === 'en' ? 'Member Sign In' : 'सदस्य साइन इन') 
-                      : (lang === 'en' ? 'Enter Verification Code' : 'सत्यापन कोड दर्ज करें')}
-                  </h3>
-                  <p className="text-[11px] text-slate-500 font-semibold mt-1">
-                    {signInStep === 'email' 
-                      ? (lang === 'en' ? 'Enter your email address to retrieve your loyalty account' : 'अपना लॉयल्टी खाता प्राप्त करने के लिए ईमेल दर्ज करें')
-                      : (lang === 'en' ? 'Verification OTP has been sent via email' : 'सत्यापन ओटीपी ईमेल द्वारा भेजा गया है')}
-                  </p>
-                </div>
-
-                {/* Input Display Box */}
-                <div className="w-full flex flex-col gap-1 mt-1">
-                  <div className="w-full bg-[#f4f7f3] border-2 border-[#dae3d9] rounded-xl h-11 flex items-center justify-center px-4 shadow-inner relative">
-                    <span className="font-sans text-sm font-extrabold text-[#12240f] tracking-wide truncate max-w-[260px]">
-                      {signInStep === 'email' 
-                        ? (emailInput || (lang === 'en' ? 'name@example.com' : 'नाम@उदाहरण.कॉम')) 
-                        : (otpInput || '••••')}
-                    </span>
-                  </div>
-                  
-                  {signInError && (
-                    <span className="text-[10px] font-bold text-red-500 bg-red-50 py-1.5 px-3 rounded-lg border border-red-100 text-center leading-none">
-                      {signInError}
-                    </span>
-                  )}
-                  {signInStep === 'otp' && !signInError && (
-                    <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 py-1.5 px-3 rounded-lg border border-emerald-100 text-center leading-none">
-                      {lang === 'en' ? '💡 Tip: Enter 1234 to verify' : '💡 युक्ति: सत्यापित करने के लिए 1234 दर्ज करें'}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Dynamic Keypad Area */}
-              <div className="flex-grow flex flex-col h-full bg-white border border-[#cbd7ca]/40 rounded-3xl p-4 shadow-sm mt-3 flex-1 justify-center gap-3 min-h-0">
-                {signInStep === 'email' ? (
-                  /* QWERTY Keyboard for Email Input */
-                  <div className="w-full flex flex-col gap-1.5 select-none bg-slate-50 p-2.5 rounded-2xl border border-slate-200/60 shadow-inner">
-                    {[
-                      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-                      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
-                      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
-                      ['z', 'x', 'c', 'v', 'b', 'n', 'm', '@', '.', '_']
-                    ].map((row, rIdx) => (
-                      <div key={rIdx} className="flex justify-center gap-1">
-                        {row.map(char => (
-                          <button
-                            key={char}
-                            onClick={() => handleKeypadPress(char)}
-                            className="h-9 w-7.5 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-xs font-bold text-[#12240f] cursor-pointer flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.01)] uppercase"
-                          >
-                            {char}
-                          </button>
-                        ))}
+                <div className="flex flex-col gap-2.5">
+                  {cart.map(item => (
+                    <div key={item.product.id} className="flex justify-between items-center py-2.5 border-b border-dashed border-slate-100 last:border-0 last:pb-0 first:pt-0">
+                      <div className="flex items-start gap-2.5 min-w-0">
+                        {/* Quantity Badge */}
+                        <span className="bg-[#f0fdf4] border border-[#dcfce7] text-[#008744] font-sans font-black text-[10px] px-2 py-0.5 rounded-lg shrink-0 mt-0.5">
+                          {item.quantity}x
+                        </span>
+                        <div className="flex flex-col gap-0.5 min-w-0">
+                          <span className="text-[#12240f] font-extrabold text-[13.5px] leading-tight truncate text-left">
+                            {formatProductName(item.product.name)}
+                          </span>
+                          <span className="text-[10px] text-[#5e6d5b] text-left font-semibold">
+                            ₹{item.product.price} each
+                          </span>
+                        </div>
                       </div>
-                    ))}
-                    <div className="flex justify-center gap-1 mt-0.5">
-                      <button
-                        onClick={() => handleKeypadPress('clear')}
-                        className="h-9 px-2.5 rounded-lg border border-[#e3ebe2] bg-[#fdf0f0]/60 active:bg-red-50 active:scale-95 transition-all text-[10px] font-black uppercase text-red-600 cursor-pointer flex items-center justify-center shadow-sm"
-                      >
-                        {lang === 'en' ? 'Clear' : 'साफ़'}
-                      </button>
-                      <button
-                        onClick={() => handleKeypadPress('space')}
-                        className="h-9 w-28 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[10px] font-black uppercase text-slate-500 cursor-pointer flex items-center justify-center shadow-sm"
-                      >
-                        Space
-                      </button>
-                      <button
-                        onClick={() => handleKeypadPress('.com')}
-                        className="h-9 px-2 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[11px] font-black text-emerald-700 cursor-pointer flex items-center justify-center shadow-sm"
-                      >
-                        .com
-                      </button>
-                      <button
-                        onClick={() => handleKeypadPress('backspace')}
-                        className="h-9 px-2.5 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[#12240f] cursor-pointer flex items-center justify-center shadow-sm"
-                      >
-                        <span className="material-symbols-outlined font-extrabold text-[14px]">backspace</span>
-                      </button>
+                      <span className="text-[14.5px] font-black font-mono text-[#12240f] shrink-0">
+                        ₹{item.product.price * item.quantity}
+                      </span>
                     </div>
-                  </div>
-                ) : (
-                  /* Numeric Keypad for OTP Input */
-                  <div className="w-full max-w-[260px] mx-auto grid grid-cols-3 gap-2 p-2 select-none bg-slate-50 rounded-2xl border border-slate-200/60 shadow-inner">
-                    {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
-                      <button
-                        key={num}
-                        onClick={() => handleKeypadPress(num)}
-                        className="h-11 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-center text-base font-black font-sans text-slate-800 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
-                      >
-                        {num}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => handleKeypadPress('clear')}
-                      className="h-11 bg-rose-50 hover:bg-rose-100/70 border border-rose-100 rounded-xl flex items-center justify-center text-[9px] font-black uppercase text-rose-600 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
-                    >
-                      {lang === 'en' ? 'Clear' : 'साफ़'}
-                    </button>
-                    <button
-                      onClick={() => handleKeypadPress('0')}
-                      className="h-11 bg-white hover:bg-slate-50 border border-[#e3ebe2] rounded-xl flex items-center justify-center text-base font-black font-sans text-slate-800 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
-                    >
-                      0
-                    </button>
-                    <button
-                      onClick={() => handleKeypadPress('backspace')}
-                      className="h-11 bg-slate-100/80 hover:bg-slate-150 border border-slate-200 rounded-xl flex items-center justify-center text-slate-600 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
-                    >
-                      <span className="material-symbols-outlined font-extrabold text-[18px]">backspace</span>
-                    </button>
-                  </div>
-                )}
+                  ))}
+                </div>
+                
+                {/* Total Bill section styled like receipt footer */}
+                <div className="flex justify-between items-center bg-[#f7faf6] -mx-5 -mb-5 mt-4 p-4.5 rounded-b-[22px] border-t border-[#cbd7ca]/20">
+                  <span className="font-sans font-black text-[11px] text-[#12240f] uppercase tracking-wider">Total Bill</span>
+                  <span className="text-xl font-black font-mono text-[#006e2f]">₹{getCartTotal()}</span>
+                </div>
+              </section>
 
-                {/* Confirm/Send OTP Button */}
-                <button
-                  onClick={signInStep === 'email' ? handleSendOtp : handleVerifyOtp}
-                  className="w-full bg-[#006e2f] hover:bg-[#005321] text-white font-black py-3.5 rounded-2xl shadow-md shadow-emerald-950/10 active:scale-[0.98] transition-all cursor-pointer text-center text-sm font-sans uppercase tracking-wider mt-1"
-                >
-                  {signInStep === 'email' 
-                    ? (lang === 'en' ? 'Send OTP Verification' : 'ओटीपी सत्यापन भेजें') 
-                    : (lang === 'en' ? 'Verify Code' : 'कोड सत्यापित करें')}
-                </button>
-
-                <button
-                  onClick={() => {
-                    if (signInStep === 'otp') {
-                      setSignInStep('email');
-                      setOtpInput('');
-                      setSignInError('');
-                    } else {
-                      setScreen('landing');
-                    }
-                  }}
-                  className="w-full bg-slate-100 hover:bg-slate-200 text-[#4B5563] font-bold py-2.5 rounded-xl active:scale-[0.98] transition-all cursor-pointer text-center text-xs font-sans"
-                >
-                  {signInStep === 'otp' ? (lang === 'en' ? 'Back' : 'पीछे') : (lang === 'en' ? 'Cancel' : 'रद्द करें')}
-                </button>
-              </div>
             </motion.div>
           )}
 
@@ -1542,15 +1266,6 @@ export default function App() {
               </div>
             )}
 
-            {/* Payment Screen: back to home */}
-            {screen === 'payment' && !paymentProcessing && (
-              <button 
-                onClick={() => setScreen('cart')}
-                className="w-full h-12 rounded-2xl bg-slate-100 text-on-surface font-sans font-bold text-sm active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-200"
-              >
-                Back to Cart
-              </button>
-            )}
 
           </div>
         </div>
@@ -1602,39 +1317,9 @@ export default function App() {
             </span>
           </button>
  
-          {/* Pay */}
-          <button 
-            onClick={() => {
-              if (cart.length > 0) {
-                setUpiId('anonymous@gpay');
-                setScreen('payment');
-              } else {
-                setSelectedCategory("Women's Health");
-                setScreen('products');
-              }
-              setAccountOpen(false);
-            }}
-            className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
-          >
-            <QrCode size={20} className="mb-1 text-slate-400 hover:text-slate-600 transition-colors duration-200" />
-            <span className="text-[10px] font-bold text-slate-400">
-              {t('pay')}
-            </span>
-          </button>
- 
           {/* Account */}
           <button 
-            onClick={() => {
-              if (user) {
-                setAccountOpen(true);
-              } else {
-                setSignInStep('email');
-                setEmailInput('');
-                setOtpInput('');
-                setSignInError('');
-                setScreen('signin');
-              }
-            }}
+            onClick={() => setAccountOpen(true)}
             className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
           >
             {accountOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
@@ -1738,12 +1423,10 @@ export default function App() {
                   <User size={24} />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-extrabold text-sm text-[#111827] text-left">
-                    {user ? user.name : (lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક')}
+                  <h4 className="font-extrabold text-sm text-[#111827]">
+                    {lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક'}
                   </h4>
-                  <p className="text-xs font-semibold text-slate-500 text-left">
-                    {user ? `Email: ${user.email}` : 'ID: PC-8893-X'}
-                  </p>
+                  <p className="text-xs font-semibold text-slate-500">ID: PC-8893-X</p>
                 </div>
                 <div className="bg-emerald-100/50 border border-emerald-200/50 text-[#006e2f] text-[10px] font-black uppercase px-2 py-1 rounded-lg">
                   {lang === 'en' ? 'Active' : lang === 'hi' ? 'सक्रिय' : 'સક્રિય'}
@@ -1754,19 +1437,12 @@ export default function App() {
               <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm flex flex-col gap-3">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-extrabold text-slate-700">CarePoints Balance</span>
-                  <span className="text-sm font-black text-[#006e2f]">{user ? `${user.points} pts` : '120 pts'}</span>
+                  <span className="text-sm font-black text-[#006e2f]">120 pts</span>
                 </div>
                 <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-[#006e2f] h-full rounded-full transition-all duration-300" 
-                    style={{ width: user ? `${Math.min(100, (user.points / 400) * 100)}%` : '30%' }} 
-                  />
+                  <div className="bg-[#006e2f] h-full rounded-full" style={{ width: '60%' }} />
                 </div>
-                <span className="text-[10px] font-semibold text-slate-400 text-left">
-                  {user 
-                    ? `${400 - user.points} more points to get a free hygiene sample`
-                    : '80 more points to get a free hygiene sample'}
-                </span>
+                <span className="text-[10px] font-semibold text-slate-400">80 more points to get a free hygiene sample</span>
               </div>
 
               {/* Interactive Settings / Privacy Mode */}
@@ -1805,27 +1481,13 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Close & Logout Buttons */}
-              <div className="flex flex-col gap-2 mt-1">
-                {user && (
-                  <button 
-                    onClick={() => {
-                      setUser(null);
-                      setAccountOpen(false);
-                      setScreen('landing');
-                    }}
-                    className="w-full bg-red-50 hover:bg-red-100/60 text-red-600 font-extrabold py-3.5 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm border border-red-100"
-                  >
-                    {lang === 'en' ? 'Sign Out' : 'साइन आउट'}
-                  </button>
-                )}
-                <button 
-                  onClick={() => setAccountOpen(false)}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-[#4B5563] font-bold py-3 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm font-sans"
-                >
-                  {t('close')}
-                </button>
-              </div>
+              {/* Close Button */}
+              <button 
+                onClick={() => setAccountOpen(false)}
+                className="w-full mt-1 bg-gray-100 hover:bg-gray-200 text-[#4B5563] font-bold py-3 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm font-sans"
+              >
+                {t('close')}
+              </button>
             </motion.div>
           </motion.div>
         )}
