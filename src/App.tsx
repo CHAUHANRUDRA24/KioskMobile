@@ -1382,88 +1382,183 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* ACCOUNT MODAL (BOTTOM SHEET) */}
+      {/* ACCOUNT MODAL (FULL SCREEN VIEW) */}
       <AnimatePresence>
         {accountOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm z-[999] flex flex-col justify-end"
+          <motion.div
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
+            className="absolute inset-0 bg-[#f8f9fa] z-[999] flex flex-col overflow-hidden pb-16 text-left"
           >
-            {/* Backdrop click listener */}
-            <div className="absolute inset-0" onClick={() => setAccountOpen(false)} />
-            
-            {/* Sheet Content */}
-            <motion.div 
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-              className="bg-white w-full rounded-t-3xl shadow-2xl relative z-10 p-6 pb-8 border-t border-gray-100 flex flex-col gap-5 text-left"
-            >
-              {/* Drag Handle */}
-              <div className="w-full flex justify-center cursor-pointer" onClick={() => setAccountOpen(false)}>
-                <div className="w-12 h-1.5 bg-gray-200 rounded-full" />
-              </div>
+            {/* Header */}
+            <header className="flex items-center justify-between px-5 py-4 bg-white border-b border-slate-100 shrink-0">
+              <button 
+                onClick={() => setAccountOpen(false)}
+                className="w-10 h-10 rounded-full flex items-center justify-center text-slate-700 hover:bg-slate-100 active:scale-95 transition-all cursor-pointer"
+              >
+                <span className="material-symbols-outlined font-black text-xl">arrow_back</span>
+              </button>
+              <h3 className="text-base font-black text-[#12240f] uppercase tracking-wide">
+                {lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું'}
+              </h3>
+              <div className="w-10 h-10" /> {/* Spacer for centering */}
+            </header>
 
-              {/* Title */}
-              <div className="flex flex-col gap-1.5 text-center">
-                <h3 className="text-xl font-black text-[#006e2f] tracking-tight">
-                  {lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું'}
-                </h3>
-                <p className="text-xs text-slate-500 font-medium">
-                  {lang === 'en' ? 'Manage your kiosk session and rewards' : lang === 'hi' ? 'अपने कियोस्क सत्र और पुरस्कार प्रबंधित करें' : 'તમારા કિઓસ્ક સત્ર અને પુરસ્કારોનું સંચાલન કરો'}
-                </p>
-              </div>
-
+            {/* Scrollable Content */}
+            <div className="flex-1 overflow-y-auto no-scrollbar p-5 flex flex-col gap-4">
+              
               {/* Profile Card */}
-              <div className="flex items-center gap-4 p-4 bg-[#f4f7f3] rounded-2xl border border-[#dae3d9] shadow-sm">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#006e2f] to-emerald-400 text-white flex items-center justify-center shadow-md">
-                  <User size={24} />
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#006e2f] to-emerald-400 text-white flex items-center justify-center shadow-md shrink-0">
+                    <User size={26} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-extrabold text-base text-[#12240f] leading-tight truncate">
+                      {lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક'}
+                    </h4>
+                    <p className="text-xs font-semibold text-[#5e6d5b] mt-0.5">ID: PC-8893-X</p>
+                  </div>
+                  <div className="bg-[#ecf3ec] border border-[#cbd7ca]/50 text-[#006e2f] text-[10px] font-black uppercase px-2.5 py-1 rounded-lg shrink-0">
+                    {lang === 'en' ? 'Active' : lang === 'hi' ? 'सक्रिय' : 'સક્રિય'}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <h4 className="font-extrabold text-sm text-[#111827]">
-                    {lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક'}
-                  </h4>
-                  <p className="text-xs font-semibold text-slate-500">ID: PC-8893-X</p>
-                </div>
-                <div className="bg-emerald-100/50 border border-emerald-200/50 text-[#006e2f] text-[10px] font-black uppercase px-2 py-1 rounded-lg">
-                  {lang === 'en' ? 'Active' : lang === 'hi' ? 'सक्रिय' : 'સક્રિય'}
+                <div className="h-px bg-slate-100 w-full"></div>
+                <div className="grid grid-cols-2 gap-4 text-left">
+                  <div>
+                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">Session Status</span>
+                    <span className="text-xs font-extrabold text-[#12240f] mt-0.5 block">Anonymous Session</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">Kiosk Location</span>
+                    <span className="text-xs font-extrabold text-[#12240f] mt-0.5 block">Kiosk DEL-09</span>
+                  </div>
                 </div>
               </div>
 
               {/* Rewards Progress Card */}
-              <div className="p-4 rounded-2xl border border-slate-100 bg-white shadow-sm flex flex-col gap-3">
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4 text-left">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs font-extrabold text-slate-700">CarePoints Balance</span>
-                  <span className="text-sm font-black text-[#006e2f]">120 pts</span>
+                  <div>
+                    <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">CarePoints Rewards</h4>
+                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Earn points on every purchase</p>
+                  </div>
+                  <span className="text-lg font-black text-[#006e2f] font-mono">120 pts</span>
                 </div>
-                <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                  <div className="bg-[#006e2f] h-full rounded-full" style={{ width: '60%' }} />
-                </div>
-                <span className="text-[10px] font-semibold text-slate-400">80 more points to get a free hygiene sample</span>
-              </div>
-
-              {/* Interactive Settings / Privacy Mode */}
-              <div className="flex flex-col gap-2">
-                {/* Secure Badge */}
-                <div className="flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-black text-[#006e2f] uppercase tracking-wider bg-emerald-50/50 rounded-xl border border-emerald-100/30">
-                  <Shield size={12} className="stroke-[3]" />
-                  <span>
-                    {t('confidential')}
+                
+                {/* Progress Bar */}
+                <div className="flex flex-col gap-1.5">
+                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                    <div className="bg-[#006e2f] h-full rounded-full" style={{ width: '60%' }} />
+                  </div>
+                  <span className="text-[10px] font-semibold text-slate-500">
+                    80 more points to get a free hygiene sample
                   </span>
                 </div>
+
+                {/* Points history list */}
+                <div className="h-px bg-slate-100 w-full my-1"></div>
+                <div>
+                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2.5">Points History</h5>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex justify-between items-center text-xs">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-extrabold text-[#12240f]">Welcome Bonus</span>
+                        <span className="text-[9.5px] text-slate-400 font-medium">01 Jul 2026</span>
+                      </div>
+                      <span className="font-mono font-black text-[#006e2f]">+100 pts</span>
+                    </div>
+                    <div className="flex justify-between items-center text-xs">
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-extrabold text-[#12240f]">Kiosk Purchase</span>
+                        <span className="text-[9.5px] text-slate-400 font-medium">01 Jul 2026</span>
+                      </div>
+                      <span className="font-mono font-black text-[#006e2f]">+20 pts</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              {/* Close Button */}
+              {/* Session Transaction History */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3.5 text-left">
+                <div>
+                  <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">Session Transactions</h4>
+                  <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Receipts from this session</p>
+                </div>
+                
+                <div className="flex flex-col gap-2.5">
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-extrabold text-[#12240f]">Receipt #TX-9902</span>
+                        <span className="text-[9.5px] text-slate-400 font-medium">Completed • 3 items</span>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black font-mono text-[#12240f]">₹3,470</span>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                    <div className="flex items-center gap-3">
+                      <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="text-xs font-extrabold text-[#12240f]">Receipt #TX-9874</span>
+                        <span className="text-[9.5px] text-slate-400 font-medium">Completed • 1 item</span>
+                      </div>
+                    </div>
+                    <span className="text-xs font-black font-mono text-[#12240f]">₹150</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Settings & Support Section */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3 text-left">
+                <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide mb-1">Session Settings</h4>
+                
+                {/* Current Language */}
+                <div className="flex justify-between items-center py-1">
+                  <div className="flex items-center gap-2.5">
+                     <span className="material-symbols-outlined text-slate-500 text-lg">translate</span>
+                     <span className="text-xs font-extrabold text-[#12240f]">Session Language</span>
+                  </div>
+                  <span className="text-xs font-black text-[#006e2f] uppercase bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100/40">
+                    {lang === 'en' ? 'English' : lang === 'hi' ? 'हिंदी' : 'ગુજરાતી'}
+                  </span>
+                </div>
+
+                <div className="h-px bg-slate-100 w-full my-1"></div>
+
+                {/* Toll-Free Help */}
+                <div className="flex items-start gap-2.5 py-1">
+                  <span className="material-symbols-outlined text-slate-500 text-lg mt-0.5">call</span>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="text-xs font-extrabold text-[#12240f]">Toll-Free Helpline</span>
+                    <span className="text-[11.5px] font-black text-[#006e2f] font-mono">1800-111-2222</span>
+                    <p className="text-[9.5px] text-slate-400 font-medium leading-tight mt-0.5">Available 24/7 for technical and ordering support</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Secure Badge */}
+              <div className="flex items-center justify-center gap-1.5 py-3 text-[10px] font-black text-[#006e2f] uppercase tracking-wider bg-emerald-50/50 rounded-2xl border border-emerald-100/30 shrink-0">
+                <Shield size={12} className="stroke-[3]" />
+                <span>
+                  {t('confidential')}
+                </span>
+              </div>
+            </div>
+
+            {/* Footer Close Button */}
+            <footer className="px-5 py-4 bg-white border-t border-slate-100 shrink-0">
               <button 
                 onClick={() => setAccountOpen(false)}
-                className="w-full mt-1 bg-gray-100 hover:bg-gray-200 text-[#4B5563] font-bold py-3 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm font-sans"
+                className="w-full h-12 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-sm shadow-md hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 {t('close')}
               </button>
-            </motion.div>
+            </footer>
           </motion.div>
         )}
       </AnimatePresence>
