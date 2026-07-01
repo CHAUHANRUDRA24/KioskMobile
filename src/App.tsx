@@ -60,71 +60,129 @@ const Logo: React.FC<{ className?: string }> = ({ className }) => {
 
 const TRANSLATIONS = {
   en: {
-    welcome: "Welcome",
-    tagline: "Your Private 24/7 Health Dispenser",
-    description: "Purchase personal health and wellness products anonymously through the Creator Lab Smart Kiosk.",
-    startShopping: "Start Shopping",
-    whyChooseUs: "Why choose us",
-    anonymousTitle: "Anonymous",
-    anonymousDesc: "No tracking. Complete isolation of your medical transaction records.",
-    touchlessTitle: "Touchless",
-    touchlessDesc: "Hygienic use. Conduct purchase on your screen, collect directly.",
-    upiQrTitle: "UPI & QR",
-    upiQrDesc: "Fast, secure payments. Instant scan code and pick.",
-    realTimeTitle: "Real-Time",
-    realTimeDesc: "Always accurate. Showing live dispenser inventory of products.",
-    howItWorks: "How It Works",
-    step1Title: "Scan QR",
-    step1Desc: "Start your session anonymously at the physical kiosk screen.",
-    step2Title: "Select",
-    step2Desc: "Choose your medical products on your own phone or kiosk screen.",
-    step3Title: "Pay",
-    step3Desc: "Secure touchless mobile payment (UPI, cards, or digital wallets).",
-    step4Title: "Collect",
-    step4Desc: "Your items dispense instantly in the kiosk's private pick-up tray.",
-    secureTitle: "100% Secure",
-    secureDesc: "Encrypted",
-    privacyTitle: "Total Privacy",
-    privacyDesc: "Verified",
-    guideBtn: "GUIDE",
-    needHelp: "Need help? 1800-111-2222",
+    tagline: 'Your Private Health Store',
+    description: 'Buy health products anytime, privately, without talking to anyone.',
+    private: 'Private',
+    instant: 'Instant',
+    alwaysOpenBadge: '24×7',
+    startShopping: 'Start Shopping',
+    browseEssentials: 'Browse 20+ health essentials',
+    howItWorks: 'HOW IT WORKS',
+    chooseProducts: 'Choose Products',
+    browseMenu: 'Browse menu and tap what you need.',
+    payWithUpi: 'Pay with UPI',
+    scanQrCode: 'Scan the QR code with any UPI app.',
+    collectItems: 'Collect Your Items',
+    machineGives: 'The machine gives your items instantly.',
+    whyTrust: 'WHY TRUST THIS KIOSK',
+    fullyPrivate: 'Fully Private',
+    alwaysOpen: 'Always Open',
+    easyPayment: 'Easy Payment',
+    superFast: 'Super Fast',
+    madeWithCare: 'MADE WITH CARE',
+    byTeam: 'By Team CREATO4',
+    home: 'Home',
+    products: 'Products',
+    cart: 'Cart',
+    pay: 'Pay',
+    about: 'About',
+    howToUse: 'How to Use Kiosk',
+    getProductsSteps: 'Get your health products in 3 simple steps:',
+    selectProducts: 'Select Products',
+    browseCategories: 'Browse through hygiene & medical categories and add what you need to your cart.',
+    scanPayUpi: 'Scan & Pay via UPI',
+    clickProceed: 'Click "Proceed to Pay" and scan the QR code with GPay, PhonePe, Paytm, or BHIM.',
+    collectInstantly: 'Collect Instantly',
+    itemsDispense: 'Your items will immediately dispense into the delivery tray at the bottom.',
+    confidential: '100% Confidential & Secure',
+    close: 'Close'
   },
   hi: {
-    welcome: "स्वागत है",
-    tagline: "आपका निजी 24/7 स्वास्थ्य डिस्पेंसर",
-    description: "द क्रिएटर लैब स्मार्ट कियोस्क के माध्यम से गुमनाम रूप से व्यक्तिगत स्वास्थ्य और कल्याण उत्पाद खरीदें।",
-    startShopping: "खरीदारी शुरू करें",
-    whyChooseUs: "हमारा चयन क्यों करें",
-    anonymousTitle: "गुमनाम",
-    anonymousDesc: "कोई ट्रैकिंग नहीं। आपके चिकित्सा लेनदेन रिकॉर्ड का पूर्ण अलगाव।",
-    touchlessTitle: "स्पर्श रहित",
-    touchlessDesc: "हाइजीनिक उपयोग। अपनी स्वयं की स्क्रीन पर खरीदारी करें, सीधे कलेक्ट करें।",
-    upiQrTitle: "UPI और QR",
-    upiQrDesc: "तेज़, सुरक्षित भुगतान। तुरंत कोड स्कैन करें और चुनें।",
-    realTimeTitle: "रियल-टाइम",
-    realTimeDesc: "हमेशा सटीक। उत्पादों की लाइव डिस्पेंसर इन्वेंट्री दिखा रहा है।",
-    howItWorks: "यह कैसे काम करता है",
-    step1Title: "QR स्कैन करें",
-    step1Desc: "भौतिक कियोस्क स्क्रीन पर गुमनाम रूप से अपना सत्र शुरू करें।",
-    step2Title: "उत्पाद चुनें",
-    step2Desc: "अपने फोन या कियोस्क स्क्रीन पर अपने चिकित्सा उत्पाद चुनें।",
-    step3Title: "भुगतान करें",
-    step3Desc: "सुरक्षित स्पर्श रहित मोबाइल भुगतान (UPI, कार्ड, या डिजिटल वॉलेट)।",
-    step4Title: "सामान प्राप्त करें",
-    step4Desc: "आपकी वस्तुएं तुरंत कियोस्क की निजी पिक-अप ट्रे में डिस्पेंस हो जाएंगी।",
-    secureTitle: "100% सुरक्षित",
-    secureDesc: "एन्क्रिप्टेड",
-    privacyTitle: "पूर्ण गोपनीयता",
-    privacyDesc: "सत्यापित",
-    guideBtn: "गाइड",
-    needHelp: "सहायता चाहिए? 1800-111-2222",
+    tagline: 'आपका निजी स्वास्थ्य स्टोर',
+    description: 'किसी से बात किए बिना, निजी तौर पर, कभी भी स्वास्थ्य उत्पाद खरीदें।',
+    private: 'निजी',
+    instant: 'तुरंत',
+    alwaysOpenBadge: '२४×७',
+    startShopping: 'खरीदारी शुरू करें',
+    browseEssentials: '२०+ आवश्यक उत्पाद देखें',
+    howItWorks: 'यह कैसे काम करता है',
+    chooseProducts: 'उत्पाद चुनें',
+    browseMenu: 'मेन्यू ब्राउज़ करें और अपनी ज़रूरत की चीज़ों पर टैप करें।',
+    payWithUpi: 'UPI से भुगतान',
+    scanQrCode: 'किसी भी UPI ऐप से QR कोड स्कैन करें।',
+    collectItems: 'सामान प्राप्त करें',
+    machineGives: 'मशीन आपको तुरंत सामान प्रदान करती है।',
+    whyTrust: 'इस कियोस्क पर भरोसा क्यों करें',
+    fullyPrivate: 'पूर्ण गोपनीय',
+    alwaysOpen: 'हमेशा खुला',
+    easyPayment: 'आसान भुगतान',
+    superFast: 'अत्यधिक तेज़',
+    madeWithCare: 'देखभाल के साथ बनाया गया',
+    byTeam: 'टीम CREATO4 द्वारा',
+    home: 'होम',
+    products: 'उत्पाद',
+    cart: 'कार्ट',
+    pay: 'भुगतान',
+    about: 'विवरण',
+    howToUse: 'कियोस्क का उपयोग कैसे करें',
+    getProductsSteps: 'अपने स्वास्थ्य उत्पादों को 3 आसान चरणों में प्राप्त करें:',
+    selectProducts: 'उत्पाद चुनें',
+    browseCategories: 'हाइजीन और मेडिकल श्रेणियों को देखें और अपनी जरूरत के सामान को कार्ट में जोड़ें।',
+    scanPayUpi: 'स्कैन और यूपीआई भुगतान',
+    clickProceed: '"Proceed to Pay" पर क्लिक करें और GPay, PhonePe, Paytm या BHIM से QR कोड स्कैन करें।',
+    collectInstantly: 'तुरंत सामान प्राप्त करें',
+    itemsDispense: 'आपका सामान मशीन के सबसे निचले हिस्से में स्थित डिलीवरी ट्रे में तुरंत आ जाएगा।',
+    confidential: '100% गोपनीय और सुरक्षित',
+    close: 'बंद करें'
+  },
+  gu: {
+    tagline: 'તમારો ખાનગી સ્વાસ્થ્ય સ્ટોર',
+    description: 'કોઈપણ સાથે વાત કર્યા વિના, ખાનગી રીતે, ગમે ત્યારે આરોગ્ય ઉત્પાદનો ખરીદો.',
+    private: 'ખાનગી',
+    instant: 'ત્વરિત',
+    alwaysOpenBadge: '૨૪×૭',
+    startShopping: 'ખરીદી શરૂ કરો',
+    browseEssentials: '૨૦+ આરોગ્યની આવશ્યક ચીજો જુઓ',
+    howItWorks: 'તે કેવી રીતે કાર્ય કરે છે',
+    chooseProducts: 'ઉત્પાદનો પસંદ કરો',
+    browseMenu: 'મેનૂ બ્રાઉઝ કરો અને તમને જે જોઈએ તે પર ટેપ કરો.',
+    payWithUpi: 'UPI વડે ચૂકવણી કરો',
+    scanQrCode: 'કોઈપણ UPI એપ વડે QR કોડ સ્કેન કરો.',
+    collectItems: 'તમારી વસ્તુઓ મેળવો',
+    machineGives: 'મશીન તમને તમારી વસ્તુઓ તરત જ આપશે.',
+    whyTrust: 'આ કિઓસ્ક પર શા માટે વિશ્વાસ કરવો',
+    fullyPrivate: 'સંપૂર્ણ ખાનગી',
+    alwaysOpen: 'હંમેશા ખુલ્લું',
+    easyPayment: 'સરળ ચુકવણી',
+    superFast: 'અતિ ઝડપી',
+    madeWithCare: 'કાળજીપૂર્વક બનાવેલ',
+    byTeam: 'ટીમ CREATO4 દ્વારા',
+    home: 'હોમ',
+    products: 'ઉત્પાદનો',
+    cart: 'કાર્ટ',
+    pay: 'ચૂકવો',
+    about: 'વિશે',
+    howToUse: 'કિઓસ્કનો ઉપયોગ કેવી રીતે કરવો',
+    getProductsSteps: 'તમારા આરોગ્ય ઉત્પાદનો 3 સરળ પગલાંમાં મેળવો:',
+    selectProducts: 'ઉત્પાદનો પસંદ કરો',
+    browseCategories: 'હાઇજીન અને મેડિકલ કેટેગરીઝ બ્રાઉઝ કરો અને તમને જોઈતી વસ્તુઓ તમારા કાર્ટમાં ઉમેરો.',
+    scanPayUpi: 'સ્કેન અને UPI દ્વારા ચુકવણી',
+    clickProceed: '"Proceed to Pay" પર ક્લિક કરો અને GPay, PhonePe, Paytm અથવા BHIM વડે QR કોડ સ્કેન કરો.',
+    collectInstantly: 'તરત જ મેળવો',
+    itemsDispense: 'તમારી વસ્તુઓ તરત જ નીચે ડિલિવરી ટ્રેમાં વિતરિત થઈ જશે.',
+    confidential: '100% ગોપનીય અને સુરક્ષિત',
+    close: 'બંધ કરો'
   }
 };
 
 export default function App() {
   // Navigation & Cart States
   const [screen, setScreen] = useState<ScreenType>('landing');
-  const [lang, setLang] = useState<'en' | 'hi'>('en');
+  const [lang, setLang] = useState<'en' | 'hi' | 'gu'>('en');
+  
+  const t = (key: keyof typeof TRANSLATIONS.en) => {
+    return TRANSLATIONS[lang]?.[key] || TRANSLATIONS.en[key];
+  };
   const [aboutOpen, setAboutOpen] = useState<boolean>(false);
   const [cart, setCart] = useState<CartItem[]>([]);
 
@@ -273,10 +331,10 @@ export default function App() {
       const el = document.getElementById(targetId);
       if (el) {
         const rect = el.getBoundingClientRect();
-        // Distance from the top of the container
-        const dist = rect.top - containerRect.top;
-        // If the section is currently active and near the top of the scrollable region
-        if (dist < 120 && dist > -rect.height + 40) {
+        // Distance to the top of the container (with a small 40px offset for natural scrolling feel)
+        const dist = Math.abs(rect.top - containerRect.top - 40);
+        if (dist < minDistance) {
+          minDistance = dist;
           closestCategory = category;
         }
       }
@@ -361,7 +419,7 @@ export default function App() {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {screen === 'landing' && (
-            /* English / Hindi Switcher */
+            /* English / Hindi / Gujarati Switcher */
             <div className="flex bg-slate-100 rounded-full p-0.5 border border-slate-200 shadow-inner">
               <button 
                 onClick={() => setLang('en')}
@@ -378,6 +436,14 @@ export default function App() {
                 }`}
               >
                 हिं
+              </button>
+              <button 
+                onClick={() => setLang('gu')}
+                className={`px-2.5 py-1 text-[10px] font-extrabold rounded-full transition-all cursor-pointer ${
+                  lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                ગુ
               </button>
             </div>
           )}
@@ -426,94 +492,7 @@ export default function App() {
             >
               {/* Hero Section */}
               <section className="bg-gradient-to-tr from-[#F0FDF4] via-[#DCFCE7] to-white px-4 pt-6 pb-6 text-center rounded-[24px] overflow-hidden relative border border-emerald-100/50 shadow-sm flex flex-col items-center">
-                <div className="flex justify-center mb-5 relative z-10">
-                  {/* Highly polished physical Smart Kiosk with Creator Lab Branding */}
-                  <div className="relative w-56 h-[270px] bg-gradient-to-b from-slate-700 via-slate-800 to-slate-900 rounded-[20px] border-[3px] border-slate-600 shadow-xl flex flex-col overflow-hidden group">
-                    {/* Metallic side highlights */}
-                    <div className="absolute top-0 bottom-0 left-0 w-1 bg-gradient-to-r from-slate-500/20 to-transparent"></div>
-                    <div className="absolute top-0 bottom-0 right-0 w-1 bg-gradient-to-l from-slate-500/20 to-transparent"></div>
 
-                    {/* Kiosk Header: Backlit brand banner */}
-                    <div className="bg-slate-950 px-2 py-1 border-b border-slate-800 flex items-center justify-center gap-1 shadow-md">
-                      {/* Creator Lab Logo Image */}
-                      <Logo 
-                        className="w-3.5 h-3.5 rounded-sm border border-emerald-500/50" 
-                      />
-                      <span className="font-mono text-[7px] font-bold text-emerald-400 tracking-wider">CREATOR LAB</span>
-                    </div>
-
-                    {/* Main Kiosk Screen */}
-                    <div className="flex-1 m-2 bg-[#F0FDF4] rounded-lg border border-slate-950 shadow-inner overflow-hidden flex flex-col relative">
-                      {/* Screen Glare reflection */}
-                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/10 pointer-events-none z-10"></div>
-                      
-                      {/* Screen Header */}
-                      <div className="bg-white/95 px-1.5 py-0.5 border-b border-emerald-100 flex items-center justify-between">
-                        <div className="flex items-center gap-0.5">
-                          {/* Miniature Kiosk Logo */}
-                          <Logo 
-                            className="w-2.5 h-2.5 rounded-sm border border-[#006e2f]/50" 
-                          />
-                          <span className="text-[7px] font-extrabold text-[#006e2f] tracking-tight">Smart Kiosk</span>
-                        </div>
-                        <span className="text-[5.5px] font-bold text-slate-400 bg-slate-100 px-0.5 rounded">ONLINE</span>
-                      </div>
-
-                      {/* Screen Content Mockup */}
-                      <div className="flex-1 p-1 flex flex-col justify-center items-center text-center">
-                        <div className="text-base mb-0.5 animate-bounce">🩸</div>
-                        <div className="text-[8px] font-bold text-slate-800 leading-tight">Pads & Health Essentials</div>
-                        <div className="text-[6px] text-slate-500 mt-0.5">Dispenser Ready</div>
-                        
-                        {/* Mini interface list */}
-                        <div className="w-full mt-1.5 space-y-0.5">
-                          <div className="bg-white/80 p-0.5 rounded border border-emerald-500/10 flex items-center justify-between">
-                            <span className="text-[6px] font-medium text-slate-700">Regular Sanitary Pad</span>
-                            <span className="text-[6px] font-bold text-emerald-600">₹15</span>
-                          </div>
-                          <div className="bg-white/80 p-0.5 rounded border border-emerald-500/10 flex items-center justify-between">
-                            <span className="text-[6px] font-medium text-slate-700">Meftal Spas</span>
-                            <span className="text-[6px] font-bold text-emerald-600">₹30</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Touch Prompt Indicator */}
-                      <div className="bg-[#006e2f] text-white py-0.5 text-center text-[7px] font-bold tracking-wide uppercase">
-                        TAP TO START
-                      </div>
-                    </div>
-
-                    {/* Physical elements section below screen */}
-                    <div className="px-2 pb-2 space-y-1">
-                      {/* Interface Controls: Flashing Green lights, card reader */}
-                      <div className="flex items-center justify-between">
-                        {/* Card Reader slot */}
-                        <div className="w-10 h-2 bg-slate-950 rounded border-b border-slate-700 shadow flex items-center justify-center">
-                          <div className="w-6 h-0.5 bg-slate-800"></div>
-                        </div>
-                        
-                        {/* Status indicator LEDs */}
-                        <div className="flex gap-1">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_6px_#10b981] animate-pulse"></div>
-                          <div className="w-1.5 h-1.5 rounded-full bg-slate-600"></div>
-                        </div>
-                      </div>
-
-                      {/* Recessed Glowing dispensing tray at bottom */}
-                      <div className="bg-slate-950 rounded-lg h-9 border border-slate-800/80 shadow-[inset_0_3px_10px_rgba(0,0,0,0.8)] relative overflow-hidden flex items-center justify-center group/dispenser">
-                        {/* Glowing emerald internal LEDs */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-emerald-950/40 via-transparent to-transparent pointer-events-none"></div>
-                        <div className="absolute top-0 left-0 right-0 h-0.5 bg-emerald-500/30 shadow-[0_1px_6px_#10b981]"></div>
-                        
-                        {/* Dispensed product wait animation */}
-                        <div className="text-base z-10 transition-transform group-hover/dispenser:scale-110 duration-300 filter drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]">
-                          📦
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Brand Logo Circle */}
                 <div className="w-16 h-16 rounded-2xl overflow-hidden shadow-md border-2 border-white mb-2 bg-white flex-shrink-0">
@@ -524,22 +503,22 @@ export default function App() {
                   SMART KIOSK
                 </p>
                 <h2 className="font-sans font-bold text-xl text-[#0F172A] mb-1.5 leading-tight">
-                  {lang === 'en' ? 'Your Private Health Store' : 'आपका निजी स्वास्थ्य स्टोर'}
+                  {t('tagline')}
                 </h2>
                 <p className="font-sans text-xs text-[#6B7280] mb-4 max-w-[280px] mx-auto leading-relaxed">
-                  {lang === 'en' ? 'Buy health products anytime, privately, without talking to anyone.' : 'किसी से बात किए बिना, निजी तौर पर, कभी भी स्वास्थ्य उत्पाद खरीदें।'}
+                  {t('description')}
                 </p>
 
                 {/* Status Badges */}
                 <div className="flex justify-center gap-1.5 flex-wrap">
                   <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                    <span className="material-symbols-outlined text-[14px]">lock</span> {lang === 'en' ? 'Private' : 'निजी'}
+                    <span className="material-symbols-outlined text-[14px]">lock</span> {t('private')}
                   </span>
                   <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                    <span className="material-symbols-outlined text-[14px]">bolt</span> {lang === 'en' ? 'Instant' : 'तुरंत'}
+                    <span className="material-symbols-outlined text-[14px]">bolt</span> {t('instant')}
                   </span>
                   <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
-                    <span className="material-symbols-outlined text-[14px]">spa</span> {lang === 'en' ? '24×7' : '२४×७'}
+                    <span className="material-symbols-outlined text-[14px]">spa</span> {t('alwaysOpenBadge')}
                   </span>
                 </div>
               </section>
@@ -552,8 +531,8 @@ export default function App() {
                 <div className="flex items-center gap-3.5">
                   <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center text-xl shadow-inner">🛒</div>
                   <div className="text-left font-sans">
-                    <p className="text-[16px] font-extrabold tracking-tight">{lang === 'en' ? 'Start Shopping' : 'खरीदारी शुरू करें'}</p>
-                    <p className="text-white/80 text-[11px] font-medium">{lang === 'en' ? 'Browse 20+ health essentials' : '२०+ आवश्यक उत्पाद देखें'}</p>
+                    <p className="text-[16px] font-extrabold tracking-tight">{t('startShopping')}</p>
+                    <p className="text-white/80 text-[11px] font-medium">{t('browseEssentials')}</p>
                   </div>
                 </div>
                 <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center group-hover:translate-x-0.5 transition-transform">
@@ -566,7 +545,7 @@ export default function App() {
                 <div className="flex items-center gap-4 mb-6">
                   <div className="h-px flex-1 bg-gray-100"></div>
                   <h3 className="text-[11px] font-bold tracking-[2px] text-[#6B7280] uppercase">
-                    {lang === 'en' ? 'HOW IT WORKS' : 'यह कैसे काम करता है'}
+                    {t('howItWorks')}
                   </h3>
                   <div className="h-px flex-1 bg-gray-100"></div>
                 </div>
@@ -577,10 +556,10 @@ export default function App() {
                     <div className="w-12 h-12 bg-[#FEF9C3] rounded-full flex-shrink-0 flex items-center justify-center text-xl">👆</div>
                     <div className="text-left">
                       <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
-                        {lang === 'en' ? 'Choose Products' : 'उत्पाद चुनें'}
+                        {t('chooseProducts')}
                       </h4>
                       <p className="font-sans text-xs text-[#6B7280]">
-                        {lang === 'en' ? 'Browse menu and tap what you need.' : 'मेन्यू ब्राउज़ करें और अपनी ज़रूरत की चीज़ों पर टैप करें।'}
+                        {t('browseMenu')}
                       </p>
                     </div>
                   </div>
@@ -590,10 +569,10 @@ export default function App() {
                     <div className="w-12 h-12 bg-[#F0FDF4] rounded-full flex-shrink-0 flex items-center justify-center text-xl">💳</div>
                     <div className="text-left">
                       <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
-                        {lang === 'en' ? 'Pay with UPI' : 'UPI से भुगतान'}
+                        {t('payWithUpi')}
                       </h4>
                       <p className="font-sans text-xs text-[#6B7280]">
-                        {lang === 'en' ? 'Scan the QR code with any UPI app.' : 'किसी भी UPI ऐप से QR कोड स्कैन करें।'}
+                        {t('scanQrCode')}
                       </p>
                     </div>
                   </div>
@@ -603,10 +582,10 @@ export default function App() {
                     <div className="w-12 h-12 bg-[#EFF6FF] rounded-full flex-shrink-0 flex items-center justify-center text-xl">📦</div>
                     <div className="text-left">
                       <h4 className="font-sans text-[15px] font-bold text-[#111827] mb-0.5">
-                        {lang === 'en' ? 'Collect Your Items' : 'सामान प्राप्त करें'}
+                        {t('collectItems')}
                       </h4>
                       <p className="font-sans text-xs text-[#6B7280]">
-                        {lang === 'en' ? 'The machine gives your items instantly.' : 'मशीन आपको तुरंत सामान प्रदान करती है।'}
+                        {t('machineGives')}
                       </p>
                     </div>
                   </div>
@@ -616,24 +595,24 @@ export default function App() {
               {/* Trust Section */}
               <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100">
                 <h3 className="text-[11px] font-bold tracking-[2px] text-[#6B7280] mb-5 uppercase text-center">
-                  {lang === 'en' ? 'WHY TRUST THIS KIOSK' : 'इस कियोस्क पर भरोसा क्यों करें'}
+                  {t('whyTrust')}
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
                     <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">lock</span>
-                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Fully Private' : 'पूर्ण गोपनीय'}</p>
+                    <p className="font-bold text-[13px] text-[#111827]">{t('fullyPrivate')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
                     <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">schedule</span>
-                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Always Open' : 'हमेशा खुला'}</p>
+                    <p className="font-bold text-[13px] text-[#111827]">{t('alwaysOpen')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
                     <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">qr_code_2</span>
-                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Easy Payment' : 'आसान भुगतान'}</p>
+                    <p className="font-bold text-[13px] text-[#111827]">{t('easyPayment')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
                     <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">bolt</span>
-                    <p className="font-bold text-[13px] text-[#111827]">{lang === 'en' ? 'Super Fast' : 'अत्यधिक तेज़'}</p>
+                    <p className="font-bold text-[13px] text-[#111827]">{t('superFast')}</p>
                   </div>
                 </div>
               </div>
@@ -650,10 +629,10 @@ export default function App() {
                 {/* Text lines */}
                 <div className="flex flex-col text-left">
                   <h4 className="font-sans font-black text-[13px] tracking-wider text-[#1e2e1c] leading-tight uppercase">
-                    {lang === 'en' ? 'MADE WITH CARE' : 'देखभाल के साथ बनाया गया'}
+                    {t('madeWithCare')}
                   </h4>
                   <p className="font-sans font-semibold text-[11px] text-[#556251] mt-0.5 leading-none">
-                    {lang === 'en' ? 'By Team CREATO4' : 'टीम CREATO4 द्वारा'}
+                    {t('byTeam')}
                   </p>
                 </div>
               </div>
@@ -711,7 +690,7 @@ export default function App() {
                 <div 
                   id="products-scroll-container"
                   onScroll={handleScroll}
-                  className="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-6 scroll-smooth pb-24"
+                  className="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-6 scroll-smooth pb-[450px]"
                 >
                   {totalMatchingProducts === 0 ? (
                     <div className="text-center py-12 flex flex-col items-center gap-3">
@@ -1289,10 +1268,10 @@ export default function App() {
             {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
             <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
             <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {lang === 'en' ? 'Home' : 'होम'}
+              {t('home')}
             </span>
           </button>
-
+ 
           {/* Products */}
           <button 
             onClick={() => { setScreen('products'); setAboutOpen(false); }}
@@ -1301,10 +1280,10 @@ export default function App() {
             {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
             <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
             <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {lang === 'en' ? 'Products' : 'उत्पाद'}
+              {t('products')}
             </span>
           </button>
-
+ 
           {/* Cart */}
           <button 
             onClick={() => { setScreen('cart'); setAboutOpen(false); }}
@@ -1320,10 +1299,10 @@ export default function App() {
               )}
             </div>
             <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {lang === 'en' ? 'Cart' : 'कार्ट'}
+              {t('cart')}
             </span>
           </button>
-
+ 
           {/* Pay */}
           <button 
             onClick={() => {
@@ -1340,10 +1319,10 @@ export default function App() {
           >
             <QrCode size={20} className="mb-1 text-slate-400 hover:text-slate-600 transition-colors duration-200" />
             <span className="text-[10px] font-bold text-slate-400">
-              {lang === 'en' ? 'Pay' : 'भुगतान'}
+              {t('pay')}
             </span>
           </button>
-
+ 
           {/* About */}
           <button 
             onClick={() => setAboutOpen(true)}
@@ -1352,7 +1331,7 @@ export default function App() {
             {aboutOpen && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
             <Info size={20} className={`mb-1 transition-colors duration-200 ${aboutOpen ? 'text-[#006e2f]' : 'text-slate-400'}`} />
             <span className={`text-[10px] font-bold transition-colors duration-200 ${aboutOpen ? 'text-[#006e2f]' : 'text-slate-400'}`}>
-              {lang === 'en' ? 'About' : 'विवरण'}
+              {t('about')}
             </span>
           </button>
         </nav>
@@ -1436,12 +1415,10 @@ export default function App() {
 
               <div className="flex flex-col gap-1.5 text-center">
                 <h3 className="text-xl font-black text-[#006e2f] tracking-tight">
-                  {lang === 'en' ? 'How to Use Kiosk' : 'कियोस्क का उपयोग कैसे करें'}
+                  {t('howToUse')}
                 </h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  {lang === 'en' 
-                    ? 'Get your health products in 3 simple steps:' 
-                    : 'अपने स्वास्थ्य उत्पादों को 3 आसान चरणों में प्राप्त करें:'}
+                  {t('getProductsSteps')}
                 </p>
               </div>
 
@@ -1453,12 +1430,10 @@ export default function App() {
                   </div>
                   <div className="text-left font-sans">
                     <h4 className="font-extrabold text-sm text-[#111827]">
-                      {lang === 'en' ? 'Select Products' : 'उत्पाद चुनें'}
+                      {t('selectProducts')}
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed font-semibold">
-                      {lang === 'en' 
-                        ? 'Browse through hygiene & medical categories and add what you need to your cart.' 
-                        : 'हाइजीन और मेडिकल श्रेणियों को देखें और अपनी जरूरत के सामान को कार्ट में जोड़ें।'}
+                      {t('browseCategories')}
                     </p>
                   </div>
                 </div>
@@ -1470,12 +1445,10 @@ export default function App() {
                   </div>
                   <div className="text-left font-sans">
                     <h4 className="font-extrabold text-sm text-[#111827]">
-                      {lang === 'en' ? 'Scan & Pay via UPI' : 'स्कैन और यूपीआई भुगतान'}
+                      {t('scanPayUpi')}
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed font-semibold">
-                      {lang === 'en' 
-                        ? 'Click "Proceed to Pay" and scan the QR code with GPay, PhonePe, Paytm, or BHIM.' 
-                        : '"Proceed to Pay" पर क्लिक करें और GPay, PhonePe, Paytm या BHIM से QR कोड स्कैन करें।'}
+                      {t('clickProceed')}
                     </p>
                   </div>
                 </div>
@@ -1487,12 +1460,10 @@ export default function App() {
                   </div>
                   <div className="text-left font-sans">
                     <h4 className="font-extrabold text-sm text-[#111827]">
-                      {lang === 'en' ? 'Collect Instantly' : 'तुरंत सामान प्राप्त करें'}
+                      {t('collectInstantly')}
                     </h4>
                     <p className="text-xs text-slate-500 mt-0.5 leading-relaxed font-semibold">
-                      {lang === 'en' 
-                        ? 'Your items will immediately dispense into the delivery tray at the bottom.' 
-                        : 'आपका सामान मशीन के सबसे निचले हिस्से में स्थित डिलीवरी ट्रे में तुरंत आ जाएगा।'}
+                      {t('itemsDispense')}
                     </p>
                   </div>
                 </div>
@@ -1500,7 +1471,7 @@ export default function App() {
                 <div className="flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-black text-[#006e2f] uppercase tracking-wider bg-emerald-50/50 rounded-xl border border-emerald-100/30">
                   <Lock size={12} className="stroke-[3]" />
                   <span>
-                    {lang === 'en' ? '100% Confidential & Secure' : '100% गोपनीय और सुरक्षित'}
+                    {t('confidential')}
                   </span>
                 </div>
               </div>
@@ -1509,7 +1480,7 @@ export default function App() {
                 onClick={() => setAboutOpen(false)}
                 className="w-full mt-2 bg-gray-100 hover:bg-gray-200 text-[#4B5563] font-bold py-3 rounded-xl active:scale-[0.97] transition-all cursor-pointer text-center text-sm font-sans"
               >
-                {lang === 'en' ? 'Close' : 'बंद करें'}
+                {t('close')}
               </button>
             </motion.div>
           </motion.div>
