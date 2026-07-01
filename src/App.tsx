@@ -416,62 +416,50 @@ export default function App() {
     <div className="w-full max-w-[430px] h-screen md:h-[92vh] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto pb-16">
 
       {/* HEADER BAR */}
-      <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
-        <div className="flex items-center gap-2.5 min-w-0">
-          {screen !== 'landing' && (
-            <button 
-              onClick={() => {
-                if (screen === 'payment') setScreen('cart');
-                else if (screen === 'cart') setScreen('products');
-                else if (screen === 'products') setScreen('landing');
-                else if (screen === 'account') setScreen('landing');
-              }}
-              className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container flex-shrink-0"
-            >
-              <ArrowLeft size={22} className="stroke-[2.5px]" />
-            </button>
-          )}
-          
-          <div className="flex items-center gap-2 min-w-0">
-            <Logo 
-              className="w-8 h-8 rounded-md border border-[#006e2f]/20 shadow-sm flex-shrink-0" 
-            />
-            <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
-              Smart Kiosk
-            </h1>
+      {screen === 'landing' && (
+        <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <Logo 
+                className="w-8 h-8 rounded-md border border-[#006e2f]/20 shadow-sm flex-shrink-0" 
+              />
+              <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
+                Smart Kiosk
+              </h1>
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {/* English / Hindi / Gujarati Switcher */}
-          <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner">
-            <button 
-              onClick={() => setLang('en')}
-              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              EN
-            </button>
-            <button 
-              onClick={() => setLang('hi')}
-              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              हिं
-            </button>
-            <button 
-              onClick={() => setLang('gu')}
-              className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
-                lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              ગુ
-            </button>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {/* English / Hindi / Gujarati Switcher */}
+            <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner">
+              <button 
+                onClick={() => setLang('en')}
+                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                  lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                EN
+              </button>
+              <button 
+                onClick={() => setLang('hi')}
+                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                  lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                हिं
+              </button>
+              <button 
+                onClick={() => setLang('gu')}
+                className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
+                  lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                ગુ
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
 
       <main className={`flex-1 flex flex-col no-scrollbar min-h-0 ${
