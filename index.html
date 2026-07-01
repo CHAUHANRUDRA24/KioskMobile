@@ -412,9 +412,9 @@
     }
 
     function launchReactApp() {
-      // Clear body class and insert React root
-      document.body.className = '';
-      document.body.innerHTML = '<div id="root"></div>';
+      // Keep centering and background body classes and insert React root
+      document.body.className = 'bg-background md:bg-surface-container-low min-h-screen flex items-center justify-center font-body-md text-on-surface';
+      document.body.innerHTML = '<div id="root" class="w-full h-full flex items-center justify-center"></div>';
 
       // Load main application script
       const script = document.createElement('script');
