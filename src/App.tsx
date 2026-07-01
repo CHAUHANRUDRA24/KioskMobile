@@ -416,7 +416,7 @@ export default function App() {
     <div className="w-full max-w-[430px] h-screen md:h-[92vh] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto pb-16">
 
       {/* HEADER BAR */}
-      {screen === 'landing' && (
+      {screen === 'landing' ? (
         <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="flex items-center gap-2 min-w-0">
@@ -458,6 +458,30 @@ export default function App() {
               </button>
             </div>
           </div>
+        </header>
+      ) : (
+        <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
+          <div className="flex items-center gap-3.5 min-w-0">
+            <button 
+              onClick={() => {
+                if (screen === 'payment') setScreen('cart');
+                else if (screen === 'cart') setScreen('products');
+                else if (screen === 'products') setScreen('landing');
+                else if (screen === 'account') setScreen('landing');
+              }}
+              className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container flex-shrink-0 cursor-pointer"
+            >
+              <ArrowLeft size={22} className="stroke-[2.5px]" />
+            </button>
+            
+            <h1 className="font-sans font-black text-lg tracking-tight text-[#006e2f] truncate">
+              {screen === 'products' && (lang === 'en' ? 'Products' : lang === 'hi' ? 'उत्पाद' : 'ઉત્પાદનો')}
+              {screen === 'cart' && (lang === 'en' ? 'My Cart' : lang === 'hi' ? 'मेरी कार्ट' : 'મારું કાર્ટ')}
+              {screen === 'payment' && (lang === 'en' ? 'Payment Checkout' : lang === 'hi' ? 'भुगतान चेकआउट' : 'ચુકવણી ચેકઆઉટ')}
+              {screen === 'account' && (lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું')}
+            </h1>
+          </div>
+          <div className="w-9 h-9" />
         </header>
       )}
 
