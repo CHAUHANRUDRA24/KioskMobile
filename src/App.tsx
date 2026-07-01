@@ -1390,7 +1390,7 @@ export default function App() {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'tween', duration: 0.25, ease: 'easeOut' }}
-            className="absolute inset-0 bg-[#f8f9fa] z-[999] flex flex-col overflow-hidden pb-16 text-left"
+            className="absolute inset-0 bg-[#f8f9fa] z-[999] flex flex-col overflow-hidden text-left"
           >
             {/* Header */}
             <header className="flex items-center justify-between px-5 py-4 bg-white border-b border-slate-100 shrink-0">
