@@ -185,21 +185,23 @@ export default function App() {
   };
   const [accountOpen, setAccountOpen] = useState<boolean>(false);
   const [privacyMode, setPrivacyMode] = useState<boolean>(false);
-  const [user, setUser] = useState<{ name: string; phone: string; points: number } | null>(null);
-  const [phoneInput, setPhoneInput] = useState<string>('');
+  const [user, setUser] = useState<{ name: string; email: string; points: number } | null>(null);
+  const [emailInput, setEmailInput] = useState<string>('');
   const [otpInput, setOtpInput] = useState<string>('');
-  const [signInStep, setSignInStep] = useState<'phone' | 'otp'>('phone');
+  const [signInStep, setSignInStep] = useState<'email' | 'otp'>('email');
   const [signInError, setSignInError] = useState<string>('');
 
   const handleKeypadPress = (val: string) => {
     setSignInError('');
-    if (signInStep === 'phone') {
+    if (signInStep === 'email') {
       if (val === 'backspace') {
-        setPhoneInput(prev => prev.slice(0, -1));
+        setEmailInput(prev => prev.slice(0, -1));
       } else if (val === 'clear') {
-        setPhoneInput('');
-      } else if (phoneInput.length < 10) {
-        setPhoneInput(prev => prev + val);
+        setEmailInput('');
+      } else if (val === 'space') {
+        setEmailInput(prev => prev + ' ');
+      } else {
+        setEmailInput(prev => prev + val);
       }
     } else {
       if (val === 'backspace') {
@@ -213,8 +215,9 @@ export default function App() {
   };
 
   const handleSendOtp = () => {
-    if (phoneInput.length !== 10) {
-      setSignInError(lang === 'en' ? 'Enter a valid 10-digit mobile number' : 'कृपया सही 10-अंकीय मोबाइल नंबर दर्ज करें');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailInput)) {
+      setSignInError(lang === 'en' ? 'Enter a valid email address' : 'कृपया सही ईमेल पता दर्ज करें');
       return;
     }
     setSignInStep('otp');
@@ -229,14 +232,16 @@ export default function App() {
     }
     if (otpInput === '1234') {
       // Mock login successful
+      const emailPrefix = emailInput.split('@')[0];
+      const displayName = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
       setUser({
-        name: 'Rudraksh Chauhan',
-        phone: phoneInput.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3'),
+        name: displayName,
+        email: emailInput,
         points: 320
       });
-      setPhoneInput('');
+      setEmailInput('');
       setOtpInput('');
-      setSignInStep('phone');
+      setSignInStep('email');
       setScreen('landing');
     } else {
       setSignInError(lang === 'en' ? 'Incorrect OTP. Try 1234' : 'गलत ओटीपी। 1234 आज़माएं');
@@ -471,6 +476,13 @@ export default function App() {
                 if (screen === 'payment') setScreen('cart');
                 else if (screen === 'cart') setScreen('products');
                 else if (screen === 'products') setScreen('landing');
+                else if (screen === 'signin') {
+                  setScreen('landing');
+                  setEmailInput('');
+                  setOtpInput('');
+                  setSignInStep('email');
+                  setSignInError('');
+                }
               }}
               className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1 rounded-full hover:bg-secondary-container flex-shrink-0"
             >
@@ -640,7 +652,7 @@ export default function App() {
                     </div>
                   </div>
                   <button 
-                    onClick={() => { setSignInStep('phone'); setPhoneInput(''); setOtpInput(''); setSignInError(''); setScreen('signin'); }}
+                    onClick={() => { setSignInStep('email'); setEmailInput(''); setOtpInput(''); setSignInError(''); setScreen('signin'); }}
                     className="bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs px-4 py-2.5 rounded-xl active:scale-[0.97] transition-all cursor-pointer shadow-sm shadow-emerald-950/10"
                   >
                     {lang === 'en' ? 'Sign In' : 'साइन इन'}
@@ -1345,35 +1357,35 @@ export default function App() {
               className="flex-grow flex flex-col h-full bg-[#f4f7f3] select-none"
             >
               {/* Header card inside screen */}
-              <div className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm text-center flex flex-col items-center gap-3.5 flex-shrink-0">
-                <div className="w-12 h-12 rounded-2xl bg-[#ecf3ec] border border-[#cbd7ca]/50 text-[#006e2f] flex items-center justify-center shadow-inner">
-                  <User size={24} className="stroke-[2.5]" />
+              <div className="bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm text-center flex flex-col items-center gap-3 flex-shrink-0">
+                <div className="w-11 h-11 rounded-2xl bg-[#ecf3ec] border border-[#cbd7ca]/50 text-[#006e2f] flex items-center justify-center shadow-inner">
+                  <User size={22} className="stroke-[2.5]" />
                 </div>
                 <div>
-                  <h3 className="font-sans font-black text-base text-[#12240f] uppercase tracking-wider">
-                    {signInStep === 'phone' 
+                  <h3 className="font-sans font-black text-sm text-[#12240f] uppercase tracking-wider">
+                    {signInStep === 'email' 
                       ? (lang === 'en' ? 'Member Sign In' : 'सदस्य साइन इन') 
                       : (lang === 'en' ? 'Enter Verification Code' : 'सत्यापन कोड दर्ज करें')}
                   </h3>
-                  <p className="text-xs text-slate-500 font-semibold mt-1">
-                    {signInStep === 'phone' 
-                      ? (lang === 'en' ? 'Enter your 10-digit mobile number to earn CarePoints' : 'केयरपॉइंट्स कमाने के लिए 10-अंकीय मोबाइल नंबर दर्ज करें')
-                      : (lang === 'en' ? 'Verification OTP has been sent via SMS' : 'सत्यापन ओटीपी एसएमएस द्वारा भेजा गया है')}
+                  <p className="text-[11px] text-slate-500 font-semibold mt-1">
+                    {signInStep === 'email' 
+                      ? (lang === 'en' ? 'Enter your email address to retrieve your loyalty account' : 'अपना लॉयल्टी खाता प्राप्त करने के लिए ईमेल दर्ज करें')
+                      : (lang === 'en' ? 'Verification OTP has been sent via email' : 'सत्यापन ओटीपी ईमेल द्वारा भेजा गया है')}
                   </p>
                 </div>
 
                 {/* Input Display Box */}
-                <div className="w-full flex flex-col gap-1.5 mt-1">
-                  <div className="w-full bg-[#f4f7f3] border-2 border-[#dae3d9] rounded-2xl h-14 flex items-center justify-center px-4 shadow-inner relative">
-                    <span className="font-mono text-xl font-extrabold text-[#12240f] tracking-widest">
-                      {signInStep === 'phone' 
-                        ? (phoneInput || '••••••••••') 
+                <div className="w-full flex flex-col gap-1 mt-1">
+                  <div className="w-full bg-[#f4f7f3] border-2 border-[#dae3d9] rounded-xl h-11 flex items-center justify-center px-4 shadow-inner relative">
+                    <span className="font-sans text-sm font-extrabold text-[#12240f] tracking-wide truncate max-w-[260px]">
+                      {signInStep === 'email' 
+                        ? (emailInput || (lang === 'en' ? 'name@example.com' : 'नाम@उदाहरण.कॉम')) 
                         : (otpInput || '••••')}
                     </span>
                   </div>
                   
                   {signInError && (
-                    <span className="text-[11px] font-bold text-red-500 bg-red-50 py-1.5 px-3 rounded-lg border border-red-100 text-center leading-none">
+                    <span className="text-[10px] font-bold text-red-500 bg-red-50 py-1.5 px-3 rounded-lg border border-red-100 text-center leading-none">
                       {signInError}
                     </span>
                   )}
@@ -1385,44 +1397,95 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Custom Touch Keypad Layout */}
-              <div className="flex-1 bg-white border border-[#cbd7ca]/40 rounded-3xl p-5 shadow-sm mt-4 flex flex-col gap-4 min-h-0 justify-center">
-                <div className="grid grid-cols-3 gap-2.5">
-                  {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
+              {/* Dynamic Keypad Area */}
+              <div className="flex-grow flex flex-col h-full bg-white border border-[#cbd7ca]/40 rounded-3xl p-4 shadow-sm mt-3 flex-1 justify-center gap-3 min-h-0">
+                {signInStep === 'email' ? (
+                  /* QWERTY Keyboard for Email Input */
+                  <div className="w-full flex flex-col gap-1.5 select-none bg-slate-50 p-2.5 rounded-2xl border border-slate-200/60 shadow-inner">
+                    {[
+                      ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+                      ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
+                      ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l'],
+                      ['z', 'x', 'c', 'v', 'b', 'n', 'm', '@', '.', '_']
+                    ].map((row, rIdx) => (
+                      <div key={rIdx} className="flex justify-center gap-1">
+                        {row.map(char => (
+                          <button
+                            key={char}
+                            onClick={() => handleKeypadPress(char)}
+                            className="h-9 w-7.5 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-xs font-bold text-[#12240f] cursor-pointer flex items-center justify-center shadow-[0_1px_2px_rgba(0,0,0,0.01)] uppercase"
+                          >
+                            {char}
+                          </button>
+                        ))}
+                      </div>
+                    ))}
+                    <div className="flex justify-center gap-1 mt-0.5">
+                      <button
+                        onClick={() => handleKeypadPress('clear')}
+                        className="h-9 px-2.5 rounded-lg border border-[#e3ebe2] bg-[#fdf0f0]/60 active:bg-red-50 active:scale-95 transition-all text-[10px] font-black uppercase text-red-600 cursor-pointer flex items-center justify-center shadow-sm"
+                      >
+                        {lang === 'en' ? 'Clear' : 'साफ़'}
+                      </button>
+                      <button
+                        onClick={() => handleKeypadPress('space')}
+                        className="h-9 w-28 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[10px] font-black uppercase text-slate-500 cursor-pointer flex items-center justify-center shadow-sm"
+                      >
+                        Space
+                      </button>
+                      <button
+                        onClick={() => handleKeypadPress('.com')}
+                        className="h-9 px-2 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[11px] font-black text-emerald-700 cursor-pointer flex items-center justify-center shadow-sm"
+                      >
+                        .com
+                      </button>
+                      <button
+                        onClick={() => handleKeypadPress('backspace')}
+                        className="h-9 px-2.5 rounded-lg border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[#12240f] cursor-pointer flex items-center justify-center shadow-sm"
+                      >
+                        <span className="material-symbols-outlined font-extrabold text-[14px]">backspace</span>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Numeric Keypad for OTP Input */
+                  <div className="w-full max-w-[260px] mx-auto grid grid-cols-3 gap-2 p-2 select-none bg-slate-50 rounded-2xl border border-slate-200/60 shadow-inner">
+                    {['1', '2', '3', '4', '5', '6', '7', '8', '9'].map(num => (
+                      <button
+                        key={num}
+                        onClick={() => handleKeypadPress(num)}
+                        className="h-11 bg-white hover:bg-slate-50 border border-slate-200/80 rounded-xl flex items-center justify-center text-base font-black font-sans text-slate-800 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
+                      >
+                        {num}
+                      </button>
+                    ))}
                     <button
-                      key={num}
-                      onClick={() => handleKeypadPress(num)}
-                      className="h-13 rounded-2xl border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-lg font-black text-[#12240f] cursor-pointer flex items-center justify-center shadow-[0_1.5px_2px_rgba(0,0,0,0.01)]"
+                      onClick={() => handleKeypadPress('clear')}
+                      className="h-11 bg-rose-50 hover:bg-rose-100/70 border border-rose-100 rounded-xl flex items-center justify-center text-[9px] font-black uppercase text-rose-600 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
                     >
-                      {num}
+                      {lang === 'en' ? 'Clear' : 'साफ़'}
                     </button>
-                  ))}
-                  <button
-                    onClick={() => handleKeypadPress('clear')}
-                    className="h-13 rounded-2xl border border-[#e3ebe2] bg-[#fdf0f0]/60 active:bg-red-50 active:scale-95 transition-all text-[11px] font-black uppercase text-red-600 cursor-pointer flex items-center justify-center"
-                  >
-                    {lang === 'en' ? 'Clear' : 'साफ़'}
-                  </button>
-                  <button
-                    onClick={() => handleKeypadPress('0')}
-                    className="h-13 rounded-2xl border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-lg font-black text-[#12240f] cursor-pointer flex items-center justify-center shadow-[0_1.5px_2px_rgba(0,0,0,0.01)]"
-                  >
-                    0
-                  </button>
-                  <button
-                    onClick={() => handleKeypadPress('backspace')}
-                    className="h-13 rounded-2xl border border-[#e3ebe2] bg-[#fcfdfc] active:bg-[#eaf0ea] active:scale-95 transition-all text-[#12240f] cursor-pointer flex items-center justify-center"
-                  >
-                    <span className="material-symbols-outlined font-extrabold text-[20px]">backspace</span>
-                  </button>
-                </div>
+                    <button
+                      onClick={() => handleKeypadPress('0')}
+                      className="h-11 bg-white hover:bg-slate-50 border border-[#e3ebe2] rounded-xl flex items-center justify-center text-base font-black font-sans text-slate-800 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
+                    >
+                      0
+                    </button>
+                    <button
+                      onClick={() => handleKeypadPress('backspace')}
+                      className="h-11 bg-slate-100/80 hover:bg-slate-150 border border-slate-200 rounded-xl flex items-center justify-center text-slate-600 active:scale-[0.96] transition-all cursor-pointer shadow-sm"
+                    >
+                      <span className="material-symbols-outlined font-extrabold text-[18px]">backspace</span>
+                    </button>
+                  </div>
+                )}
 
                 {/* Confirm/Send OTP Button */}
                 <button
-                  onClick={signInStep === 'phone' ? handleSendOtp : handleVerifyOtp}
+                  onClick={signInStep === 'email' ? handleSendOtp : handleVerifyOtp}
                   className="w-full bg-[#006e2f] hover:bg-[#005321] text-white font-black py-3.5 rounded-2xl shadow-md shadow-emerald-950/10 active:scale-[0.98] transition-all cursor-pointer text-center text-sm font-sans uppercase tracking-wider mt-1"
                 >
-                  {signInStep === 'phone' 
+                  {signInStep === 'email' 
                     ? (lang === 'en' ? 'Send OTP Verification' : 'ओटीपी सत्यापन भेजें') 
                     : (lang === 'en' ? 'Verify Code' : 'कोड सत्यापित करें')}
                 </button>
@@ -1430,14 +1493,14 @@ export default function App() {
                 <button
                   onClick={() => {
                     if (signInStep === 'otp') {
-                      setSignInStep('phone');
+                      setSignInStep('email');
                       setOtpInput('');
                       setSignInError('');
                     } else {
                       setScreen('landing');
                     }
                   }}
-                  className="w-full bg-slate-100 hover:bg-slate-200 text-[#4B5563] font-bold py-3 rounded-2xl active:scale-[0.98] transition-all cursor-pointer text-center text-xs font-sans"
+                  className="w-full bg-slate-100 hover:bg-slate-200 text-[#4B5563] font-bold py-2.5 rounded-xl active:scale-[0.98] transition-all cursor-pointer text-center text-xs font-sans"
                 >
                   {signInStep === 'otp' ? (lang === 'en' ? 'Back' : 'पीछे') : (lang === 'en' ? 'Cancel' : 'रद्द करें')}
                 </button>
@@ -1565,8 +1628,8 @@ export default function App() {
               if (user) {
                 setAccountOpen(true);
               } else {
-                setSignInStep('phone');
-                setPhoneInput('');
+                setSignInStep('email');
+                setEmailInput('');
                 setOtpInput('');
                 setSignInError('');
                 setScreen('signin');
@@ -1679,7 +1742,7 @@ export default function App() {
                     {user ? user.name : (lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક')}
                   </h4>
                   <p className="text-xs font-semibold text-slate-500 text-left">
-                    {user ? `Phone: ${user.phone}` : 'ID: PC-8893-X'}
+                    {user ? `Email: ${user.email}` : 'ID: PC-8893-X'}
                   </p>
                 </div>
                 <div className="bg-emerald-100/50 border border-emerald-200/50 text-[#006e2f] text-[10px] font-black uppercase px-2 py-1 rounded-lg">
