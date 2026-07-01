@@ -1447,31 +1447,6 @@ export default function App() {
 
               {/* Interactive Settings / Privacy Mode */}
               <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <div className="flex gap-3 items-center">
-                    <Lock size={18} className="text-[#006e2f] shrink-0" />
-                    <div>
-                      <h4 className="font-extrabold text-xs text-[#111827]">
-                        {lang === 'en' ? 'Privacy Mode' : lang === 'hi' ? 'गोपनीयता मोड' : 'ગોપનીયતા મોડ'}
-                      </h4>
-                      <p className="text-[10px] text-slate-400 font-semibold leading-relaxed">
-                        {lang === 'en' ? 'Masks sensitive items in cart' : lang === 'hi' ? 'कार्ट में संवेदनशील वस्तुओं को छुपाता है' : 'કાર્ટમાં સંવેદનશીલ વસ્તુઓ છુપાવે છે'}
-                      </p>
-                    </div>
-                  </div>
-                  {/* Toggle switch */}
-                  <button 
-                    onClick={() => setPrivacyMode(!privacyMode)}
-                    className={`w-11 h-6 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer ${
-                      privacyMode ? 'bg-[#006e2f]' : 'bg-slate-300'
-                    }`}
-                  >
-                    <div className={`bg-white w-5 h-5 rounded-full shadow-md transform transition-transform duration-200 ${
-                      privacyMode ? 'translate-x-5' : 'translate-x-0'
-                    }`} />
-                  </button>
-                </div>
-
                 {/* Secure Badge */}
                 <div className="flex items-center justify-center gap-1.5 py-2.5 text-[10px] font-black text-[#006e2f] uppercase tracking-wider bg-emerald-50/50 rounded-xl border border-emerald-100/30">
                   <Shield size={12} className="stroke-[3]" />
