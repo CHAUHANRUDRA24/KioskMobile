@@ -1283,11 +1283,25 @@ export default function App() {
                 <div className="flex flex-col gap-2.5">
                   {cart.map(item => (
                     <div key={item.product.id} className="flex justify-between items-center py-2.5 border-b border-dashed border-slate-100 last:border-0 last:pb-0 first:pt-0">
-                      <div className="flex items-start gap-2.5 min-w-0">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         {/* Quantity Badge */}
-                        <span className="bg-[#f0fdf4] border border-[#dcfce7] text-[#008744] font-sans font-black text-[10px] px-2 py-0.5 rounded-lg shrink-0 mt-0.5">
+                        <span className="bg-[#f0fdf4] border border-[#dcfce7] text-[#008744] font-sans font-black text-[10px] px-2 py-0.5 rounded-lg shrink-0">
                           {item.quantity}x
                         </span>
+
+                        {/* Product Image */}
+                        <div className="w-9 h-9 rounded-lg border border-[#cbd7ca]/30 flex items-center justify-center shrink-0 overflow-hidden bg-[#f4f7f3]">
+                          {item.product.imageUrl ? (
+                            <img 
+                              src={item.product.imageUrl} 
+                              alt={item.product.name} 
+                              className="w-full h-full object-cover" 
+                            />
+                          ) : (
+                            <span className="text-sm">{item.product.imageEmoji}</span>
+                          )}
+                        </div>
+
                         <div className="flex flex-col gap-0.5 min-w-0">
                           <span className="text-[#12240f] font-extrabold text-[13.5px] leading-tight truncate text-left">
                             {formatProductName(item.product.name)}
