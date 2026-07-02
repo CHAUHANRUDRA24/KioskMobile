@@ -146,14 +146,21 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
   return (
     <div className="w-full flex-grow flex flex-col justify-between bg-white text-[#0b1c30] select-none h-full overflow-y-auto no-scrollbar">
       {/* Header */}
-      <header className="w-full flex justify-between items-center px-4 py-3 bg-transparent shrink-0">
-        <div className="flex items-center gap-2">
-          <h1 className="font-sans font-extrabold text-lg tracking-tight text-[#006e2f]">Smart Kiosk</h1>
+      <header className="w-full flex justify-between items-center px-4 py-3 bg-white border-b border-[#bdcaba]/35 shrink-0 transition-all select-none">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <img 
+            src={logoImg} 
+            alt="Creator Lab" 
+            className="w-8 h-8 rounded-lg border border-[#006e2f]/20 shadow-sm flex-shrink-0 object-cover" 
+          />
+          <h1 className="font-sans font-extrabold text-lg tracking-tight text-[#006e2f] truncate">
+            Smart Kiosk
+          </h1>
         </div>
-        <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200 shadow-inner">
+        <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200/60 shadow-inner">
           <button 
             onClick={() => setLang('en')}
-            className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all cursor-pointer ${
+            className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
             }`}
           >
@@ -161,7 +168,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
           </button>
           <button 
             onClick={() => setLang('hi')}
-            className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all cursor-pointer ${
+            className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
             }`}
           >
@@ -169,7 +176,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
           </button>
           <button 
             onClick={() => setLang('gu')}
-            className={`px-3 py-1 text-[11px] font-extrabold rounded-full transition-all cursor-pointer ${
+            className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
             }`}
           >
