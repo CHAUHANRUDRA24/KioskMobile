@@ -1329,87 +1329,60 @@ export default function App() {
               transition={{ duration: 0.2 }}
               className="flex flex-col gap-4 text-left"
             >
-              {/* Profile Card */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-tr from-[#006e2f] to-emerald-400 text-white flex items-center justify-center shadow-md shrink-0">
-                    <User size={26} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-extrabold text-base text-[#12240f] leading-tight truncate">
-                      {lang === 'en' ? 'Guest Customer' : lang === 'hi' ? 'अतिथि ग्राहक' : 'અતિથિ ગ્રાહક'}
-                    </h4>
-                    <p className="text-xs font-semibold text-[#5e6d5b] mt-0.5">ID: PC-8893-X</p>
-                  </div>
-                  <div className="bg-[#ecf3ec] border border-[#cbd7ca]/50 text-[#006e2f] text-[10px] font-black uppercase px-2.5 py-1 rounded-lg shrink-0">
-                    {lang === 'en' ? 'Active' : lang === 'hi' ? 'सक्रिय' : 'સક્રિય'}
-                  </div>
+              {/* Friendly Welcome Card */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-[#006e2f] to-emerald-400 text-white flex items-center justify-center shadow-md shrink-0">
+                  <User size={22} />
                 </div>
-                <div className="h-px bg-slate-100 w-full"></div>
-                <div className="grid grid-cols-2 gap-4 text-left">
-                  <div>
-                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">Session Status</span>
-                    <span className="text-xs font-extrabold text-[#12240f] mt-0.5 block">Anonymous Session</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-black tracking-wider text-slate-400 block">Kiosk Location</span>
-                    <span className="text-xs font-extrabold text-[#12240f] mt-0.5 block">Kiosk DEL-09</span>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-extrabold text-base text-[#12240f] leading-tight">
+                    {lang === 'en' ? 'Welcome, Guest!' : lang === 'hi' ? 'स्वागत है, अतिथि!' : 'સ્વાગત છે, અતિથિ!'}
+                  </h4>
+                  <p className="text-xs text-[#5e6d5b] font-semibold mt-1 leading-snug">
+                    {lang === 'en' 
+                      ? 'You are signed in anonymously. Your privacy is fully secured.' 
+                      : lang === 'hi' 
+                      ? 'आप गुमनाम रूप से साइन इन हैं। आपकी गोपनीयता पूरी तरह से सुरक्षित है।' 
+                      : 'તમે અનામી રીતે સાઇન ઇન છો. તમારી ગોપનીયતા સંપૂર્ણપણે સુરક્ષિત છે.'}
+                  </p>
                 </div>
               </div>
 
-              {/* Rewards Progress Card */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4 text-left">
+              {/* CarePoints Rewards Card (Simplified & Plain Language) */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3">
                 <div className="flex justify-between items-center">
-                  <div>
-                    <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">CarePoints Rewards</h4>
-                    <p className="text-[10px] text-slate-400 font-semibold mt-0.5">Earn points on every purchase</p>
+                  <div className="text-left">
+                    <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">
+                      {lang === 'en' ? 'My Rewards' : lang === 'hi' ? 'मेरे पुरस्कार' : 'મારા પુરસ્કારો'}
+                    </h4>
+                    <p className="text-[11px] text-[#5e6d5b] font-semibold mt-0.5">
+                      {carePoints >= 200 
+                        ? (lang === 'en' ? 'Claim your free hygiene sample now!' : lang === 'hi' ? 'अपना मुफ्त हाइजीन सैंपल अभी प्राप्त करें!' : 'તમારો મફત હાઇજીન સેમ્પલ અત્યારે મેળવો!') 
+                        : (lang === 'en' ? `Get ${200 - carePoints} more points for a free gift` : lang === 'hi' ? `मुफ्त उपहार के लिए ${200 - carePoints} और अंक प्राप्त करें` : `મફત ભેટ માટે વધુ ${200 - carePoints} પોઇન્ટ મેળવો`)}
+                    </p>
                   </div>
-                  <span className="text-lg font-black text-[#006e2f] font-mono">{carePoints} pts</span>
+                  <span className="text-lg font-black text-[#006e2f] font-mono shrink-0">{carePoints} pts</span>
                 </div>
-                
-                {/* Progress Bar */}
-                <div className="flex flex-col gap-1.5">
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-[#006e2f] h-full rounded-full" style={{ width: `${Math.min(100, (carePoints / 200) * 100)}%` }} />
-                  </div>
-                  <span className="text-[10px] font-semibold text-slate-500">
-                    {carePoints >= 200 
-                      ? 'You qualify for a free hygiene sample!' 
-                      : `${200 - carePoints} more points to get a free hygiene sample`}
-                  </span>
-                </div>
-
-                {/* Points history list */}
-                <div className="h-px bg-slate-100 w-full my-1"></div>
-                <div>
-                  <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2.5">Points History</h5>
-                  <div className="flex flex-col gap-3 max-h-[160px] overflow-y-auto no-scrollbar">
-                    {pointsHistory.map((item, index) => (
-                      <div key={index} className="flex justify-between items-center text-xs">
-                        <div className="flex flex-col gap-0.5">
-                          <span className="font-extrabold text-[#12240f]">{item.name}</span>
-                          <span className="text-[9.5px] text-slate-400 font-medium">{item.date}</span>
-                        </div>
-                        <span className="font-mono font-black text-[#006e2f]">+{item.points} pts</span>
-                      </div>
-                    ))}
-                  </div>
+                {/* Simplified thin progress bar */}
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-[#006e2f] h-full rounded-full transition-all" style={{ width: `${Math.min(100, (carePoints / 200) * 100)}%` }} />
                 </div>
               </div>
 
               {/* Session Transaction History */}
               <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3.5 text-left">
                 <div>
-                  <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">Session Transactions</h4>
+                  <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">
+                    {lang === 'en' ? 'Recent Purchases' : lang === 'hi' ? 'हाल की खरीदारी' : 'તાજેતરની ખરીદી'}
+                  </h4>
                   <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
                     {sessionTransactions.length > 0 
-                      ? 'Receipts from this session' 
-                      : 'No transactions in this session yet'}
+                      ? (lang === 'en' ? 'Your receipts from this session' : lang === 'hi' ? 'इस सत्र की आपकी रसीदें' : 'આ સત્રની તમારી રસીદો')
+                      : (lang === 'en' ? 'No purchases made yet' : lang === 'hi' ? 'अभी तक कोई खरीदारी नहीं की गई' : 'હજુ સુધી કોઈ ખરીદી કરવામાં આવી નથી')}
                   </p>
                 </div>
                 
-                <div className="flex flex-col gap-2.5 max-h-[220px] overflow-y-auto no-scrollbar">
+                <div className="flex flex-col gap-2.5 max-h-[160px] overflow-y-auto no-scrollbar">
                   {sessionTransactions.map((tx) => (
                     <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
                       <div className="flex items-center gap-3">
@@ -1417,48 +1390,29 @@ export default function App() {
                         <div className="flex flex-col gap-0.5">
                           <span className="text-xs font-extrabold text-[#12240f]">Receipt #{tx.id}</span>
                           <span className="text-[9.5px] text-slate-400 font-medium">
-                            Completed • {tx.itemsCount} {tx.itemsCount === 1 ? 'item' : 'items'}
+                            {tx.itemsCount} {tx.itemsCount === 1 ? 'item' : 'items'} • {tx.date}
                           </span>
                         </div>
                       </div>
                       <span className="text-xs font-black font-mono text-[#12240f]">₹{tx.total}</span>
                     </div>
                   ))}
-                  
-                  {sessionTransactions.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-6 text-center text-slate-400">
-                      <span className="material-symbols-outlined text-3xl text-slate-300">receipt_long</span>
-                      <p className="text-[10.5px] font-semibold mt-1">Your purchase receipts will appear here</p>
-                    </div>
-                  )}
                 </div>
               </div>
 
-              {/* Settings & Support Section */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3 text-left">
-                <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide mb-1">Session Settings</h4>
-                
-                {/* Current Language */}
-                <div className="flex justify-between items-center py-1">
-                  <div className="flex items-center gap-2.5">
-                     <span className="material-symbols-outlined text-slate-500 text-lg">translate</span>
-                     <span className="text-xs font-extrabold text-[#12240f]">Session Language</span>
-                  </div>
-                  <span className="text-xs font-black text-[#006e2f] uppercase bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-100/40">
-                    {lang === 'en' ? 'English' : lang === 'hi' ? 'हिंदी' : 'ગુજરાતી'}
-                  </span>
+              {/* Support Helpline Card */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex items-center gap-4 text-left">
+                <div className="w-10 h-10 rounded-full bg-emerald-50 text-[#006e2f] flex items-center justify-center shrink-0 shadow-inner">
+                  <span className="material-symbols-outlined text-lg">call</span>
                 </div>
-
-                <div className="h-px bg-slate-100 w-full my-1"></div>
-
-                {/* Toll-Free Help */}
-                <div className="flex items-start gap-2.5 py-1">
-                  <span className="material-symbols-outlined text-slate-500 text-lg mt-0.5">call</span>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="text-xs font-extrabold text-[#12240f]">Toll-Free Helpline</span>
-                    <span className="text-[11.5px] font-black text-[#006e2f] font-mono">1800-111-2222</span>
-                    <p className="text-[9.5px] text-slate-400 font-medium leading-tight mt-0.5">Available 24/7 for technical and ordering support</p>
-                  </div>
+                <div className="flex-grow min-w-0">
+                  <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">
+                    {lang === 'en' ? 'Need Help?' : lang === 'hi' ? 'मदद चाहिए?' : 'મદદ જોઈતી હોય તો?'}
+                  </h4>
+                  <span className="text-[13px] font-black text-[#006e2f] font-mono mt-0.5 block">1800-111-2222</span>
+                  <p className="text-[9.5px] text-slate-400 font-medium leading-none mt-1">
+                    {lang === 'en' ? 'Free 24/7 helpline for ordering support' : lang === 'hi' ? 'निशुल्क 24/7 तकनीकी और ऑर्डर हेल्पलाइन' : 'મફત 24/7 તકનીકી અને ઓર્ડર હેલ્પલાઇન'}
+                  </p>
                 </div>
               </div>
 
