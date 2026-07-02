@@ -807,10 +807,15 @@ export default function App() {
                               return (
                                 <div 
                                   key={product.id}
+                                  onClick={() => {
+                                    if (qty === 0) {
+                                      addToCart(product);
+                                    }
+                                  }}
                                   className={`group border-2 rounded-2xl p-2.5 flex items-center justify-between gap-3 transition-all duration-200 select-none ${
                                     qty > 0 
                                       ? 'bg-[#ecf3ec] border-[#006e2f] shadow-[0_3px_10px_rgba(0,110,47,0.05)]' 
-                                      : 'bg-white hover:bg-[#fcfdfc] border-[#e6ebe5] hover:border-[#cbd7ca] shadow-[0_1.5px_3px_rgba(0,0,0,0.015)]'
+                                      : 'bg-white hover:bg-[#fcfdfc] border-[#e6ebe5] hover:border-[#cbd7ca] shadow-[0_1.5px_3px_rgba(0,0,0,0.015)] cursor-pointer'
                                   }`}
                                 >
                                   {/* Left: Rounded Square Image Box with image or emoji */}
