@@ -510,27 +510,60 @@ export default function App() {
         </header>
       ) : (
         <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
-          <div className="flex items-center gap-3.5 min-w-0">
+          <div className="flex items-center gap-3.5 min-w-0 flex-grow">
             <button 
               onClick={() => {
-                if (screen === 'payment') setScreen('cart');
-                else if (screen === 'cart') setScreen('products');
-                else if (screen === 'products') setScreen('landing');
-                else if (screen === 'account') setScreen('landing');
+                if (searchOpen) {
+                  setSearchOpen(false);
+                  setSearchQuery('');
+                } else {
+                  if (screen === 'payment') setScreen('cart');
+                  else if (screen === 'cart') setScreen('products');
+                  else if (screen === 'products') setScreen('landing');
+                  else if (screen === 'account') setScreen('landing');
+                }
               }}
               className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container flex-shrink-0 cursor-pointer"
             >
               <ArrowLeft size={22} className="stroke-[2.5px]" />
             </button>
             
-            <h1 className="font-sans font-black text-lg tracking-tight text-[#006e2f] truncate">
-              {screen === 'products' && (lang === 'en' ? 'Products' : lang === 'hi' ? 'उत्पाद' : 'ઉત્પાદનો')}
-              {screen === 'cart' && (lang === 'en' ? 'My Cart' : lang === 'hi' ? 'मेरी कार्ट' : 'મારું કાર્ટ')}
-              {screen === 'payment' && (lang === 'en' ? 'Payment Checkout' : lang === 'hi' ? 'भुगतान चेकआउट' : 'ચુકવણી ચેકઆઉટ')}
-              {screen === 'account' && (lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું')}
-            </h1>
+            {screen === 'products' && searchOpen ? (
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={lang === 'en' ? 'Search essentials...' : lang === 'hi' ? 'खोजें...' : 'શોધો...'}
+                className="w-full bg-[#f4f7f3] border border-[#cbd7ca]/50 rounded-xl px-3 py-1.5 text-xs text-[#0b1c30] placeholder:text-[#5e6d5b]/60 focus:outline-none focus:border-[#006e2f] transition-all"
+                autoFocus
+              />
+            ) : (
+              <h1 className="font-sans font-black text-lg tracking-tight text-[#006e2f] truncate">
+                {screen === 'products' && (lang === 'en' ? 'Products' : lang === 'hi' ? 'उत्पाद' : 'ઉત્પાદનો')}
+                {screen === 'cart' && (lang === 'en' ? 'My Cart' : lang === 'hi' ? 'मेरी कार्ट' : 'મારું કાર્ટ')}
+                {screen === 'payment' && (lang === 'en' ? 'Payment Checkout' : lang === 'hi' ? 'भुगतान चेकआउट' : 'ચુકવણી ચેકઆઉટ')}
+                {screen === 'account' && (lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું')}
+              </h1>
+            )}
           </div>
-          <div className="w-9 h-9" />
+          
+          {screen === 'products' ? (
+            <button 
+              onClick={() => {
+                setSearchOpen(!searchOpen);
+                if (searchOpen) {
+                  setSearchQuery('');
+                }
+              }}
+              className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container flex-shrink-0 cursor-pointer flex items-center justify-center w-9 h-9"
+            >
+              <span className="material-symbols-outlined text-[22px] font-bold">
+                {searchOpen ? 'close' : 'search'}
+              </span>
+            </button>
+          ) : (
+            <div className="w-9 h-9" />
+          )}
         </header>
       )}
 
@@ -565,7 +598,7 @@ export default function App() {
                   <Logo className="w-full h-full object-cover" />
                 </div>
 
-                <p className="font-bold text-[10px] tracking-[3px] text-[#16A34A] mb-2 uppercase">
+                <p className="font-bold text-[10px] tracking-[3px] text-[#006e2f] mb-2 uppercase">
                   SMART KIOSK
                 </p>
                 <h2 className="font-sans font-bold text-xl text-[#0F172A] mb-1.5 leading-tight">
@@ -577,13 +610,13 @@ export default function App() {
 
                 {/* Status Badges */}
                 <div className="flex justify-center gap-1.5 flex-wrap">
-                  <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                  <span className="px-2.5 py-1 bg-white text-[#006e2f] border border-[#cbd7ca]/40 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
                     <span className="material-symbols-outlined text-[14px]">lock</span> {t('private')}
                   </span>
-                  <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                  <span className="px-2.5 py-1 bg-white text-[#006e2f] border border-[#cbd7ca]/40 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
                     <span className="material-symbols-outlined text-[14px]">bolt</span> {t('instant')}
                   </span>
-                  <span className="px-2.5 py-1 bg-white text-[#16A34A] border border-[#BBF7D0]/60 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
+                  <span className="px-2.5 py-1 bg-white text-[#006e2f] border border-[#cbd7ca]/40 rounded-full text-[10px] font-bold flex items-center gap-1 shadow-sm">
                     <span className="material-symbols-outlined text-[14px]">spa</span> {t('alwaysOpenBadge')}
                   </span>
                 </div>
@@ -592,7 +625,7 @@ export default function App() {
               {/* Get Started Card */}
               <button 
                 onClick={() => setScreen('products')}
-                className="w-full bg-[#16A34A] hover:bg-[#15803d] text-white rounded-2xl p-4 shadow-lg shadow-emerald-700/20 active:scale-[0.98] transition-all group flex items-center justify-between border-b-4 border-emerald-800"
+                className="w-full bg-[#006e2f] hover:bg-[#005321] text-white rounded-2xl p-4 shadow-lg shadow-[#006e2f]/20 active:scale-[0.98] transition-all group flex items-center justify-between border-b-4 border-[#00471b]"
               >
                 <div className="flex items-center gap-3.5">
                   <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center text-xl shadow-inner">🛒</div>
@@ -665,19 +698,19 @@ export default function App() {
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
-                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">lock</span>
+                    <span className="material-symbols-outlined text-[#006e2f] text-[28px] mb-2">lock</span>
                     <p className="font-bold text-[13px] text-[#111827]">{t('fullyPrivate')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
-                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">schedule</span>
+                    <span className="material-symbols-outlined text-[#006e2f] text-[28px] mb-2">schedule</span>
                     <p className="font-bold text-[13px] text-[#111827]">{t('alwaysOpen')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
-                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">qr_code_2</span>
+                    <span className="material-symbols-outlined text-[#006e2f] text-[28px] mb-2">qr_code_2</span>
                     <p className="font-bold text-[13px] text-[#111827]">{t('easyPayment')}</p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-gray-100 text-center shadow-sm flex flex-col items-center">
-                    <span className="material-symbols-outlined text-[#16A34A] text-[28px] mb-2">bolt</span>
+                    <span className="material-symbols-outlined text-[#006e2f] text-[28px] mb-2">bolt</span>
                     <p className="font-bold text-[13px] text-[#111827]">{t('superFast')}</p>
                   </div>
                 </div>
