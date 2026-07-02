@@ -1021,8 +1021,16 @@ export default function App() {
                         : 'bg-white border-[#cbd7ca]/40 hover:border-[#cbd7ca]/80 shadow-sm'
                     }`}>
                       <div className="flex items-start gap-3.5 text-left">
-                        <div className="w-11 h-11 rounded-xl bg-[#f4f7f3] border border-[#cbd7ca]/30 flex items-center justify-center text-xl shrink-0">
-                          🛍️
+                        <div className="w-11 h-11 rounded-xl bg-[#f4f7f3] border border-[#cbd7ca]/30 flex items-center justify-center shrink-0 overflow-hidden">
+                          {PRODUCTS.find(p => p.id === 'tc3')?.imageUrl ? (
+                            <img 
+                              src={PRODUCTS.find(p => p.id === 'tc3')?.imageUrl} 
+                              alt="Discreet Bag" 
+                              className="w-full h-full object-cover" 
+                            />
+                          ) : (
+                            <span className="text-xl">🛍️</span>
+                          )}
                         </div>
                         <div>
                           <h4 className="font-sans font-black text-[13px] text-[#12240f]">
