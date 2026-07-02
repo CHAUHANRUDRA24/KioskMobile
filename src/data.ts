@@ -21,7 +21,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid',
     description: 'Soft & comfortable protection',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/whisper_regular.webp'
   },
   {
     id: 'w2',
@@ -32,7 +33,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid',
     description: 'Extra long night protection',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/whisper_xl_pad.webp'
   },
   {
     id: 'w3',
@@ -43,7 +45,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid',
     description: 'All-night peaceful sleep',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/overnight_pad.webp'
   },
   {
     id: 'w4',
@@ -54,7 +57,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid',
     description: 'Super active comfortable leak-lock',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/tampax.webp'
   },
   {
     id: 'w5',
@@ -65,7 +69,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩹',
     type: 'other',
     description: 'Fast menstrual cramp relief',
-    stockStatus: 'LOW STOCK'
+    stockStatus: 'LOW STOCK',
+    imageUrl: '/images/heating_patch.webp'
   },
   {
     id: 'w6',
@@ -76,7 +81,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩸',
     type: 'fluid',
     description: 'Reusable eco-friendly protection',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/menstrual_cup.webp'
   },
 
   // Pregnancy & Fertility
@@ -89,7 +95,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧪',
     type: 'other',
     description: '99% accurate instant results',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/preganews.webp'
   },
   {
     id: 'p2',
@@ -100,7 +107,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧪',
     type: 'other',
     description: 'Track your fertility window',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/ovulation_strip.webp'
   },
 
   // Sexual Wellness
@@ -113,7 +121,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🛡️',
     type: 'other',
     description: 'Ultra-thin premium protection',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/durex_extra_condom.webp'
   },
   {
     id: 's2',
@@ -124,7 +133,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🍓',
     type: 'other',
     description: 'Sweet strawberry fragrance',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/durex_strawberry.webp'
   },
   {
     id: 's3',
@@ -135,7 +145,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🍫',
     type: 'other',
     description: 'Rich chocolate flavour',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/manforce_chocolate.webp'
   },
   {
     id: 's4',
@@ -146,7 +157,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧪',
     type: 'other',
     description: 'Smooth silk long-lasting lube',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/durex_play_lube.webp'
   },
 
   // Hygiene & Personal Care
@@ -159,7 +171,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧻',
     type: 'other',
     description: 'Gentle refreshing wet wipes',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/himalaya_wipes_real.webp'
   },
   {
     id: 'hc2',
@@ -170,7 +183,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧻',
     type: 'other',
     description: 'Soft 3-ply pocket tissue',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/tissue_pack.webp'
   },
 
   // First Aid & Emergency
@@ -183,7 +197,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩹',
     type: 'other',
     description: 'Flexible waterproof bandages',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/bandaid_real.webp'
   },
   {
     id: 'fa2',
@@ -194,7 +209,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧼',
     type: 'other',
     description: 'Quick wound cleaning wipes',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/antiseptic_wipe.webp'
   },
   {
     id: 'fa3',
@@ -205,7 +221,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🩹',
     type: 'other',
     description: 'Sterile absorbent cotton pads',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/gauze_pad.webp'
   },
   {
     id: 'fa4',
@@ -216,7 +233,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧪',
     type: 'other',
     description: 'Antibacterial skin ointment',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/soframycin_cream.webp'
   },
 
   // Health & Nutrition
@@ -229,7 +247,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🍬',
     type: 'pill',
     description: 'Instant energy chewable tablets',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/glucose_tablets.webp'
   },
 
   // Travel & Convenience
@@ -242,7 +261,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🪒',
     type: 'other',
     description: 'Smooth glide dual-blade razor',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/disposable_razor.webp'
   },
   {
     id: 'tc2',
@@ -253,7 +273,8 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🧴',
     type: 'spray',
     description: 'Kills 99.9% germs on-the-go',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/hand_sanitizer.webp'
   },
   {
     id: 'tc3',
@@ -264,6 +285,7 @@ export const PRODUCTS: Product[] = [
     imageEmoji: '🛍️',
     type: 'other',
     description: 'Eco-friendly opaque carry bag',
-    stockStatus: 'IN STOCK'
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/brown_bag.webp'
   }
 ];

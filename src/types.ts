@@ -8,6 +8,7 @@ export interface Product {
   type: 'fluid' | 'pill' | 'spray' | 'other';
   description: string;
   stockStatus: 'IN STOCK' | 'LOW STOCK';
+  imageUrl?: string;
 }
 
 export interface CartItem {

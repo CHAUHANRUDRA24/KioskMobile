@@ -813,13 +813,21 @@ export default function App() {
                                       : 'bg-white hover:bg-[#fcfdfc] border-[#e6ebe5] hover:border-[#cbd7ca] shadow-[0_1.5px_3px_rgba(0,0,0,0.015)]'
                                   }`}
                                 >
-                                  {/* Left: Rounded Square Image Box with emoji */}
-                                  <div className={`w-12.5 h-12.5 rounded-xl flex items-center justify-center text-2xl select-none flex-shrink-0 transition-all border ${
+                                  {/* Left: Rounded Square Image Box with image or emoji */}
+                                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center select-none flex-shrink-0 transition-all border overflow-hidden ${
                                     qty > 0 
                                       ? 'bg-white border-[#b8c9b7] shadow-[0_2px_6px_rgba(0,110,47,0.03)]' 
                                       : 'bg-[#f4f7f3] border-[#e3ebe2] shadow-[0_1px_2px_rgba(0,0,0,0.01)]'
                                   }`}>
-                                    <span className="drop-shadow-sm select-none">{product.imageEmoji}</span>
+                                    {product.imageUrl ? (
+                                      <img 
+                                        src={product.imageUrl} 
+                                        alt={product.name} 
+                                        className="w-full h-full object-cover" 
+                                      />
+                                    ) : (
+                                      <span className="text-2xl drop-shadow-sm select-none">{product.imageEmoji}</span>
+                                    )}
                                   </div>
 
                                   {/* Center: Details */}
@@ -961,8 +969,16 @@ export default function App() {
                           className="bg-white border-2 border-[#e6ebe5] rounded-2xl p-3 flex items-center justify-between gap-3 shadow-[0_1.5px_3px_rgba(0,0,0,0.015)]"
                         >
                           {/* Left: Rounded Image Box */}
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl select-none flex-shrink-0 border border-[#e3ebe2] shadow-[0_1px_2px_rgba(0,0,0,0.01)] ${getProductBg(item.product.type)}`}>
-                            <span className="drop-shadow-sm">{item.product.imageEmoji}</span>
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center select-none flex-shrink-0 border border-[#e3ebe2] shadow-[0_1px_2px_rgba(0,0,0,0.01)] overflow-hidden ${getProductBg(item.product.type)}`}>
+                            {item.product.imageUrl ? (
+                              <img 
+                                src={item.product.imageUrl} 
+                                alt={item.product.name} 
+                                className="w-full h-full object-cover" 
+                              />
+                            ) : (
+                              <span className="text-2xl drop-shadow-sm">{item.product.imageEmoji}</span>
+                            )}
                           </div>
 
                           {/* Center details */}
