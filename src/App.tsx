@@ -510,60 +510,27 @@ export default function App() {
         </header>
       ) : (
         <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
-          <div className="flex items-center gap-3.5 min-w-0 flex-grow">
+          <div className="flex items-center gap-3.5 min-w-0">
             <button 
               onClick={() => {
-                if (searchOpen) {
-                  setSearchOpen(false);
-                  setSearchQuery('');
-                } else {
-                  if (screen === 'payment') setScreen('cart');
-                  else if (screen === 'cart') setScreen('products');
-                  else if (screen === 'products') setScreen('landing');
-                  else if (screen === 'account') setScreen('landing');
-                }
+                if (screen === 'payment') setScreen('cart');
+                else if (screen === 'cart') setScreen('products');
+                else if (screen === 'products') setScreen('landing');
+                else if (screen === 'account') setScreen('landing');
               }}
               className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container flex-shrink-0 cursor-pointer"
             >
               <ArrowLeft size={22} className="stroke-[2.5px]" />
             </button>
             
-            {screen === 'products' && searchOpen ? (
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={lang === 'en' ? 'Search essentials...' : lang === 'hi' ? 'खोजें...' : 'શોધો...'}
-                className="w-full bg-[#f4f7f3] border border-[#cbd7ca]/50 rounded-xl px-3 py-1.5 text-xs text-[#0b1c30] placeholder:text-[#5e6d5b]/60 focus:outline-none focus:border-[#006e2f] transition-all"
-                autoFocus
-              />
-            ) : (
-              <h1 className="font-sans font-black text-lg tracking-tight text-[#006e2f] truncate">
-                {screen === 'products' && (lang === 'en' ? 'Products' : lang === 'hi' ? 'उत्पाद' : 'ઉત્પાદનો')}
-                {screen === 'cart' && (lang === 'en' ? 'My Cart' : lang === 'hi' ? 'मेरी कार्ट' : 'મારું કાર્ટ')}
-                {screen === 'payment' && (lang === 'en' ? 'Payment Checkout' : lang === 'hi' ? 'भुगतान चेकआउट' : 'ચુકવણી ચેકઆઉટ')}
-                {screen === 'account' && (lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું')}
-              </h1>
-            )}
+            <h1 className="font-sans font-black text-lg tracking-tight text-[#006e2f] truncate">
+              {screen === 'products' && (lang === 'en' ? 'Products' : lang === 'hi' ? 'उत्पाद' : 'ઉત્પાદનો')}
+              {screen === 'cart' && (lang === 'en' ? 'My Cart' : lang === 'hi' ? 'मेरी कार्ट' : 'મારું કાર્ટ')}
+              {screen === 'payment' && (lang === 'en' ? 'Payment Checkout' : lang === 'hi' ? 'भुगतान चेकआउट' : 'ચુકવણી ચેકઆઉટ')}
+              {screen === 'account' && (lang === 'en' ? 'My Account' : lang === 'hi' ? 'मेरा खाता' : 'મારું ખાતું')}
+            </h1>
           </div>
-          
-          {screen === 'products' ? (
-            <button 
-              onClick={() => {
-                setSearchOpen(!searchOpen);
-                if (searchOpen) {
-                  setSearchQuery('');
-                }
-              }}
-              className="text-[#006b2c] hover:opacity-80 transition-opacity active:scale-90 p-1.5 rounded-full hover:bg-secondary-container flex-shrink-0 cursor-pointer flex items-center justify-center w-9 h-9"
-            >
-              <span className="material-symbols-outlined text-[22px] font-bold">
-                {searchOpen ? 'close' : 'search'}
-              </span>
-            </button>
-          ) : (
-            <div className="w-9 h-9" />
-          )}
+          <div className="w-9 h-9" />
         </header>
       )}
 
