@@ -472,15 +472,10 @@ export default function App() {
       {/* HEADER BAR */}
       {screen === 'landing' ? (
         <header className="w-full pt-4 pb-4 px-4 sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-sm border-b border-[#bdcaba]/30 flex items-center justify-between transition-all select-none">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex items-center gap-2 min-w-0">
-              <Logo 
-                className="w-8 h-8 rounded-md border border-[#006e2f]/20 shadow-sm flex-shrink-0" 
-              />
-              <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
-                Smart Kiosk
-              </h1>
-            </div>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="font-sans font-extrabold text-xl tracking-tight text-[#006e2f] truncate">
+              Smart Kiosk
+            </h1>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
