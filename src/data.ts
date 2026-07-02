@@ -236,6 +236,18 @@ export const PRODUCTS: Product[] = [
     stockStatus: 'IN STOCK',
     imageUrl: '/images/soframycin_cream.webp'
   },
+  {
+    id: 'fa5',
+    idCode: 'AID-05',
+    name: 'Moov Pain Relief Spray',
+    price: 150,
+    category: 'First Aid & Emergency',
+    imageEmoji: '💨',
+    type: 'spray',
+    description: 'Fast relief from muscle and bone pain',
+    stockStatus: 'IN STOCK',
+    imageUrl: '/images/moov_spray.png'
+  },
 
   // Health & Nutrition
   {
