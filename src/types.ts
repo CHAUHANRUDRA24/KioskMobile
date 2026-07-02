@@ -15,4 +15,5 @@ export interface CartItem {
   quantity: number;
 }
 
-export type ScreenType = 'landing' | 'products' | 'cart' | 'payment' | 'account';
+export type ScreenType = 'login' | 'landing' | 'products' | 'cart' | 'payment' | 'account';
+

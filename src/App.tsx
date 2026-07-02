@@ -24,6 +24,8 @@ import { QRCodeSVG } from 'qrcode.react';
 import { PRODUCTS, CATEGORIES } from './data';
 import { Product, CartItem, ScreenType } from './types';
 import logoImg from './assets/creator_lab_logo.jpg';
+import { LoginScreen } from './LoginScreen';
+
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => {
   const [error, setError] = useState(false);
@@ -176,7 +178,7 @@ const TRANSLATIONS = {
 
 export default function App() {
   // Navigation & Cart States
-  const [screen, setScreen] = useState<ScreenType>('landing');
+  const [screen, setScreen] = useState<ScreenType>('login');
   const [lang, setLangState] = useState<'en' | 'hi' | 'gu'>(() => {
     return (localStorage.getItem('lang') as 'en' | 'hi' | 'gu') || 'en';
   });
@@ -455,6 +457,14 @@ export default function App() {
         return 'bg-emerald-50/70 border-emerald-100';
     }
   };
+
+  if (screen === 'login') {
+    return (
+      <div className="w-full max-w-[430px] h-screen md:h-[92vh] md:max-h-[850px] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto">
+        <LoginScreen lang={lang} setLang={setLang} onLoginSuccess={() => setScreen('landing')} />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-[430px] h-screen md:h-[92vh] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto pb-16">
