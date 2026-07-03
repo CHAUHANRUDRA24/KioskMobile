@@ -1521,8 +1521,16 @@ export default function App() {
             className="absolute bottom-20 left-4 right-4 z-40 bg-[#0a2614]/95 text-white backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between border border-emerald-950/20"
           >
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-base shrink-0">
-                🛒
+              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden shrink-0">
+                {lastAddedProduct.imageUrl ? (
+                  <img 
+                    src={lastAddedProduct.imageUrl} 
+                    alt={lastAddedProduct.name} 
+                    className="w-full h-full object-cover" 
+                  />
+                ) : (
+                  <span className="text-base select-none">{lastAddedProduct.imageEmoji || '🛒'}</span>
+                )}
               </div>
               <div className="text-left min-w-0">
                 <p className="text-[11px] font-black text-emerald-400 uppercase tracking-wider leading-none">Added to Cart</p>

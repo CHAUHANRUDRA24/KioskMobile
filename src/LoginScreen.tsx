@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  Mail, 
-  Key, 
-  Eye, 
-  EyeOff, 
+  Smartphone, 
   ArrowRight, 
   Lock, 
-  Shield 
+  Shield,
+  Edit2,
+  MessageSquare
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import logoImg from './assets/creator_lab_logo.jpg';
 
 interface LoginScreenProps {
@@ -21,10 +21,13 @@ const LOGIN_TRANSLATIONS = {
     privateSecure: "Private & Secure",
     welcome: "Welcome Back",
     subtitle: "Sign in to manage your health essentials",
-    emailLabel: "Email Address",
-    passwordLabel: "Password",
-    forgotPassword: "Forgot Password?",
-    signIn: "Sign In",
+    phoneLabel: "Mobile Number",
+    otpLabel: "Enter 6-Digit OTP",
+    sendOtp: "Send OTP",
+    resendOtp: "Resend OTP",
+    resendOtpIn: "Resend OTP in {seconds}s",
+    otpSentMsg: "OTP sent successfully to your mobile!",
+    signIn: "Verify & Sign In",
     or: "OR",
     google: "Continue with Google",
     trust: "Your data is strictly confidential and protected by end-to-end encryption.",
@@ -32,21 +35,23 @@ const LOGIN_TRANSLATIONS = {
     terms: "Terms",
     security: "Security",
     copyright: "© 2024 Smart Kiosk Secure Access",
-    invalidCreds: "Invalid credentials. Please use: demo@smartkiosk.com / password123",
-    enterEmail: "Please enter your email address first.",
-    resetSent: "A password reset link has been sent to your email!",
-    emptyFields: "Please fill in all fields.",
+    invalidCreds: "Invalid OTP. For demo use Mobile: 9876543210 & OTP: 123456",
+    enterPhone: "Please enter a valid 10-digit mobile number.",
+    enterOtp: "Please enter the 6-digit OTP.",
     connectingGoogle: "Connecting with Google...",
-    signingIn: "Signing in..."
+    signingIn: "Sending OTP..."
   },
   hi: {
     privateSecure: "निजी और सुरक्षित",
     welcome: "वापसी पर स्वागत है",
     subtitle: "अपने स्वास्थ्य उत्पादों को प्रबंधित करने के लिए साइन इन करें",
-    emailLabel: "ईमेल पता",
-    passwordLabel: "पासवर्ड",
-    forgotPassword: "पासवर्ड भूल गए?",
-    signIn: "साइन इन करें",
+    phoneLabel: "मोबाइल नंबर",
+    otpLabel: "६-अंकीय ओटीपी दर्ज करें",
+    sendOtp: "ओटीपी भेजें",
+    resendOtp: "ओटीपी पुनः भेजें",
+    resendOtpIn: "{seconds}s में ओटीपी पुनः भेजें",
+    otpSentMsg: "आपके मोबाइल नंबर पर ओटीपी सफलतापूर्वक भेज दिया गया है!",
+    signIn: "सत्यापित करें और साइन इन करें",
     or: "अथवा",
     google: "गूगल के साथ जारी रखें",
     trust: "आपका डेटा पूरी तरह से गोपनीय है और एंड-टू-एंड एन्क्रिप्शन द्वारा सुरक्षित है।",
@@ -54,21 +59,23 @@ const LOGIN_TRANSLATIONS = {
     terms: "सेवा की शर्तें",
     security: "सुरक्षा श्वेतपत्र",
     copyright: "© २०२४ स्मार्ट कियोस्क सुरक्षित पहुंच",
-    invalidCreds: "अमान्य क्रेडेंशियल। कृपया उपयोग करें: demo@smartkiosk.com / password123",
-    enterEmail: "कृपया पहले अपना ईमेल दर्ज करें।",
-    resetSent: "आपके ईमेल पर पासवर्ड रीसेट लिंक भेज दिया गया है!",
-    emptyFields: "कृपया सभी फ़ील्ड भरें।",
+    invalidCreds: "अमान्य विवरण। कृपया उपयोग करें: मोबाइल: 9876543210 और ओटीपी: 123456",
+    enterPhone: "कृपया एक वैध 10-अंकीय मोबाइल नंबर दर्ज करें।",
+    enterOtp: "कृपया 6-अंकीय ओटीपी दर्ज करें।",
     connectingGoogle: "गूगल से कनेक्ट किया जा रहा है...",
-    signingIn: "साइन इन हो रहा है..."
+    signingIn: "ओटीपी भेजा जा रहा है..."
   },
   gu: {
     privateSecure: "ખાનગી અને સુરક્ષિત",
     welcome: "આપનું સ્વાગત છે",
     subtitle: "તમારી સ્વાસ્થ્ય જરૂરિયાતોનું સંચાન કરવા માટે સાઇન ઇન કરો",
-    emailLabel: "ઈમેલ સરનામું",
-    passwordLabel: "પાસવર્ડ",
-    forgotPassword: "પાસવર્ડ ભૂલી ગયા છો?",
-    signIn: "સાઇન ઇન કરો",
+    phoneLabel: "મોબાઇલ નંબર",
+    otpLabel: "૬-આંકડાનો OTP દાખલ કરો",
+    sendOtp: "OTP મોકલો",
+    resendOtp: "OTP ફરીથી મોકલો",
+    resendOtpIn: "{seconds}s માં OTP ફરીથી મોકલો",
+    otpSentMsg: "તમારા મોબાઇલ નંબર પર OTP સફળતાપૂર્વક મોકલવામાં આવ્યો છે!",
+    signIn: "વેરિફાય કરો અને સાઇન ઇન કરો",
     or: "અથવા",
     google: "ગૂગલ સાથે ચાલુ રાખો",
     trust: "તમારો ડેટા સંપૂર્ણપણે ગુપ્ત છે અને એન્ડ-ટુ-એન્ડ એન્ક્રિપ્શન દ્વારા સુરક્ષિત છે.",
@@ -76,19 +83,20 @@ const LOGIN_TRANSLATIONS = {
     terms: "સેવાની શરતો",
     security: "સુરક્ષા શ્વેતપત્ર",
     copyright: "© ૨૦૨૪ સ્માર્ટ કિઓસ્ક સુરક્ષિત ઍક્સેસ",
-    invalidCreds: "અમાન્ય ઓળખપત્રો. કૃપા કરીને ઉપયોગ કરો: demo@smartkiosk.com / password123",
-    enterEmail: "કૃપા કરીને પહેલા તમારો ઈમેલ દાખલ કરો.",
-    resetSent: "તમારા ઈમેલ પર પાસવર્ડ રીસેટ લિંક મોકલવામાં આવી છે!",
-    emptyFields: "કૃપા કરીને બધી વિગતો ભરો.",
+    invalidCreds: "અમાન્ય ઓળખપત્રો. કૃપા કરીને ઉપયોગ કરો: મોબાઇલ: 9876543210 અને OTP: 123456",
+    enterPhone: "કૃપા કરીને માન્ય 10-આંકડાનો મોબાઇલ નંબર દાખલ કરો.",
+    enterOtp: "કૃપા કરીને 6-આંકડાનો OTP દાખલ કરો.",
     connectingGoogle: "ગૂગલ સાથે કનેક્ટ થઈ રહ્યું છે...",
-    signingIn: "સાઇન ઇન થઈ રહ્યું છે..."
+    signingIn: "OTP મોકલી રહ્યું છે..."
   }
 };
 
 export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLoginSuccess }) => {
-  const [email, setEmail] = useState('demo@smartkiosk.com');
-  const [password, setPassword] = useState('password123');
-  const [showPassword, setShowPassword] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('9876543210');
+  const [otp, setOtp] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const [isSending, setIsSending] = useState(false);
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
   const [statusIsError, setStatusIsError] = useState(true);
 
@@ -96,18 +104,65 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
     return LOGIN_TRANSLATIONS[lang]?.[key] || LOGIN_TRANSLATIONS.en[key];
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // OTP Countdown Timer Effect
+  useEffect(() => {
+    let interval: any;
+    if (timer > 0) {
+      interval = setInterval(() => {
+        setTimer(prev => prev - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleSendOtp = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setStatusMsg(null);
 
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !password) {
-      setStatusMsg(t('emptyFields'));
+    const cleanPhone = phoneNumber.trim().replace(/\D/g, '');
+    if (cleanPhone.length !== 10) {
+      setStatusMsg(t('enterPhone'));
       setStatusIsError(true);
       return;
     }
 
-    if (trimmedEmail === 'demo@smartkiosk.com' && password === 'password123') {
+    setIsSending(true);
+    // Simulate sending OTP API call
+    setTimeout(() => {
+      setIsSending(false);
+      setOtpSent(true);
+      setTimer(30);
+      setStatusMsg(t('otpSentMsg'));
+      setStatusIsError(false);
+    }, 1000);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatusMsg(null);
+
+    if (!otpSent) {
+      handleSendOtp();
+      return;
+    }
+
+    const cleanPhone = phoneNumber.trim().replace(/\D/g, '');
+    const cleanOtp = otp.trim().replace(/\D/g, '');
+
+    if (cleanPhone.length !== 10) {
+      setStatusMsg(t('enterPhone'));
+      setStatusIsError(true);
+      return;
+    }
+
+    if (cleanOtp.length !== 6) {
+      setStatusMsg(t('enterOtp'));
+      setStatusIsError(true);
+      return;
+    }
+
+    // Verify credentials (demo mode: 9876543210 and 123456)
+    if (cleanPhone === '9876543210' && cleanOtp === '123456') {
       setStatusMsg(t('signingIn'));
       setStatusIsError(false);
       setTimeout(() => {
@@ -117,21 +172,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
       setStatusMsg(t('invalidCreds'));
       setStatusIsError(true);
     }
-  };
-
-  const handleForgotPassword = (e: React.MouseEvent) => {
-    e.preventDefault();
-    setStatusMsg(null);
-
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
-      setStatusMsg(t('enterEmail'));
-      setStatusIsError(true);
-      return;
-    }
-
-    setStatusMsg(t('resetSent'));
-    setStatusIsError(false);
   };
 
   const handleGoogleLogin = () => {
@@ -159,6 +199,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
         </div>
         <div className="flex bg-slate-100 rounded-full p-1 border border-slate-200/60 shadow-inner">
           <button 
+            type="button"
             onClick={() => setLang('en')}
             className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'en' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
@@ -167,6 +208,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
             EN
           </button>
           <button 
+            type="button"
             onClick={() => setLang('hi')}
             className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'hi' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
@@ -175,6 +217,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
             हिं
           </button>
           <button 
+            type="button"
             onClick={() => setLang('gu')}
             className={`px-4 py-1.5 text-xs font-extrabold rounded-full transition-all cursor-pointer ${
               lang === 'gu' ? 'bg-[#006b2c] text-white shadow-sm' : 'text-[#5e6d5b] hover:text-[#0b1c30]'
@@ -186,19 +229,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow flex flex-col justify-center px-6 py-4">
+      <main className="flex-grow flex flex-col justify-center px-6 py-5">
         <div className="w-full max-w-sm mx-auto">
           {/* Logo centered */}
-          <div className="flex justify-center mb-5">
+          <div className="flex justify-center mb-4 shrink-0">
             <img 
               src={logoImg} 
               alt="Creator Lab Logo" 
-              className="w-16 h-16 rounded-2xl object-cover shadow-md border border-slate-200" 
+              className="w-14 h-14 rounded-2xl object-cover shadow-md border border-slate-200" 
             />
           </div>
           
           {/* Badge */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-3.5 shrink-0">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#006e2f] border border-emerald-100 font-semibold text-xs shadow-sm">
               <Lock size={12} className="stroke-[2.5]" />
               <span>{t('privateSecure')}</span>
@@ -206,72 +249,98 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
           </div>
 
           {/* Headings */}
-          <div className="text-center mb-6">
-            <h2 className="font-sans font-bold text-xl text-[#0b1c30] mb-1.5">{t('welcome')}</h2>
+          <div className="text-center mb-5 shrink-0">
+            <h2 className="font-sans font-bold text-xl text-[#0b1c30] mb-1">{t('welcome')}</h2>
             <p className="text-xs text-[#5e6d5b] font-medium">{t('subtitle')}</p>
           </div>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Email Field */}
-            <div className="space-y-1">
-              <label className="font-semibold text-xs text-[#0b1c30] block pl-0.5" htmlFor="email">
-                {t('emailLabel')}
+            {/* Mobile Number Field */}
+            <div className="space-y-1.5">
+              <label className="font-bold text-xs text-[#0b1c30] block pl-0.5" htmlFor="phone">
+                {t('phoneLabel')}
               </label>
-              <div className="relative">
+              <div className="relative flex items-center">
                 <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[#5e6d5b] pointer-events-none">
-                  <Mail size={16} />
+                  <Smartphone size={16} />
                 </span>
                 <input 
-                  className="w-full min-h-[48px] pl-9 pr-4 bg-[#f8f9fa] border border-[#bdcaba]/50 rounded-2xl text-xs text-[#0b1c30] placeholder:text-slate-400 focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f] transition-all outline-none"
-                  id="email" 
-                  name="email" 
-                  placeholder="name@example.com" 
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  className={`w-full min-h-[48px] pl-9 pr-12 bg-[#f8f9fa] border border-[#bdcaba]/50 rounded-2xl text-xs text-[#0b1c30] placeholder:text-slate-400 focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f] transition-all outline-none ${
+                    otpSent ? 'opacity-70 font-semibold cursor-not-allowed bg-slate-100' : ''
+                  }`}
+                  id="phone" 
+                  name="phone" 
+                  placeholder="Enter 10-digit number" 
+                  type="tel"
+                  maxLength={10}
+                  disabled={otpSent}
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                 />
+                {otpSent && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOtpSent(false);
+                      setOtp('');
+                      setStatusMsg(null);
+                    }}
+                    className="absolute right-3 flex items-center justify-center p-1.5 text-[#006e2f] hover:bg-emerald-50 rounded-full transition-colors cursor-pointer"
+                    title="Edit Phone Number"
+                  >
+                    <Edit2 size={14} className="stroke-[2.5]" />
+                  </button>
+                )}
               </div>
             </div>
 
-            {/* Password Field */}
-            <div className="space-y-1">
-              <div className="flex justify-between items-center px-0.5">
-                <label className="font-semibold text-xs text-[#0b1c30] block" htmlFor="password">
-                  {t('passwordLabel')}
-                </label>
-                <a 
-                  id="forgot-password-link" 
-                  className="font-bold text-xs text-[#006e2f] hover:text-[#005321] transition-colors" 
-                  href="#"
-                  onClick={handleForgotPassword}
+            {/* OTP Field with Animation */}
+            <AnimatePresence>
+              {otpSent && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, y: -10 }}
+                  animate={{ opacity: 1, height: 'auto', y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-1.5 overflow-hidden"
                 >
-                  {t('forgotPassword')}
-                </a>
-              </div>
-              <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[#5e6d5b] pointer-events-none">
-                  <Key size={16} />
-                </span>
-                <input 
-                  className="w-full min-h-[48px] pl-9 pr-10 bg-[#f8f9fa] border border-[#bdcaba]/50 rounded-2xl text-xs text-[#0b1c30] placeholder:text-slate-400 focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f] transition-all outline-none"
-                  id="password" 
-                  name="password" 
-                  placeholder="••••••••" 
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button 
-                  aria-label="Toggle password visibility" 
-                  className="absolute inset-y-0 right-0 flex items-center pr-3 text-[#5e6d5b] hover:text-[#0b1c30] transition-colors cursor-pointer" 
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
-                </button>
-              </div>
-            </div>
+                  <div className="flex justify-between items-center px-0.5">
+                    <label className="font-bold text-xs text-[#0b1c30] block pl-0.5" htmlFor="otp">
+                      {t('otpLabel')}
+                    </label>
+                    {timer > 0 ? (
+                      <span className="text-[10px] font-bold text-slate-400">
+                        {t('resendOtpIn').replace('{seconds}', timer.toString())}
+                      </span>
+                    ) : (
+                      <button 
+                        type="button"
+                        onClick={() => handleSendOtp()}
+                        className="font-bold text-[11px] text-[#006e2f] hover:text-[#005321] transition-colors cursor-pointer underline"
+                      >
+                        {t('resendOtp')}
+                      </button>
+                    )}
+                  </div>
+                  <div className="relative">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-[#5e6d5b] pointer-events-none">
+                      <MessageSquare size={16} />
+                    </span>
+                    <input 
+                      className="w-full min-h-[48px] pl-9 pr-4 bg-[#f8f9fa] border border-[#bdcaba]/50 rounded-2xl text-xs text-[#0b1c30] placeholder:text-slate-400 focus:border-[#006e2f] focus:ring-1 focus:ring-[#006e2f] transition-all outline-none font-mono tracking-widest text-center"
+                      id="otp" 
+                      name="otp" 
+                      placeholder="••••••" 
+                      type="text"
+                      maxLength={6}
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* Status Alert */}
             {statusMsg && (
@@ -284,18 +353,19 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
               </div>
             )}
 
-            {/* Sign In Button */}
+            {/* Submit Button */}
             <button 
-              className="w-full min-h-[48px] bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs rounded-full shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              className="w-full min-h-[48px] bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs rounded-full shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               type="submit"
+              disabled={isSending}
             >
-              <span>{t('signIn')}</span>
+              <span>{isSending ? t('signingIn') : (otpSent ? t('signIn') : t('sendOtp'))}</span>
               <ArrowRight size={14} className="stroke-[3]" />
             </button>
           </form>
 
           {/* Divider */}
-          <div className="flex items-center gap-3 my-5">
+          <div className="flex items-center gap-3 my-4 shrink-0">
             <div className="flex-grow h-px bg-slate-200"></div>
             <span className="font-semibold text-xs text-[#5e6d5b]">{t('or')}</span>
             <div className="flex-grow h-px bg-slate-200"></div>
@@ -304,7 +374,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, setLang, onLogin
           {/* Google Auth */}
           <button 
             id="google-btn" 
-            className="w-full min-h-[48px] bg-white border border-[#bdcaba]/50 hover:border-slate-300 hover:bg-[#f8f9fa] text-[#0b1c30] font-extrabold text-xs rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="w-full min-h-[48px] bg-white border border-[#bdcaba]/50 hover:border-slate-300 hover:bg-[#f8f9fa] text-[#0b1c30] font-extrabold text-xs rounded-full shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
             type="button"
             onClick={handleGoogleLogin}
           >
