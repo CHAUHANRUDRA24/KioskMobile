@@ -237,8 +237,18 @@ export default function App() {
   // Custom state for Guide modal
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
 
+  // Custom state for Add to Cart Popup
+  const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
+  const [lastAddedProduct, setLastAddedProduct] = useState<Product | null>(null);
+  const [popupTriggerId, setPopupTriggerId] = useState<number>(0);
+
   // Cart operations
   const addToCart = (product: Product) => {
+    if (screen === 'products') {
+      setLastAddedProduct(product);
+      setShowAddPopup(true);
+      setPopupTriggerId(prev => prev + 1);
+    }
     setCart(prev => {
       const existing = prev.find(item => item.product.id === product.id);
       if (existing) {
@@ -291,9 +301,9 @@ export default function App() {
         setCountdown(prev => prev - 1);
       }, 1000);
     } else if (countdown === 0) {
-      // Reset after purchase complete and go back to landing
+      // Reset after purchase complete and go back to login screen
       setCart([]);
-      setScreen('landing');
+      setScreen('login');
       setPaymentSuccess(false);
       setPaymentFinished(false);
       setCountdown(10);
@@ -302,6 +312,35 @@ export default function App() {
     }
     return () => clearTimeout(timer);
   }, [paymentFinished, countdown]);
+
+  // Effect to auto-hide the "Added to Cart" popup
+  useEffect(() => {
+    if (showAddPopup) {
+      const timer = setTimeout(() => {
+        setShowAddPopup(false);
+      }, 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [showAddPopup]);
+
+  // Dismiss the "Added to Cart" popup only when leaving the products screen
+  const prevScreenRef = useRef<ScreenType | null>(null);
+  useEffect(() => {
+    if (prevScreenRef.current === 'products' && screen !== 'products') {
+      setShowAddPopup(false);
+    }
+    prevScreenRef.current = screen;
+  }, [screen]);
+
+  // Reset payment states when navigating away from the payment screen
+  useEffect(() => {
+    if (screen !== 'payment') {
+      setPaymentSuccess(false);
+      setPaymentFinished(false);
+      setCountdown(10);
+      setPickupCode('');
+    }
+  }, [screen]);
 
   // Effect to record transaction and rewards points in real-time
   useEffect(() => {
@@ -1256,7 +1295,7 @@ export default function App() {
                         )}
 
                         <div className="mt-5.5 px-4.5 py-2 bg-[#006e2f] text-white rounded-2xl text-xs font-black tracking-wide uppercase shadow-sm">
-                          Returning to Home in {countdown}s
+                          Returning to Sign-in in {countdown}s
                         </div>
                       </motion.div>
                     )}
@@ -1440,7 +1479,7 @@ export default function App() {
 
       {/* STICKY BOTTOM ACTIONS ROW */}
       {screen === 'cart' && cart.length > 0 && (
-        <div className="absolute bottom-16 left-0 right-0 w-full z-40 bg-white/80 backdrop-blur-md border-t border-[#bdcaba]/30 px-5 py-4 flex justify-center shadow-lg rounded-t-3xl">
+        <div className="absolute bottom-20 left-4 right-4 z-40 bg-white/95 backdrop-blur-md border border-[#cbd7ca]/40 px-4 py-3 flex justify-center shadow-xl rounded-2xl">
           <div className="w-full flex flex-col gap-2">
 
             {/* Cart Bottom Action: Proceed to Payment */}
@@ -1470,6 +1509,42 @@ export default function App() {
         </div>
       )}
 
+      {/* Added to Cart Toast Popup */}
+      <AnimatePresence>
+        {showAddPopup && lastAddedProduct && screen === 'products' && (
+          <motion.div
+            key={`popup-${lastAddedProduct.id}-${popupTriggerId}`}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute bottom-20 left-4 right-4 z-40 bg-[#0a2614]/95 text-white backdrop-blur-md px-4 py-3 rounded-2xl shadow-xl flex items-center justify-between border border-emerald-950/20"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center text-base shrink-0">
+                🛒
+              </div>
+              <div className="text-left min-w-0">
+                <p className="text-[11px] font-black text-emerald-400 uppercase tracking-wider leading-none">Added to Cart</p>
+                <p className="text-xs font-bold text-white mt-1 truncate leading-tight">
+                  {formatProductName(lastAddedProduct.name)}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setScreen('cart');
+                setShowAddPopup(false);
+              }}
+              className="bg-[#22c55e] hover:bg-[#16a34a] text-white active:scale-95 transition-all px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider cursor-pointer shadow-sm ml-3 shrink-0 flex items-center gap-1"
+            >
+              <span>Go to Cart</span>
+              <span className="material-symbols-outlined text-[12px] font-bold">arrow_forward</span>
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* FOOTER TAB NAV BAR SHELL FOR DEEP SIMULATION */}
       <nav className="absolute bottom-0 left-0 right-0 h-[64px] bg-white z-30 border-t border-gray-200 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] flex justify-around items-center">
         {/* Home */}
@@ -1477,7 +1552,7 @@ export default function App() {
           onClick={() => setScreen('landing')}
           className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
         >
-          {screen === 'landing' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          {screen === 'landing' && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
           <Home size={20} className={`mb-1 transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
           <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'landing' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
             {t('home')}
@@ -1489,7 +1564,7 @@ export default function App() {
           onClick={() => setScreen('products')}
           className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
         >
-          {screen === 'products' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          {screen === 'products' && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
           <Grid size={20} className={`mb-1 transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
           <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'products' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
             {t('products')}
@@ -1501,7 +1576,7 @@ export default function App() {
           onClick={() => setScreen('cart')}
           className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
         >
-          {screen === 'cart' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          {screen === 'cart' && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
           <div className="relative mb-0.5">
             <ShoppingCart size={20} className={`mb-0.5 transition-colors duration-200 ${screen === 'cart' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
             {getCartCount() > 0 && (
@@ -1520,7 +1595,7 @@ export default function App() {
           onClick={() => setScreen('account')}
           className="flex flex-col items-center justify-center w-16 h-full relative group active:scale-95 transition-all cursor-pointer"
         >
-          {screen === 'account' && <div className="absolute top-0 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
+          {screen === 'account' && <div className="absolute top-0 left-1/2 -translate-x-1/2 w-6 h-[3px] bg-[#006e2f] rounded-b-full"></div>}
           <User size={20} className={`mb-1 transition-colors duration-200 ${screen === 'account' ? 'text-[#006e2f]' : 'text-slate-400'}`} />
           <span className={`text-[10px] font-bold transition-colors duration-200 ${screen === 'account' ? 'text-[#006e2f]' : 'text-slate-400'}`}>
             {t('account')}
