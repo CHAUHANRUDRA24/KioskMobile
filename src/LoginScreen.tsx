@@ -56,40 +56,47 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, onLoginSuccess }
   const t = LOGIN_TRANSLATIONS[lang];
 
   useEffect(() => {
-    const randId = 'tg_' + Math.random().toString(36).substring(2, 10);
-    setSessionId(randId);
+    let interval: NodeJS.Timeout;
     
-    const interval = setInterval(async () => {
+    const initializeSession = async () => {
       try {
-        const res = await fetch(`/api/telegram-login-status?sessionId=${randId}`);
-        if (res.ok) {
-          const data = await res.json();
-          if (data.loggedIn && data.user) {
-            clearInterval(interval);
-            setIsSuccess(true);
-            setTimeout(() => {
-              onLoginSuccess(data.user);
-            }, 1000);
-          }
+        const createRes = await fetch('http://localhost:3001/api/auth/session/create', { method: 'POST' });
+        if (createRes.ok) {
+          const { sessionId: newSessionId } = await createRes.json();
+          setSessionId(newSessionId);
+          
+          interval = setInterval(async () => {
+            try {
+              const res = await fetch(`http://localhost:3001/api/auth/session/${newSessionId}`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data.status === 'authenticated') {
+                  clearInterval(interval);
+                  setIsSuccess(true);
+                  setTimeout(() => {
+                    onLoginSuccess({
+                      phoneNumber: data.phone,
+                      first_name: data.name
+                    });
+                  }, 1000);
+                }
+              }
+            } catch (err) {
+              console.error('Error checking login status:', err);
+            }
+          }, 2000);
         }
       } catch (err) {
-        // Silently handle polling errors
-      }
-    }, 2000);
-
-    return () => {
-      clearInterval(interval);
-      // Clean up session if they leave without authenticating
-      if (!isSuccess) {
-        fetch(`/api/telegram-login-cleanup`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId: randId }),
-          keepalive: true
-        }).catch(() => {});
+        console.error('Error creating session:', err);
       }
     };
-  }, [isSuccess, onLoginSuccess]);
+
+    initializeSession();
+
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [onLoginSuccess]);
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-between p-6 bg-[#f7faf7] overflow-y-auto">
