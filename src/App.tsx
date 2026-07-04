@@ -25,6 +25,8 @@ import { PRODUCTS, CATEGORIES } from './data';
 import { Product, CartItem, ScreenType } from './types';
 import logoImg from './assets/creator_lab_logo.jpg';
 import { LoginScreen } from './LoginScreen';
+import { db } from './firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => {
@@ -179,6 +181,7 @@ const TRANSLATIONS = {
 export default function App() {
   // Navigation & Cart States
   const [screen, setScreen] = useState<ScreenType>('login');
+  const [user, setUser] = useState<any | null>(null);
   const [lang, setLangState] = useState<'en' | 'hi' | 'gu'>(() => {
     return (localStorage.getItem('lang') as 'en' | 'hi' | 'gu') || 'en';
   });
@@ -216,6 +219,80 @@ export default function App() {
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(10);
   const [pickupCode, setPickupCode] = useState<string>('');
+
+  // Load Razorpay Script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handleRazorpayPayment = () => {
+    const totalAmount = getCartTotal();
+    if (totalAmount <= 0) return;
+
+    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    if (!keyId) {
+      alert("Razorpay Key ID is not configured in .env file.");
+      return;
+    }
+
+    const options = {
+      key: keyId,
+      amount: totalAmount * 100, // in paise
+      currency: "INR",
+      name: "Smart Kiosk",
+      description: "Discreet Hygiene & Health Products",
+      image: logoImg,
+      handler: async function (response: any) {
+        // Payment success!
+        const paymentId = response.razorpay_payment_id;
+        
+        // Save order to Firestore
+        try {
+          const orderId = `order_${paymentId}`;
+          await setDoc(doc(db, "orders", orderId), {
+            orderId: paymentId,
+            items: cart.map(item => ({
+              id: item.product.id,
+              name: item.product.name,
+              price: item.product.price,
+              quantity: item.quantity
+            })),
+            totalAmount: totalAmount,
+            createdAt: new Date().toISOString(),
+            status: "PAID",
+            paymentMethod: "razorpay"
+          });
+          console.log("Order saved to Firestore:", orderId);
+        } catch (error) {
+          console.error("Error saving order to Firestore:", error);
+        }
+
+        // Trigger UI success state
+        setPaymentSuccess(true);
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
+        setPickupCode(code);
+        setPaymentFinished(true);
+      },
+      prefill: {
+        contact: "9876543210"
+      },
+      theme: {
+        color: "#006e2f"
+      }
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.on('payment.failed', function (resp: any) {
+      alert("Payment Failed: " + resp.error.description);
+    });
+    rzp.open();
+  };
 
   // Real-time Session Account States
   const [sessionTransactions, setSessionTransactions] = useState<Array<{
@@ -365,6 +442,30 @@ export default function App() {
           { name: 'Kiosk Purchase', date: dateStr, points: earnedPoints },
           ...prev
         ]);
+
+        // Record order to Firestore for UPI / simulated checkout
+        const saveSimulatedOrder = async () => {
+          try {
+            const orderId = `order_${txId}`;
+            await setDoc(doc(db, "orders", orderId), {
+              orderId: txId,
+              items: cart.map(item => ({
+                id: item.product.id,
+                name: item.product.name,
+                price: item.product.price,
+                quantity: item.quantity
+              })),
+              totalAmount: cartTotal,
+              createdAt: new Date().toISOString(),
+              status: "PAID",
+              paymentMethod: "upi"
+            });
+            console.log("Simulated order saved to Firestore:", orderId);
+          } catch (error) {
+            console.error("Error saving simulated order to Firestore:", error);
+          }
+        };
+        saveSimulatedOrder();
       }
     }
   }, [paymentFinished]);
@@ -500,7 +601,7 @@ export default function App() {
   if (screen === 'login') {
     return (
       <div className="w-full max-w-[430px] h-screen md:h-[92vh] md:max-h-[850px] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto">
-        <LoginScreen lang={lang} setLang={setLang} onLoginSuccess={() => setScreen('landing')} />
+        <LoginScreen lang={lang} setLang={setLang} onLoginSuccess={(userDetails) => { setUser(userDetails); setScreen('landing'); }} />
       </div>
     );
   }
@@ -1242,6 +1343,23 @@ export default function App() {
                           Click or tap the QR code to simulate payment completion
                         </p>
                       </div>
+
+                      {/* Razorpay Button */}
+                      <div className="w-full mt-2 px-2">
+                        <div className="flex items-center gap-2 mb-3.5 shrink-0">
+                          <div className="flex-grow h-px bg-slate-200"></div>
+                          <span className="font-semibold text-[10px] text-slate-400 uppercase tracking-wider">OR PAY VIA</span>
+                          <div className="flex-grow h-px bg-slate-200"></div>
+                        </div>
+                        
+                        <button
+                          onClick={handleRazorpayPayment}
+                          className="w-full min-h-[48px] bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs rounded-full shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <CreditCard size={14} className="stroke-[3]" />
+                          <span>Pay with Razorpay (Card/Netbanking/UPI)</span>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -1384,14 +1502,24 @@ export default function App() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-extrabold text-base text-[#12240f] leading-tight">
-                    {lang === 'en' ? 'Welcome, Guest!' : lang === 'hi' ? 'स्वागत है, अतिथि!' : 'સ્વાગત છે, અતિથિ!'}
+                    {user 
+                      ? `${lang === 'en' ? 'Welcome' : lang === 'hi' ? 'स्वागत है' : 'સ્વાગત છે'}, ${user.first_name || 'User'}!`
+                      : (lang === 'en' ? 'Welcome, Guest!' : lang === 'hi' ? 'स्वागत है, अतिथि!' : 'સ્વાગત છે, અતિથિ!')
+                    }
                   </h4>
                   <p className="text-xs text-[#5e6d5b] font-semibold mt-1 leading-snug">
-                    {lang === 'en' 
-                      ? 'You are signed in anonymously. Your privacy is fully secured.' 
-                      : lang === 'hi' 
-                      ? 'आप गुमनाम रूप से साइन इन हैं। आपकी गोपनीयता पूरी तरह से सुरक्षित है।' 
-                      : 'તમે અનામી રીતે સાઇન ઇન છો. તમારી ગોપનીયતા સંપૂર્ણપણે સુરક્ષિત છે.'}
+                    {user 
+                      ? (lang === 'en' 
+                        ? `Signed in via Telegram (@${user.username || 'user'})` 
+                        : lang === 'hi' 
+                        ? `टेलीग्राम के माध्यम से साइन इन किया गया (@${user.username || 'user'})` 
+                        : `ટેલિગ્રામ દ્વારા સાઇન ઇન કરેલ છે (@${user.username || 'user'})`)
+                      : (lang === 'en' 
+                        ? 'You are signed in anonymously. Your privacy is fully secured.' 
+                        : lang === 'hi' 
+                        ? 'आप गुमनाम रूप से साइन इन हैं। आपकी गोपनीयता पूरी तरह से सुरक्षित है।' 
+                        : 'તમે અનામી રીતે સાઇન ઇન છો. તમારી ગોપનીયતા સંપૂર્ણપણે સુરક્ષિત છે.')
+                    }
                   </p>
                 </div>
               </div>
