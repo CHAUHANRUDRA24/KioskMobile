@@ -26,7 +26,7 @@ import { Product, CartItem, ScreenType } from './types';
 import logoImg from './assets/creator_lab_logo.jpg';
 import { LoginScreen } from './LoginScreen';
 import { db } from './firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => {
@@ -180,8 +180,23 @@ const TRANSLATIONS = {
 
 export default function App() {
   // Navigation & Cart States
-  const [screen, setScreen] = useState<ScreenType>('login');
-  const [user, setUser] = useState<any | null>(null);
+  const [screen, setScreen] = useState<ScreenType>('landing');
+  const [user, setUser] = useState<any | null>(() => {
+    try {
+      const stored = localStorage.getItem('user');
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
   const [lang, setLangState] = useState<'en' | 'hi' | 'gu'>(() => {
     return (localStorage.getItem('lang') as 'en' | 'hi' | 'gu') || 'en';
   });
@@ -252,30 +267,11 @@ export default function App() {
         // Payment success!
         const paymentId = response.razorpay_payment_id;
         
-        // Save order to Firestore
-        try {
-          const orderId = `order_${paymentId}`;
-          await setDoc(doc(db, "orders", orderId), {
-            orderId: paymentId,
-            items: cart.map(item => ({
-              id: item.product.id,
-              name: item.product.name,
-              price: item.product.price,
-              quantity: item.quantity
-            })),
-            totalAmount: totalAmount,
-            createdAt: new Date().toISOString(),
-            status: "PAID",
-            paymentMethod: "razorpay"
-          });
-          console.log("Order saved to Firestore:", orderId);
-        } catch (error) {
-          console.error("Error saving order to Firestore:", error);
-        }
+        // Generate redeem code
+        const code = Math.floor(100000 + Math.random() * 900000).toString();
 
         // Trigger UI success state
         setPaymentSuccess(true);
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
         setPickupCode(code);
         setPaymentFinished(true);
       },
@@ -313,6 +309,32 @@ export default function App() {
 
   // Custom state for Guide modal
   const [guideOpen, setGuideOpen] = useState<boolean>(false);
+
+  // Order history
+  const [userOrders, setUserOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      if (!user) return;
+      setOrdersLoading(true);
+      try {
+        const userId = user.phoneNumber || user.id;
+        const q = query(collection(db, 'orders'), where('userId', '==', String(userId)));
+        const snapshot = await getDocs(q);
+        const ordersData = snapshot.docs.map(d => d.data());
+        ordersData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setUserOrders(ordersData);
+      } catch (err) {
+        console.error("Failed to fetch orders:", err);
+      } finally {
+        setOrdersLoading(false);
+      }
+    };
+    if (screen === 'account') {
+      fetchOrders();
+    }
+  }, [screen, user]);
 
   // Custom state for Add to Cart Popup
   const [showAddPopup, setShowAddPopup] = useState<boolean>(false);
@@ -378,14 +400,13 @@ export default function App() {
         setCountdown(prev => prev - 1);
       }, 1000);
     } else if (countdown === 0) {
-      // Reset after purchase complete and go back to login screen
-      setCart([]);
-      setScreen('login');
-      setPaymentSuccess(false);
+      // Reset after purchase complete and go back to landing
       setPaymentFinished(false);
+      setPaymentSuccess(false);
+      setScreen('landing');
+      setCart([]);
+      setPickupCode(null);
       setCountdown(10);
-      setUpiId('');
-      setPickupCode('');
     }
     return () => clearTimeout(timer);
   }, [paymentFinished, countdown]);
@@ -415,7 +436,7 @@ export default function App() {
       setPaymentSuccess(false);
       setPaymentFinished(false);
       setCountdown(10);
-      setPickupCode('');
+      setPickupCode(null);
     }
   }, [screen]);
 
@@ -443,11 +464,12 @@ export default function App() {
           ...prev
         ]);
 
-        // Record order to Firestore for UPI / simulated checkout
-        const saveSimulatedOrder = async () => {
+        // Record order to Firestore for checkout
+        const saveOrderToFirestore = async () => {
           try {
-            const orderId = `order_${txId}`;
+            const orderId = `REDEEM-${pickupCode}`;
             await setDoc(doc(db, "orders", orderId), {
+              userId: String(user?.phoneNumber || user?.id || 'guest'),
               orderId: txId,
               items: cart.map(item => ({
                 id: item.product.id,
@@ -457,15 +479,16 @@ export default function App() {
               })),
               totalAmount: cartTotal,
               createdAt: new Date().toISOString(),
-              status: "PAID",
-              paymentMethod: "upi"
+              status: "pending_redemption",
+              paymentMethod: "upi",
+              redeemCode: `REDEEM-${pickupCode}`
             });
-            console.log("Simulated order saved to Firestore:", orderId);
+            console.log("Order saved to Firestore:", orderId);
           } catch (error) {
-            console.error("Error saving simulated order to Firestore:", error);
+            console.error("Error saving order to Firestore:", error);
           }
         };
-        saveSimulatedOrder();
+        saveOrderToFirestore();
       }
     }
   }, [paymentFinished]);
@@ -601,7 +624,15 @@ export default function App() {
   if (screen === 'login') {
     return (
       <div className="w-full max-w-[430px] h-screen md:h-[92vh] md:max-h-[850px] bg-surface flex flex-col relative shadow-[0_0_30px_rgba(0,110,47,0.1)] md:rounded-3xl overflow-hidden mx-auto border border-[#bdcaba]/30 my-0 md:my-auto">
-        <LoginScreen lang={lang} setLang={setLang} onLoginSuccess={(userDetails) => { setUser(userDetails); setScreen('landing'); }} />
+        <LoginScreen lang={lang} setLang={setLang} onLoginSuccess={(userDetails) => { 
+          setUser(userDetails); 
+          if (cart.length > 0) {
+            setUpiId('anonymous@gpay');
+            setScreen('payment');
+          } else {
+            setScreen('landing'); 
+          }
+        }} />
       </div>
     );
   }
@@ -1402,18 +1433,24 @@ export default function App() {
                         
                         {/* Pickup Code Display */}
                         {pickupCode && (
-                          <div className="mt-4 p-4 bg-[#f0fdf4] border border-[#cbd7ca]/40 rounded-2xl flex flex-col items-center w-full max-w-[280px]">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-[#5e6d5b]">
-                              Kiosk Collection Code
-                            </span>
-                            <span className="text-2xl font-black font-mono text-[#006e2f] mt-1 tracking-widest">
-                              {pickupCode.slice(0, 3)} {pickupCode.slice(3)}
-                            </span>
+                          <div className="mt-4 flex flex-col items-center w-full">
+                            <div className="p-4 bg-[#f0fdf4] border border-[#cbd7ca]/40 rounded-2xl flex flex-col items-center w-full max-w-[280px]">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-[#5e6d5b]">
+                                Kiosk Collection Code
+                              </span>
+                              <span className="text-2xl font-black font-mono text-[#006e2f] mt-1 tracking-widest">
+                                {pickupCode.slice(0, 3)} {pickupCode.slice(3)}
+                              </span>
+                            </div>
+                            <div className="mt-4 p-3 bg-white border border-[#cbd7ca]/40 rounded-2xl shadow-sm">
+                              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=REDEEM-${pickupCode}`} alt="QR Code" className="w-32 h-32" />
+                            </div>
+                            <span className="text-xs text-[#5e6d5b] mt-2 font-semibold">Scan this at the Kiosk to collect items</span>
                           </div>
                         )}
 
                         <div className="mt-5.5 px-4.5 py-2 bg-[#006e2f] text-white rounded-2xl text-xs font-black tracking-wide uppercase shadow-sm">
-                          Returning to Sign-in in {countdown}s
+                          Returning to Home in {countdown}s
                         </div>
                       </motion.div>
                     )}
@@ -1524,57 +1561,65 @@ export default function App() {
                 </div>
               </div>
 
-              {/* CarePoints Rewards Card (Simplified & Plain Language) */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3">
-                <div className="flex justify-between items-center">
-                  <div className="text-left">
-                    <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">
-                      {lang === 'en' ? 'My Rewards' : lang === 'hi' ? 'मेरे पुरस्कार' : 'મારા પુરસ્કારો'}
-                    </h4>
-                    <p className="text-[11px] text-[#5e6d5b] font-semibold mt-0.5">
-                      {carePoints >= 200 
-                        ? (lang === 'en' ? 'Claim your free hygiene sample now!' : lang === 'hi' ? 'अपना मुफ्त हाइजीन सैंपल अभी प्राप्त करें!' : 'તમારો મફત હાઇજીન સેમ્પલ અત્યારે મેળવો!') 
-                        : (lang === 'en' ? `Get ${200 - carePoints} more points for a free gift` : lang === 'hi' ? `मुफ्त उपहार के लिए ${200 - carePoints} और अंक प्राप्त करें` : `મફત ભેટ માટે વધુ ${200 - carePoints} પોઇન્ટ મેળવો`)}
-                    </p>
-                  </div>
-                  <span className="text-lg font-black text-[#006e2f] font-mono shrink-0">{carePoints} pts</span>
-                </div>
-                {/* Simplified thin progress bar */}
-                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                  <div className="bg-[#006e2f] h-full rounded-full transition-all" style={{ width: `${Math.min(100, (carePoints / 200) * 100)}%` }} />
-                </div>
-              </div>
-
-              {/* Session Transaction History */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-3.5 text-left">
-                <div>
-                  <h4 className="text-xs font-black text-[#12240f] uppercase tracking-wide">
-                    {lang === 'en' ? 'Recent Purchases' : lang === 'hi' ? 'हाल की खरीदारी' : 'તાજેતરની ખરીદી'}
-                  </h4>
-                  <p className="text-[10px] text-slate-400 font-semibold mt-0.5">
-                    {sessionTransactions.length > 0 
-                      ? (lang === 'en' ? 'Your receipts from this session' : lang === 'hi' ? 'इस सत्र की आपकी रसीदें' : 'આ સત્રની તમારી રસીદો')
-                      : (lang === 'en' ? 'No purchases made yet' : lang === 'hi' ? 'अभी तक कोई खरीदारी नहीं की गई' : 'હજુ સુધી કોઈ ખરીદી કરવામાં આવી નથી')}
-                  </p>
-                </div>
+              {/* Order History */}
+              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4 text-left">
+                <h4 className="text-sm font-black text-[#12240f] uppercase tracking-wide">
+                  {lang === 'en' ? 'My Orders' : lang === 'hi' ? 'मेरे आदेश' : 'મારા ઓર્ડર'}
+                </h4>
                 
-                <div className="flex flex-col gap-2.5 max-h-[160px] overflow-y-auto no-scrollbar">
-                  {sessionTransactions.map((tx) => (
-                    <div key={tx.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
-                      <div className="flex items-center gap-3">
-                        <span className="material-symbols-outlined text-slate-400 text-lg">receipt_long</span>
-                        <div className="flex flex-col gap-0.5">
-                          <span className="text-xs font-extrabold text-[#12240f]">Receipt #{tx.id}</span>
-                          <span className="text-[9.5px] text-slate-400 font-medium">
-                            {tx.itemsCount} {tx.itemsCount === 1 ? 'item' : 'items'} • {tx.date}
+                {ordersLoading ? (
+                  <div className="text-center py-4 text-sm text-gray-400 font-bold">
+                    {lang === 'en' ? 'Loading orders...' : 'लोड हो रहा है...'}
+                  </div>
+                ) : userOrders.length > 0 ? (
+                  <div className="flex flex-col gap-4">
+                    {userOrders.map((order, idx) => (
+                      <div key={idx} className="flex flex-col gap-2 p-4 rounded-2xl bg-[#f7faf7] border border-[#006e2f]/10">
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs font-bold text-gray-500">
+                            {new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </span>
+                          <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
+                            order.status === 'redeemed' 
+                              ? 'bg-emerald-100 text-emerald-800' 
+                              : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {order.status.replace('_', ' ')}
                           </span>
                         </div>
+                        <div className="text-sm font-black text-[#12240f]">
+                          ₹{order.totalAmount} • {order.items?.length || 0} items
+                        </div>
+                        {order.status === 'pending_redemption' && order.redeemCode && (
+                          <div className="mt-2 bg-[#006e2f] text-white text-xs font-black py-2 rounded-xl text-center tracking-widest">
+                            CODE: {order.redeemCode.split('-')[1]}
+                          </div>
+                        )}
                       </div>
-                      <span className="text-xs font-black font-mono text-[#12240f]">₹{tx.total}</span>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <ShoppingBag className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                    <p className="text-xs font-bold text-gray-400">
+                      {lang === 'en' ? 'No orders yet.' : 'कोई आदेश नहीं.'}
+                    </p>
+                  </div>
+                )}
               </div>
+
+              {/* Logout Button */}
+              {user && (
+                <button 
+                  onClick={() => {
+                    setUser(null);
+                    setScreen('landing');
+                  }}
+                  className="mt-2 w-full h-14 rounded-2xl bg-rose-50 text-rose-600 font-sans font-black text-sm shadow-sm active-shadow active:scale-[0.98] transition-all flex items-center justify-center border border-rose-100"
+                >
+                  {lang === 'en' ? 'Sign Out' : lang === 'hi' ? 'साइन आउट करें' : 'સાઇન આઉટ કરો'}
+                </button>
+              )}
 
               {/* Support Helpline Card */}
               <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex items-center gap-4 text-left">
@@ -1614,8 +1659,12 @@ export default function App() {
             <div className="w-full flex flex-col gap-2">
               <button 
                 onClick={() => {
-                  setUpiId('anonymous@gpay');
-                  setScreen('payment');
+                  if (!user) {
+                    setScreen('login');
+                  } else {
+                    setUpiId('anonymous@gpay');
+                    setScreen('payment');
+                  }
                 }}
                 className="w-full h-14 rounded-2xl bg-[#006e2f] text-white font-sans font-black text-base shadow-lg active-shadow hover:bg-[#005222] active:scale-[0.98] transition-all flex items-center justify-between px-5 cursor-pointer"
               >

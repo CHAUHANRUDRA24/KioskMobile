@@ -21,6 +21,7 @@ if (!token) {
 
 // In-memory cache to keep track of active Telegram login sessions
 const activeSessions = new Map();
+const pendingSessions = new Map();
 
 // In-memory cache for OTP codes: normalizedPhone -> { otp, expiresAt, chatId, firstName, username }
 const otpStore = new Map();
@@ -41,13 +42,16 @@ async function saveUserToFirestore(sessionId, userDetails) {
       telegramId: { stringValue: String(userDetails.id) },
       firstName: { stringValue: userDetails.first_name || '' },
       username: { stringValue: userDetails.username || '' },
+      phone: { stringValue: userDetails.phoneNumber || sessionId },
       authMethod: { stringValue: 'telegram' },
-      loggedInAt: { stringValue: userDetails.loggedInAt }
+      loggedInAt: { stringValue: userDetails.loggedInAt },
+      loginFromMobile: { booleanValue: true },
+      loginFromKiosk: { booleanValue: false }
     }
   };
 
   try {
-    const response = await fetch(url, {
+    const response = await fetch(`${url}&updateMask.fieldPaths=telegramId&updateMask.fieldPaths=firstName&updateMask.fieldPaths=username&updateMask.fieldPaths=phone&updateMask.fieldPaths=authMethod&updateMask.fieldPaths=loggedInAt&updateMask.fieldPaths=loginFromMobile&updateMask.fieldPaths=loginFromKiosk`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -95,10 +99,42 @@ async function savePhoneMapping(phoneNumber, mappingDetails) {
       console.error(`Firestore REST API Error (savePhoneMapping): ${response.status} - ${errorText}`);
     } else {
       console.log(`Successfully mapped phone ${normalized} to chatId ${mappingDetails.chatId} in Firestore.`);
+      await saveReverseMapping(mappingDetails.chatId, normalized);
     }
   } catch (error) {
     console.error("Error writing to Firestore REST API (savePhoneMapping):", error);
   }
+}
+
+async function saveReverseMapping(chatId, phoneNumber) {
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/chatId_${chatId}?key=${apiKey}`;
+  const body = {
+    fields: {
+      phone: { stringValue: String(phoneNumber) },
+      linkedAt: { stringValue: new Date().toISOString() }
+    }
+  };
+  try {
+    await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (err) {
+    console.error("Error saving reverse mapping", err);
+  }
+}
+
+async function getPhoneByChatId(chatId) {
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/users/chatId_${chatId}?key=${apiKey}`;
+  try {
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      return data.fields?.phone?.stringValue || null;
+    }
+  } catch (err) {}
+  return null;
 }
 
 // Helper to get phone mapping from Firestore
@@ -197,11 +233,32 @@ async function pollTelegramUpdates() {
               };
               
               await savePhoneMapping(phoneNumber, mappingDetails);
-              await sendTelegramMessage(
-                chat.id,
-                `✅ Thank you, your mobile number has been successfully linked to your Telegram account!\n\nYou can now log in at the Smart Kiosk using your mobile number.`,
-                { remove_keyboard: true }
-              );
+              
+              const pendingSessionId = pendingSessions.get(chat.id);
+              if (pendingSessionId) {
+                const userDetails = {
+                  id: chat.id,
+                  first_name: chat.first_name || '',
+                  username: chat.username || '',
+                  phoneNumber: phoneNumber,
+                  loggedInAt: new Date().toISOString()
+                };
+                activeSessions.set(pendingSessionId, userDetails);
+                await saveUserToFirestore(phoneNumber, userDetails);
+                pendingSessions.delete(chat.id);
+                
+                await sendTelegramMessage(
+                  chat.id,
+                  `✅ Thank you, your mobile number has been successfully linked!\n\n🎉 Welcome ${chat.first_name || ''}! (${phoneNumber})\nLogin successful! You are now authenticated.`,
+                  { remove_keyboard: true }
+                );
+              } else {
+                await sendTelegramMessage(
+                  chat.id,
+                  `✅ Thank you, your mobile number has been successfully linked to your Telegram account!\n\nYou can now log in at the Smart Kiosk using your mobile number.`,
+                  { remove_keyboard: true }
+                );
+              }
               continue;
             }
             
@@ -227,59 +284,91 @@ async function pollTelegramUpdates() {
               if (text.startsWith('/start ')) {
                 const sessionId = text.split('/start ')[1].trim();
                 if (sessionId) {
-                  const userDetails = {
-                    id: chat.id,
-                    first_name: chat.first_name || '',
-                    username: chat.username || '',
-                    loggedInAt: new Date().toISOString()
-                  };
+                  const existingPhone = await getPhoneByChatId(chat.id);
                   
-                  // Store in memory for the polling fallback API
-                  activeSessions.set(sessionId, userDetails);
-                  
-                  // Write directly to Firestore in real-time
-                  await saveUserToFirestore(sessionId, userDetails);
-                  
-                  // Acknowledge the user
-                  await sendTelegramMessage(
-                    chat.id,
-                    `🎉 Login successful! You are now authenticated on the Smart Kiosk. You can return to the kiosk screen.`
-                  );
+                  if (existingPhone) {
+                    const userDetails = {
+                      id: chat.id,
+                      first_name: chat.first_name || '',
+                      username: chat.username || '',
+                      phoneNumber: existingPhone,
+                      loggedInAt: new Date().toISOString()
+                    };
+                    
+                    activeSessions.set(sessionId, userDetails);
+                    await saveUserToFirestore(existingPhone, userDetails);
+                    
+                    await sendTelegramMessage(
+                      chat.id,
+                      `🎉 Welcome back ${chat.first_name || ''}! (${existingPhone})\n\nLogin successful! You are now authenticated. You can return to the kiosk screen.`
+                    );
+                  } else {
+                    pendingSessions.set(chat.id, sessionId);
+                    await sendTelegramMessage(
+                      chat.id,
+                      `👋 Welcome, ${chat.first_name || 'Guest'}!\n\nTo complete your secure login, please share your mobile number by clicking the button below.`,
+                      {
+                        keyboard: [
+                          [{ text: "📱 Share Mobile Number", request_contact: true }]
+                        ],
+                        one_time_keyboard: true,
+                        resize_keyboard: true
+                      }
+                    );
+                  }
                 }
               } else if (text === '/start') {
-                await sendTelegramMessage(
-                  chat.id,
-                  `👋 Welcome to Smart Kiosk Bot!\n\nPlease link your mobile number to enable OTP logins on the kiosk by clicking the button below, or scan a QR code to log in directly.`,
-                  {
-                    keyboard: [
-                      [
-                        {
-                          text: "📱 Share Mobile Number",
-                          request_contact: true
-                        }
-                      ]
-                    ],
-                    one_time_keyboard: true,
-                    resize_keyboard: true
-                  }
-                );
+                const existingPhone = await getPhoneByChatId(chat.id);
+                if (existingPhone) {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `👋 Welcome back to Smart Kiosk Bot, ${chat.first_name || ''}!\n\nYour mobile number (${existingPhone}) is already linked. You can scan a QR code at any kiosk to log in instantly.`,
+                    { remove_keyboard: true }
+                  );
+                } else {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `👋 Welcome to Smart Kiosk Bot!\n\nPlease link your mobile number to enable one-tap logins by clicking the button below, or scan a QR code to log in directly.`,
+                    {
+                      keyboard: [
+                        [
+                          {
+                            text: "📱 Share Mobile Number",
+                            request_contact: true
+                          }
+                        ]
+                      ],
+                      one_time_keyboard: true,
+                      resize_keyboard: true
+                    }
+                  );
+                }
               } else {
-                await sendTelegramMessage(
-                  chat.id,
-                  `🤖 Use the button below to link your mobile number for secure kiosk logins.`,
-                  {
-                    keyboard: [
-                      [
-                        {
-                          text: "📱 Share Mobile Number",
-                          request_contact: true
-                        }
-                      ]
-                    ],
-                    one_time_keyboard: true,
-                    resize_keyboard: true
-                  }
-                );
+                const existingPhone = await getPhoneByChatId(chat.id);
+                if (existingPhone) {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `🤖 Your mobile number (${existingPhone}) is securely linked. Simply scan a kiosk QR code or click a login link to proceed.`,
+                    { remove_keyboard: true }
+                  );
+                } else {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `🤖 Use the button below to link your mobile number for secure kiosk logins.`,
+                    {
+                      keyboard: [
+                        [
+                          {
+                            text: "📱 Share Mobile Number",
+                            request_contact: true
+                          }
+                        ]
+                      ],
+                      one_time_keyboard: true,
+                      resize_keyboard: true
+                    }
+                  );
+                }
               }
             }
           }
@@ -330,35 +419,40 @@ app.post('/api/send-telegram-otp', async (req, res) => {
     return res.status(400).json({ error: "Invalid phone number format" });
   }
 
-  console.log(`Checking mapping for phone: ${normalized}`);
   const mapping = await getPhoneMapping(normalized);
+  
   if (!mapping || !mapping.chatId) {
     return res.status(404).json({ 
       error: "NOT_REGISTERED", 
-      message: "This mobile number is not registered/linked with our Telegram Bot. Please scan the QR code to link your account first." 
+      message: "Mobile number not linked to Telegram bot. Please link your account in Telegram first." 
     });
   }
 
-  // Generate a random 6-digit OTP
+  const chatId = mapping.chatId;
+  const firstName = mapping.firstName;
+  const username = mapping.username;
+
+  // Generate a real random 6-digit OTP
   const otp = Math.floor(100000 + Math.random() * 900000).toString();
   const expiresAt = Date.now() + 120000; // 2 minutes
 
-  console.log(`Generated OTP ${otp} for ${normalized} (chat ID: ${mapping.chatId})`);
+  console.log(`Generated OTP ${otp} for ${normalized} (chat ID: ${chatId})`);
 
   // Save to otpStore
   otpStore.set(normalized, {
     otp,
     expiresAt,
-    chatId: mapping.chatId,
-    firstName: mapping.firstName,
-    username: mapping.username
+    chatId,
+    firstName,
+    username,
+    isLinked: true
   });
 
   // Send the OTP via Telegram
   const messageText = `🔑 *Smart Kiosk Security Verification*\n\nYour 6-digit Login Verification Code (OTP) is:\n\n*${otp}*\n\nThis code is valid for 2 minutes. Do not share it with anyone.`;
   
   try {
-    await sendTelegramMessage(mapping.chatId, messageText, null, 'Markdown');
+    await sendTelegramMessage(chatId, messageText, null, 'Markdown');
     return res.json({ success: true, message: "OTP sent successfully!" });
   } catch (error) {
     console.error("Error sending OTP via Telegram:", error);
@@ -399,11 +493,12 @@ app.post('/api/verify-telegram-otp', async (req, res) => {
     id: record.chatId,
     first_name: record.firstName,
     username: record.username,
+    phoneNumber: normalized,
     loggedInAt: new Date().toISOString()
   };
 
   // Write directly to Firestore in real-time to trigger the kiosk UI login
-  await saveUserToFirestore(sessionId, userDetails);
+  await saveUserToFirestore(normalized, userDetails);
 
   // Clean up
   otpStore.delete(normalized);
