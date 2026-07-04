@@ -57,27 +57,43 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, onLoginSuccess }
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let active = true;
     
     const initializeSession = async () => {
       try {
         const createRes = await fetch('http://localhost:3001/api/auth/session/create', { method: 'POST' });
+        if (!active) return;
+        
         if (createRes.ok) {
           const { sessionId: newSessionId } = await createRes.json();
+          if (!active) return;
+          
           setSessionId(newSessionId);
           
           interval = setInterval(async () => {
             try {
               const res = await fetch(`http://localhost:3001/api/auth/session/${newSessionId}`);
+              if (!active) {
+                clearInterval(interval);
+                return;
+              }
               if (res.ok) {
                 const data = await res.json();
+                if (!active) {
+                  clearInterval(interval);
+                  return;
+                }
                 if (data.status === 'authenticated') {
                   clearInterval(interval);
                   setIsSuccess(true);
                   setTimeout(() => {
-                    onLoginSuccess({
-                      phoneNumber: data.phone,
-                      first_name: data.name
-                    });
+                    if (active) {
+                      onLoginSuccess({
+                        phoneNumber: data.phone,
+                        first_name: data.name,
+                        id: data.chatId
+                      });
+                    }
                   }, 1000);
                 }
               }
@@ -94,6 +110,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ lang, onLoginSuccess }
     initializeSession();
 
     return () => {
+      active = false;
       if (interval) clearInterval(interval);
     };
   }, [onLoginSuccess]);

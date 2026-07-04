@@ -203,24 +203,7 @@ async function sendTelegramMessage(chatId, text, replyMarkup = null, parseMode =
 let lastUpdateId = 0;
 
 async function pollTelegramUpdates() {
-  if (!token) {
-    setTimeout(pollTelegramUpdates, 5000);
-    return;
-  }
-
-  const url = `https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId + 1}&timeout=30`;
-  
-  try {
-    const response = await fetch(url);
-    if (response.ok) {
-      const data = await response.json();
-      if (data.ok && data.result.length > 0) {
-        for (const update of data.result) {
-          lastUpdateId = update.update_id;
-          
-          if (update.message) {
-            const chat = update.message.chat;
-  // Disabled
+  console.log("Telegram Bot Polling is disabled.");
 }
 
 // API endpoint for client to poll login status as a fallback 

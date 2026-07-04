@@ -17,7 +17,8 @@ import {
   Smartphone,
   CreditCard,
   Home,
-  Grid
+  Grid,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { QRCodeSVG } from 'qrcode.react';
@@ -195,6 +196,7 @@ export default function App() {
       localStorage.setItem('user', JSON.stringify(user));
     } else {
       localStorage.removeItem('user');
+      setUserOrders([]);
     }
   }, [user]);
   const [lang, setLangState] = useState<'en' | 'hi' | 'gu'>(() => {
@@ -232,7 +234,7 @@ export default function App() {
   const [upiId, setUpiId] = useState<string>('');
   const [paymentProcessing, setPaymentSuccess] = useState<boolean>(false);
   const [paymentFinished, setPaymentFinished] = useState<boolean>(false);
-  const [countdown, setCountdown] = useState<number>(10);
+  const [countdown, setCountdown] = useState<number>(20);
   const [pickupCode, setPickupCode] = useState<string>('');
 
   // Load Razorpay Script
@@ -319,8 +321,26 @@ export default function App() {
       if (!user) return;
       setOrdersLoading(true);
       try {
-        const userId = user.phoneNumber || user.id;
-        const q = query(collection(db, 'orders'), where('userId', '==', String(userId)));
+        const variations: string[] = [];
+        if (user.phoneNumber) {
+          const rawPhone = String(user.phoneNumber);
+          variations.push(rawPhone);
+          
+          const cleanDigits = rawPhone.replace(/\D/g, '');
+          if (cleanDigits.length >= 10) {
+            const last10 = cleanDigits.slice(-10);
+            variations.push(last10);
+            variations.push(`+91${last10}`);
+            variations.push(`91${last10}`);
+          }
+        }
+        if (user.id) {
+          variations.push(String(user.id));
+        }
+        
+        const uniqueVariations = Array.from(new Set(variations)).filter(Boolean);
+        
+        const q = query(collection(db, 'orders'), where('userId', 'in', uniqueVariations));
         const snapshot = await getDocs(q);
         const ordersData = snapshot.docs.map(d => d.data());
         ordersData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -406,36 +426,33 @@ export default function App() {
       setScreen('landing');
       setCart([]);
       setPickupCode(null);
-      setCountdown(10);
+      setCountdown(20);
     }
     return () => clearTimeout(timer);
   }, [paymentFinished, countdown]);
 
-  // Effect to auto-hide the "Added to Cart" popup
-  useEffect(() => {
-    if (showAddPopup) {
-      const timer = setTimeout(() => {
-        setShowAddPopup(false);
-      }, 3500);
-      return () => clearTimeout(timer);
-    }
-  }, [showAddPopup]);
+  // Added to Cart popup auto-hide disabled per user request (it now stays until dismissed or navigated away)
 
-  // Dismiss the "Added to Cart" popup only when leaving the products screen
+  // Dismiss/restore the "Added to Cart" popup based on products screen navigation
   const prevScreenRef = useRef<ScreenType | null>(null);
   useEffect(() => {
     if (prevScreenRef.current === 'products' && screen !== 'products') {
       setShowAddPopup(false);
+    } else if (screen === 'products' && cart.length > 0) {
+      setShowAddPopup(true);
+      if (!lastAddedProduct) {
+        setLastAddedProduct(cart[cart.length - 1].product);
+      }
     }
     prevScreenRef.current = screen;
-  }, [screen]);
+  }, [screen, cart, lastAddedProduct]);
 
   // Reset payment states when navigating away from the payment screen
   useEffect(() => {
     if (screen !== 'payment') {
       setPaymentSuccess(false);
       setPaymentFinished(false);
-      setCountdown(10);
+      setCountdown(20);
       setPickupCode(null);
     }
   }, [screen]);
@@ -927,7 +944,7 @@ export default function App() {
                 <div 
                   id="products-scroll-container"
                   onScroll={handleScroll}
-                  className="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-6 scroll-smooth pb-6"
+                  className="flex-1 overflow-y-auto no-scrollbar p-4 flex flex-col gap-6 scroll-smooth pb-24"
                 >
                   {totalMatchingProducts === 0 ? (
                     <div className="text-center py-12 flex flex-col items-center gap-3">
@@ -994,7 +1011,7 @@ export default function App() {
                                       <img 
                                         src={product.imageUrl} 
                                         alt={product.name} 
-                                        className="w-full h-full object-cover" 
+                                        className={`w-full h-full ${product.id === 'fa5' ? 'object-contain p-0.5' : 'object-cover'}`} 
                                       />
                                     ) : (
                                       <span className="text-2xl drop-shadow-sm select-none">{product.imageEmoji}</span>
@@ -1145,7 +1162,7 @@ export default function App() {
                               <img 
                                 src={item.product.imageUrl} 
                                 alt={item.product.name} 
-                                className="w-full h-full object-cover" 
+                                className={`w-full h-full ${item.product.id === 'fa5' ? 'object-contain p-0.5' : 'object-cover'}`} 
                               />
                             ) : (
                               <span className="text-2xl drop-shadow-sm">{item.product.imageEmoji}</span>
@@ -1307,90 +1324,25 @@ export default function App() {
                   <div className="flex flex-col gap-4.5">
                     
                     {/* Header */}
-                    <div className="flex flex-col items-center gap-1">
-                      <span className="material-symbols-outlined text-[#006e2f] text-[28px] font-bold">qr_code_scanner</span>
-                      <h3 className="font-sans font-black text-xs text-[#12240f] uppercase tracking-wider">
-                        Scan QR Code to Pay
+                    <div className="flex flex-col items-center gap-1.5">
+                      <CreditCard size={28} className="text-[#006e2f] stroke-[2.5]" />
+                      <h3 className="font-sans font-black text-sm text-[#12240f] uppercase tracking-wider">
+                        Secure Checkout
                       </h3>
                       <p className="font-sans text-[11px] text-[#5e6d5b] font-medium leading-none">
-                        All transaction data is fully anonymized
+                        All transactions are encrypted and 100% private
                       </p>
                     </div>
 
-                    {/* QR Code SVG with scan corners */}
-                    <div className="flex flex-col items-center gap-2">
-                      <a 
-                        href={`upi://pay?pa=rudrachauhan2475@gmail.com&pn=Discreet%20Kiosk&am=${getCartTotal()}&cu=INR&tn=Kiosk%20Purchase`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => {
-                          if (window.innerWidth > 768) {
-                            e.preventDefault();
-                          }
-                          setPaymentSuccess(true);
-                          const code = Math.floor(100000 + Math.random() * 900000).toString();
-                          setPickupCode(code);
-                          setTimeout(() => {
-                            setPaymentFinished(true);
-                          }, 1800);
-                        }}
-                        className="relative block border border-[#cbd7ca]/30 rounded-2xl p-4 bg-white mx-auto shadow-[0_4px_15px_rgba(0,110,47,0.04)] select-none overflow-hidden hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                        title="Scan or tap to open in UPI application / Click to simulate pay"
+                    {/* Razorpay Button */}
+                    <div className="w-full mt-4 px-2">
+                      <button
+                        onClick={handleRazorpayPayment}
+                        className="w-full min-h-[48px] bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs rounded-full shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
                       >
-                        {/* Decorative corners */}
-                        <div className="absolute top-2 left-2 w-4 h-4 border-t-3 border-l-3 border-[#006e2f] rounded-tl-md z-10"></div>
-                        <div className="absolute top-2 right-2 w-4 h-4 border-t-3 border-r-3 border-[#006e2f] rounded-tr-md z-10"></div>
-                        <div className="absolute bottom-2 left-2 w-4 h-4 border-b-3 border-l-3 border-[#006e2f] rounded-bl-md z-10"></div>
-                        <div className="absolute bottom-2 right-2 w-4 h-4 border-b-3 border-r-3 border-[#006e2f] rounded-br-md z-10"></div>
-                        
-                        {/* Laser Scanner Line Animation ("scnner pack") */}
-                        <motion.div 
-                          className="absolute left-2 right-2 h-0.5 bg-emerald-500 shadow-[0_0_8px_#10b981,0_0_15px_#10b981] z-20"
-                          animate={{ top: ['16px', '166px', '16px'] }}
-                          transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
-                        />
-
-                        {/* Real QR Code Component */}
-                        <div className="relative z-0 p-1 bg-white rounded-lg">
-                          <QRCodeSVG
-                            value={`upi://pay?pa=rudrachauhan2475@gmail.com&pn=Discreet%20Kiosk&am=${getCartTotal()}&cu=INR&tn=Kiosk%20Purchase`}
-                            size={140}
-                            level="H"
-                            includeMargin={false}
-                          />
-                        </div>
-                      </a>
-                      
-                      {/* Interactive scanner feedback */}
-                      <div className="flex flex-col items-center gap-1 mb-1">
-                        <div className="flex items-center justify-center gap-1.5 mt-1">
-                          <span className="flex h-2 w-2 relative">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                          </span>
-                          <span className="text-[11px] text-[#006e2f] font-black uppercase tracking-wider">Awaiting UPI Scan</span>
-                        </div>
-                        <p className="font-sans text-[10px] text-slate-400 font-semibold leading-normal mt-1 max-w-[240px]">
-                          Click or tap the QR code to simulate payment completion
-                        </p>
-                      </div>
-
-                      {/* Razorpay Button */}
-                      <div className="w-full mt-2 px-2">
-                        <div className="flex items-center gap-2 mb-3.5 shrink-0">
-                          <div className="flex-grow h-px bg-slate-200"></div>
-                          <span className="font-semibold text-[10px] text-slate-400 uppercase tracking-wider">OR PAY VIA</span>
-                          <div className="flex-grow h-px bg-slate-200"></div>
-                        </div>
-                        
-                        <button
-                          onClick={handleRazorpayPayment}
-                          className="w-full min-h-[48px] bg-[#006e2f] hover:bg-[#005321] text-white font-extrabold text-xs rounded-full shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
-                        >
-                          <CreditCard size={14} className="stroke-[3]" />
-                          <span>Pay with Razorpay (Card/Netbanking/UPI)</span>
-                        </button>
-                      </div>
+                        <CreditCard size={14} className="stroke-[3]" />
+                        <span>Pay with Razorpay (Card/Netbanking/UPI)</span>
+                      </button>
                     </div>
                   </div>
                 ) : (
@@ -1489,7 +1441,7 @@ export default function App() {
                             <img 
                               src={item.product.imageUrl} 
                               alt={item.product.name} 
-                              className="w-full h-full object-cover" 
+                              className={`w-full h-full ${item.product.id === 'fa5' ? 'object-contain p-0.5' : 'object-cover'}`} 
                             />
                           ) : (
                             <span className="text-sm">{item.product.imageEmoji}</span>
@@ -1562,57 +1514,60 @@ export default function App() {
               </div>
 
               {/* Order History */}
-              <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4 text-left">
-                <h4 className="text-sm font-black text-[#12240f] uppercase tracking-wide">
-                  {lang === 'en' ? 'My Orders' : lang === 'hi' ? 'मेरे आदेश' : 'મારા ઓર્ડર'}
-                </h4>
-                
-                {ordersLoading ? (
-                  <div className="text-center py-4 text-sm text-gray-400 font-bold">
-                    {lang === 'en' ? 'Loading orders...' : 'लोड हो रहा है...'}
-                  </div>
-                ) : userOrders.length > 0 ? (
-                  <div className="flex flex-col gap-4">
-                    {userOrders.map((order, idx) => (
-                      <div key={idx} className="flex flex-col gap-2 p-4 rounded-2xl bg-[#f7faf7] border border-[#006e2f]/10">
-                        <div className="flex justify-between items-center">
-                          <span className="text-xs font-bold text-gray-500">
-                            {new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </span>
-                          <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
-                            order.status === 'redeemed' 
-                              ? 'bg-emerald-100 text-emerald-800' 
-                              : 'bg-amber-100 text-amber-800'
-                          }`}>
-                            {order.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <div className="text-sm font-black text-[#12240f]">
-                          ₹{order.totalAmount} • {order.items?.length || 0} items
-                        </div>
-                        {order.status === 'pending_redemption' && order.redeemCode && (
-                          <div className="mt-2 bg-[#006e2f] text-white text-xs font-black py-2 rounded-xl text-center tracking-widest">
-                            CODE: {order.redeemCode.split('-')[1]}
+              {user && (
+                <div className="bg-white rounded-3xl p-5 border border-[#cbd7ca]/40 shadow-sm flex flex-col gap-4 text-left">
+                  <h4 className="text-sm font-black text-[#12240f] uppercase tracking-wide">
+                    {lang === 'en' ? 'My Orders' : lang === 'hi' ? 'मेरे आदेश' : 'મારા ઓર્ડર'}
+                  </h4>
+                  
+                  {ordersLoading ? (
+                    <div className="text-center py-4 text-sm text-gray-400 font-bold">
+                      {lang === 'en' ? 'Loading orders...' : 'लोड हो रहा है...'}
+                    </div>
+                  ) : userOrders.length > 0 ? (
+                    <div className="flex flex-col gap-4">
+                      {userOrders.map((order, idx) => (
+                        <div key={idx} className="flex flex-col gap-2 p-4 rounded-2xl bg-[#f7faf7] border border-[#006e2f]/10">
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs font-bold text-gray-500">
+                              {new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </span>
+                            <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
+                              order.status === 'redeemed' 
+                                ? 'bg-emerald-100 text-emerald-800' 
+                                : 'bg-amber-100 text-amber-800'
+                            }`}>
+                              {order.status.replace('_', ' ')}
+                            </span>
                           </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <ShoppingBag className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                    <p className="text-xs font-bold text-gray-400">
-                      {lang === 'en' ? 'No orders yet.' : 'कोई आदेश नहीं.'}
-                    </p>
-                  </div>
-                )}
-              </div>
+                          <div className="text-sm font-black text-[#12240f]">
+                            ₹{order.totalAmount} • {order.items?.length || 0} items
+                          </div>
+                          {order.status === 'pending_redemption' && order.redeemCode && (
+                            <div className="mt-2 bg-[#006e2f] text-white text-xs font-black py-2 rounded-xl text-center tracking-widest">
+                              CODE: {order.redeemCode.split('-')[1]}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-6">
+                      <ShoppingBag className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-xs font-bold text-gray-400">
+                        {lang === 'en' ? 'No orders yet.' : 'कोई आदेश नहीं.'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Logout Button */}
               {user && (
                 <button 
                   onClick={() => {
                     setUser(null);
+                    setCart([]);
                     setScreen('landing');
                   }}
                   className="mt-2 w-full h-14 rounded-2xl bg-rose-50 text-rose-600 font-sans font-black text-sm shadow-sm active-shadow active:scale-[0.98] transition-all flex items-center justify-center border border-rose-100"
@@ -1688,7 +1643,7 @@ export default function App() {
 
       {/* Added to Cart Toast Popup */}
       <AnimatePresence>
-        {showAddPopup && lastAddedProduct && screen === 'products' && (
+        {showAddPopup && lastAddedProduct && screen === 'products' && cart.length > 0 && (
           <motion.div
             key={`popup-${lastAddedProduct.id}-${popupTriggerId}`}
             initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -1703,7 +1658,7 @@ export default function App() {
                   <img 
                     src={lastAddedProduct.imageUrl} 
                     alt={lastAddedProduct.name} 
-                    className="w-full h-full object-cover" 
+                    className={`w-full h-full ${lastAddedProduct.id === 'fa5' ? 'object-contain p-0.5' : 'object-cover'}`} 
                   />
                 ) : (
                   <span className="text-base select-none">{lastAddedProduct.imageEmoji || '🛒'}</span>
@@ -1716,16 +1671,25 @@ export default function App() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={() => {
-                setScreen('cart');
-                setShowAddPopup(false);
-              }}
-              className="bg-[#22c55e] hover:bg-[#16a34a] text-white active:scale-95 transition-all px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider cursor-pointer shadow-sm ml-3 shrink-0 flex items-center gap-1"
-            >
-              <span>Go to Cart</span>
-              <span className="material-symbols-outlined text-[12px] font-bold">arrow_forward</span>
-            </button>
+            <div className="flex items-center gap-2 ml-3 shrink-0">
+              <button
+                onClick={() => {
+                  setScreen('cart');
+                  setShowAddPopup(false);
+                }}
+                className="bg-[#22c55e] hover:bg-[#16a34a] text-white active:scale-95 transition-all px-3 py-1.5 rounded-xl text-[11px] font-black uppercase tracking-wider cursor-pointer shadow-sm flex items-center gap-1"
+              >
+                <span>Go to Cart</span>
+                <span className="material-symbols-outlined text-[12px] font-bold">arrow_forward</span>
+              </button>
+              <button
+                onClick={() => setShowAddPopup(false)}
+                className="text-white/60 hover:text-white transition-colors p-1"
+                aria-label="Dismiss"
+              >
+                <X size={16} className="stroke-[2.5]" />
+              </button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
