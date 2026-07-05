@@ -246,7 +246,7 @@ export const PRODUCTS: Product[] = [
     type: 'spray',
     description: 'Fast relief from muscle and bone pain',
     stockStatus: 'IN STOCK',
-    imageUrl: '/images/moov_spray.png'
+    imageUrl: '/images/moov_spray.webp'
   },
 
   // Health & Nutrition
