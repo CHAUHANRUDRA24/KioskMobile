@@ -27,7 +27,7 @@ import { Product, CartItem, ScreenType } from './types';
 import logoImg from './assets/creator_lab_logo.jpg';
 import { LoginScreen } from './LoginScreen';
 import { db } from './firebase';
-import { doc, setDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => {
@@ -498,7 +498,9 @@ export default function App() {
               createdAt: new Date().toISOString(),
               status: "pending_redemption",
               paymentMethod: "upi",
-              redeemCode: `REDEEM-${pickupCode}`
+              redeemCode: `REDEEM-${pickupCode}`,
+              pickupCode: pickupCode,
+              isUsed: false
             });
             console.log("Order saved to Firestore:", orderId);
           } catch (error) {
@@ -891,7 +893,6 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="h-4" />
             </motion.div>
           )}
 

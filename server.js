@@ -363,6 +363,96 @@ setInterval(() => {
   }
 }, 60000);
 
+// API endpoint to verify and mark a kiosk redeem code as used (one-time use)
+app.post('/api/verify-redeem-code', async (req, res) => {
+  const { code } = req.body;
+  if (!code || typeof code !== 'string') {
+    return res.status(400).json({ error: 'INVALID_REQUEST', message: 'code is required.' });
+  }
+
+  const trimmedCode = code.trim().replace(/\s/g, '');
+  const docId = `REDEEM-${trimmedCode}`;
+  const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/orders/${docId}?key=${apiKey}`;
+
+  try {
+    // 1. Fetch the order document
+    const getResp = await fetch(url);
+
+    if (getResp.status === 404) {
+      return res.status(404).json({ error: 'NOT_FOUND', message: 'Invalid code. No order found.' });
+    }
+    if (!getResp.ok) {
+      const errText = await getResp.text();
+      console.error(`Firestore GET error for ${docId}: ${getResp.status} - ${errText}`);
+      return res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to fetch order.' });
+    }
+
+    const data = await getResp.json();
+    const fields = data.fields || {};
+    const isUsed = fields.isUsed?.booleanValue === true;
+    const status = fields.status?.stringValue;
+
+    // 2. Reject if already used
+    if (isUsed || status === 'redeemed') {
+      return res.status(409).json({
+        error: 'CODE_ALREADY_USED',
+        message: 'This code has already been used and is no longer valid.',
+        redeemedAt: fields.redeemedAt?.stringValue || null
+      });
+    }
+
+    // 3. Reject if not in pending state
+    if (status !== 'pending_redemption') {
+      return res.status(400).json({ error: 'INVALID_STATUS', message: `Order is in an unexpected state: ${status}` });
+    }
+
+    // 4. Mark as redeemed (PATCH only the relevant fields)
+    const patchUrl = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/orders/${docId}?key=${apiKey}&updateMask.fieldPaths=isUsed&updateMask.fieldPaths=status&updateMask.fieldPaths=redeemedAt`;
+    const patchResp = await fetch(patchUrl, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: {
+          isUsed: { booleanValue: true },
+          status: { stringValue: 'redeemed' },
+          redeemedAt: { stringValue: new Date().toISOString() }
+        }
+      })
+    });
+
+    if (!patchResp.ok) {
+      const errText = await patchResp.text();
+      console.error(`Firestore PATCH error for ${docId}: ${patchResp.status} - ${errText}`);
+      return res.status(500).json({ error: 'SERVER_ERROR', message: 'Failed to mark code as used.' });
+    }
+
+    console.log(`Redeem code ${docId} successfully verified and marked as used.`);
+
+    // 5. Return order details to the kiosk
+    const items = (fields.items?.arrayValue?.values || []).map(v => ({
+      id: v.mapValue?.fields?.id?.stringValue,
+      name: v.mapValue?.fields?.name?.stringValue,
+      price: v.mapValue?.fields?.price?.integerValue || v.mapValue?.fields?.price?.doubleValue,
+      quantity: v.mapValue?.fields?.quantity?.integerValue
+    }));
+
+    return res.json({
+      success: true,
+      message: 'Code verified. Items will now dispense.',
+      order: {
+        orderId: fields.orderId?.stringValue,
+        totalAmount: fields.totalAmount?.integerValue || fields.totalAmount?.doubleValue,
+        items,
+        redeemedAt: new Date().toISOString()
+      }
+    });
+
+  } catch (err) {
+    console.error('Error in /api/verify-redeem-code:', err);
+    return res.status(500).json({ error: 'SERVER_ERROR', message: 'An unexpected error occurred.' });
+  }
+});
+
 app.get('/api/health', (req, res) => {
   res.json({ status: "healthy", bot: botUsername });
 });
