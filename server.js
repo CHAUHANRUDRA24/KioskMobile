@@ -203,7 +203,182 @@ async function sendTelegramMessage(chatId, text, replyMarkup = null, parseMode =
 let lastUpdateId = 0;
 
 async function pollTelegramUpdates() {
-  console.log("Telegram Bot Polling is disabled.");
+  if (!token) {
+    console.log("Telegram Bot Token not configured. Polling skipped.");
+    return;
+  }
+  try {
+    const url = `https://api.telegram.org/bot${token}/getUpdates?offset=${lastUpdateId}&timeout=30`;
+    const response = await fetch(url);
+    if (response.ok) {
+      const data = await response.json();
+      if (data.ok && data.result.length > 0) {
+        for (const update of data.result) {
+          lastUpdateId = update.update_id + 1;
+          
+          if (update.message) {
+            const chat = update.message.chat;
+            console.log(`[BOT UPDATE] Msg from chat: ${chat.id} (${chat.first_name || ''}): text="${update.message.text || ''}" contact=${update.message.contact ? 'yes' : 'no'}`);
+            
+            // Check for shared contact
+            if (update.message.contact) {
+              const contact = update.message.contact;
+              const phoneNumber = contact.phone_number;
+              const mappingDetails = {
+                chatId: chat.id,
+                firstName: contact.first_name || chat.first_name || '',
+                username: chat.username || ''
+              };
+              
+              await savePhoneMapping(phoneNumber, mappingDetails);
+              
+              const pendingSessionId = pendingSessions.get(chat.id);
+              if (pendingSessionId) {
+                const userDetails = {
+                  id: chat.id,
+                  first_name: chat.first_name || '',
+                  username: chat.username || '',
+                  phoneNumber: phoneNumber,
+                  loggedInAt: new Date().toISOString()
+                };
+                activeSessions.set(pendingSessionId, userDetails);
+                await saveUserToFirestore(phoneNumber, userDetails);
+                pendingSessions.delete(chat.id);
+                
+                await sendTelegramMessage(
+                  chat.id,
+                  `✅ Thank you, your mobile number has been successfully linked!\n\n🎉 Welcome ${chat.first_name || ''}! (${phoneNumber})\nLogin successful! You are now authenticated.`,
+                  { remove_keyboard: true }
+                );
+              } else {
+                await sendTelegramMessage(
+                  chat.id,
+                  `✅ Thank you, your mobile number has been successfully linked to your Telegram account!\n\nYou can now log in at the Smart Kiosk using your mobile number.`,
+                  { remove_keyboard: true }
+                );
+              }
+              continue;
+            }
+            
+            if (update.message.text) {
+              const text = update.message.text.trim();
+              const cleanDigits = text.replace(/\D/g, '');
+              
+              if (cleanDigits.length === 10 && /^\d+$/.test(cleanDigits)) {
+                const mappingDetails = {
+                  chatId: chat.id,
+                  firstName: chat.first_name || chat.first_name || '',
+                  username: chat.username || ''
+                };
+                await savePhoneMapping(cleanDigits, mappingDetails);
+                await sendTelegramMessage(
+                  chat.id,
+                  `✅ Thank you, your mobile number ${cleanDigits} has been successfully linked to your Telegram account!\n\nYou can now log in at the Smart Kiosk using this number.`,
+                  { remove_keyboard: true }
+                );
+                continue;
+              }
+              
+              if (text.startsWith('/start ')) {
+                const sessionId = text.split('/start ')[1].trim();
+                if (sessionId) {
+                  const existingPhone = await getPhoneByChatId(chat.id);
+                  
+                  if (existingPhone) {
+                    const userDetails = {
+                      id: chat.id,
+                      first_name: chat.first_name || '',
+                      username: chat.username || '',
+                      phoneNumber: existingPhone,
+                      loggedInAt: new Date().toISOString()
+                    };
+                    
+                    activeSessions.set(sessionId, userDetails);
+                    await saveUserToFirestore(existingPhone, userDetails);
+                    
+                    await sendTelegramMessage(
+                      chat.id,
+                      `🎉 Welcome back ${chat.first_name || ''}! (${existingPhone})\n\nLogin successful! You are now authenticated. You can return to the kiosk screen.`
+                    );
+                  } else {
+                    pendingSessions.set(chat.id, sessionId);
+                    await sendTelegramMessage(
+                      chat.id,
+                      `👋 Welcome, ${chat.first_name || 'Guest'}!\n\nTo complete your secure login, please share your mobile number by clicking the button below.`,
+                      {
+                        keyboard: [
+                          [{ text: "📱 Share Mobile Number", request_contact: true }]
+                        ],
+                        one_time_keyboard: true,
+                        resize_keyboard: true
+                      }
+                    );
+                  }
+                }
+              } else if (text === '/start') {
+                const existingPhone = await getPhoneByChatId(chat.id);
+                if (existingPhone) {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `👋 Welcome back to Smart Kiosk Bot, ${chat.first_name || ''}!\n\nYour mobile number (${existingPhone}) is already linked. You can scan a QR code at any kiosk to log in instantly.`,
+                    { remove_keyboard: true }
+                  );
+                } else {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `👋 Welcome to Smart Kiosk Bot!\n\nPlease link your mobile number to enable one-tap logins by clicking the button below, or scan a QR code to log in directly.`,
+                    {
+                      keyboard: [
+                        [
+                          {
+                            text: "📱 Share Mobile Number",
+                            request_contact: true
+                          }
+                        ]
+                      ],
+                      one_time_keyboard: true,
+                      resize_keyboard: true
+                    }
+                  );
+                }
+              } else {
+                const existingPhone = await getPhoneByChatId(chat.id);
+                if (existingPhone) {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `🤖 Your mobile number (${existingPhone}) is securely linked. Simply scan a kiosk QR code or click a login link to proceed.`,
+                    { remove_keyboard: true }
+                  );
+                } else {
+                  await sendTelegramMessage(
+                    chat.id,
+                    `🤖 Use the button below to link your mobile number for secure kiosk logins.`,
+                    {
+                      keyboard: [
+                        [
+                          {
+                            text: "📱 Share Mobile Number",
+                            request_contact: true
+                          }
+                        ]
+                      ],
+                      one_time_keyboard: true,
+                      resize_keyboard: true
+                    }
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Error polling Telegram updates:", error);
+  }
+  
+  // Schedule next poll immediately (long polling timeout is 30s)
+  setTimeout(pollTelegramUpdates, 1000);
 }
 
 // API endpoint for client to poll login status as a fallback 
