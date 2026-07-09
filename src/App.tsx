@@ -27,7 +27,7 @@ import { Product, CartItem, ScreenType } from './types';
 import logoImg from './assets/creator_lab_logo.jpg';
 import { LoginScreen } from './LoginScreen';
 import { db } from './firebase';
-import { doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => {
@@ -383,7 +383,7 @@ export default function App() {
   const [pendingDebt, setPendingDebt] = useState<any>(null);
 
   useEffect(() => {
-    const fetchOrders = async () => {
+    const setupListeners = () => {
       if (!user) return;
       setOrdersLoading(true);
       try {
@@ -402,36 +402,51 @@ export default function App() {
           collection(db, 'orders'),
           where('phone', '==', phone)
         );
-        const snapshot = await getDocs(q);
-        const ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-        // Sort by 'date' (Kiosk schema) falling back to 'createdAt'
-        ordersData.sort((a: any, b: any) => {
-          const da = new Date(a.date || a.createdAt || 0).getTime();
-          const db2 = new Date(b.date || b.createdAt || 0).getTime();
-          return db2 - da;
+        
+        // Use onSnapshot for real-time updates!
+        const unsubscribeOrders = onSnapshot(q, (snapshot) => {
+          const ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+          // Sort by 'date' (Kiosk schema) falling back to 'createdAt'
+          ordersData.sort((a: any, b: any) => {
+            const da = new Date(a.date || a.createdAt || 0).getTime();
+            const db2 = new Date(b.date || b.createdAt || 0).getTime();
+            return db2 - da;
+          });
+          setUserOrders(ordersData);
+          setOrdersLoading(false);
+        }, (err) => {
+          console.error('Failed to listen to orders:', err);
+          setOrdersLoading(false);
         });
-        setUserOrders(ordersData);
 
-        // Fetch emergency debt status
-        try {
-          const res = await fetch(`/api/debt/${phone}`);
-          if (res.ok) {
-            const data = await res.json();
-            if (data.hasDebt) setPendingDebt(data);
-            else setPendingDebt(null);
-          }
-        } catch (e) {
-          console.error('Failed to fetch debt:', e);
-        }
+        return () => {
+          unsubscribeOrders();
+        };
       } catch (err) {
-        console.error('Failed to fetch orders:', err);
-      } finally {
+        console.error('Failed to setup order listeners:', err);
         setOrdersLoading(false);
       }
     };
+
+    let cleanupOrders: any;
     if (screen === 'account') {
-      fetchOrders();
+      // Also fetch debt in a one-off (we could use onSnapshot here too, but this is fine)
+      const phone = user?.phoneNumber ? String(user.phoneNumber).replace(/\D/g, '').slice(-10) : null;
+      if (phone) {
+        fetch(`/api/debt/${phone}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.hasDebt) setPendingDebt(data);
+            else setPendingDebt(null);
+          })
+          .catch(e => console.error('Failed to fetch debt:', e));
+      }
+      cleanupOrders = setupListeners();
     }
+
+    return () => {
+      if (cleanupOrders) cleanupOrders();
+    };
   }, [screen, user]);
 
   // Custom state for Add to Cart Popup
