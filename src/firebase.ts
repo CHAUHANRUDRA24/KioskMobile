@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
+import { getAuth, signInAnonymously } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,6 +14,12 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Auth and sign in anonymously
+export const auth = getAuth(app);
+signInAnonymously(auth).catch((error) => {
+  console.warn("Client Firebase anonymous sign-in failed:", error);
+});
 
 // Initialize Cloud Firestore and get a reference to the service
 export const db = getFirestore(app);
