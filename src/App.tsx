@@ -262,23 +262,47 @@ export default function App() {
       key: keyId,
       amount: totalAmount * 100, // in paise
       currency: "INR",
-      name: "Smart Kiosk",
+      name: "CREATO4 Smart Kiosk",
       description: "Discreet Hygiene & Health Products",
       image: logoImg,
       handler: async function (response: any) {
-        // Payment success!
         const paymentId = response.razorpay_payment_id;
-        
-        // Generate redeem code
         const code = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Trigger UI success state
+        // Save order to shared Firestore (also sends Telegram receipt)
+        try {
+          const phone = user?.phoneNumber
+            ? String(user.phoneNumber).replace(/\D/g, '').slice(-10)
+            : null;
+
+          if (phone) {
+            await fetch('/api/orders/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                phone,
+                name: user?.first_name || user?.name || 'Guest',
+                items: cart.map(ci => ({
+                  productId: ci.product.id,
+                  product: { title: ci.product.title, price: ci.product.price },
+                  quantity: ci.quantity
+                })),
+                totalAmount,
+                paymentMethod: 'RAZORPAY',
+                paymentId
+              })
+            });
+          }
+        } catch (e) {
+          console.warn('Order save failed (non-critical):', e);
+        }
+
         setPaymentSuccess(true);
         setPickupCode(code);
         setPaymentFinished(true);
       },
       prefill: {
-        contact: "9876543210"
+        contact: user?.phoneNumber || "9876543210"
       },
       theme: {
         color: "#006e2f"
@@ -321,32 +345,32 @@ export default function App() {
       if (!user) return;
       setOrdersLoading(true);
       try {
-        const variations: string[] = [];
-        if (user.phoneNumber) {
-          const rawPhone = String(user.phoneNumber);
-          variations.push(rawPhone);
-          
-          const cleanDigits = rawPhone.replace(/\D/g, '');
-          if (cleanDigits.length >= 10) {
-            const last10 = cleanDigits.slice(-10);
-            variations.push(last10);
-            variations.push(`+91${last10}`);
-            variations.push(`91${last10}`);
-          }
+        // Use the canonical 10-digit phone as the lookup key (shared with Kiosk)
+        const phone = user.phoneNumber
+          ? String(user.phoneNumber).replace(/\D/g, '').slice(-10)
+          : null;
+
+        if (!phone) {
+          setUserOrders([]);
+          return;
         }
-        if (user.id) {
-          variations.push(String(user.id));
-        }
-        
-        const uniqueVariations = Array.from(new Set(variations)).filter(Boolean);
-        
-        const q = query(collection(db, 'orders'), where('userId', 'in', uniqueVariations));
+
+        // Query by 'phone' field which is what the Kiosk uses
+        const q = query(
+          collection(db, 'orders'),
+          where('phone', '==', phone)
+        );
         const snapshot = await getDocs(q);
-        const ordersData = snapshot.docs.map(d => d.data());
-        ordersData.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const ordersData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+        // Sort by 'date' (Kiosk schema) falling back to 'createdAt'
+        ordersData.sort((a: any, b: any) => {
+          const da = new Date(a.date || a.createdAt || 0).getTime();
+          const db2 = new Date(b.date || b.createdAt || 0).getTime();
+          return db2 - da;
+        });
         setUserOrders(ordersData);
       } catch (err) {
-        console.error("Failed to fetch orders:", err);
+        console.error('Failed to fetch orders:', err);
       } finally {
         setOrdersLoading(false);
       }
