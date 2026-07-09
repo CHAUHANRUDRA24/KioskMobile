@@ -249,7 +249,7 @@ app.post('/api/razorpay/create-order', async (req, res) => {
 
 app.post('/api/orders/save', async (req, res) => {
   try {
-    const { phone, name, items, totalAmount, paymentMethod, paymentId } = req.body;
+    const { phone, name, items, totalAmount, paymentMethod, paymentId, redeemCode, status } = req.body;
     if (!phone || !items || !totalAmount) {
       return res.status(400).json({ error: 'phone, items, totalAmount required' });
     }
@@ -266,7 +266,8 @@ app.post('/api/orders/save', async (req, res) => {
       paymentId: paymentId || null,
       date: new Date().toISOString(),
       type: 'mobile',
-      status: 'paid',
+      status: status || 'paid',
+      redeemCode: redeemCode || null,
       source: 'mobile_app'
     });
 

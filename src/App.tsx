@@ -289,7 +289,9 @@ export default function App() {
                 })),
                 totalAmount,
                 paymentMethod: 'RAZORPAY',
-                paymentId
+                paymentId,
+                redeemCode: `REDEEM-${code}`,
+                status: 'pending_redemption'
               })
             });
           }
