@@ -316,6 +316,45 @@ export default function App() {
     rzp.open();
   };
 
+  const handleRazorpayDebtPayment = () => {
+    if (!pendingDebt) return;
+    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_T909ZVJnRZ8gmE";
+    const phoneStr = user?.phoneNumber ? String(user.phoneNumber).replace(/\D/g, '').slice(-10) : "";
+    
+    const options = {
+      key: keyId,
+      amount: pendingDebt.amount * 100, // in paise
+      currency: "INR",
+      name: "CREATO4 Smart Kiosk",
+      description: "Emergency Debt Repayment",
+      image: logoImg,
+      handler: async function (response: any) {
+        // On success, mark debt as paid in Firestore
+        try {
+          if (phoneStr) {
+            await setDoc(doc(db, 'emergencyDebts', phoneStr), { paid: true }, { merge: true });
+          }
+        } catch (e) {
+          console.warn("Could not write debt clearance to Firestore", e);
+        }
+        setPendingDebt(null);
+        alert(lang === 'en' ? "Debt cleared successfully! Thank you." : "कर्ज चुका दिया गया! धन्यवाद।");
+      },
+      prefill: {
+        contact: phoneStr || "9876543210"
+      },
+      theme: {
+        color: "#006e2f"
+      }
+    };
+
+    const rzp = new (window as any).Razorpay(options);
+    rzp.on('payment.failed', function (resp: any) {
+      alert("Payment Failed: " + resp.error.description);
+    });
+    rzp.open();
+  };
+
   // Real-time Session Account States
   const [sessionTransactions, setSessionTransactions] = useState<Array<{
     id: string;
@@ -339,6 +378,7 @@ export default function App() {
   // Order history
   const [userOrders, setUserOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [pendingDebt, setPendingDebt] = useState<any>(null);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -369,6 +409,18 @@ export default function App() {
           return db2 - da;
         });
         setUserOrders(ordersData);
+
+        // Fetch emergency debt status
+        try {
+          const res = await fetch(`/api/debt/${phone}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.hasDebt) setPendingDebt(data);
+            else setPendingDebt(null);
+          }
+        } catch (e) {
+          console.error('Failed to fetch debt:', e);
+        }
       } catch (err) {
         console.error('Failed to fetch orders:', err);
       } finally {
@@ -1549,39 +1601,81 @@ export default function App() {
                     <div className="text-center py-4 text-sm text-gray-400 font-bold">
                       {lang === 'en' ? 'Loading orders...' : 'लोड हो रहा है...'}
                     </div>
-                  ) : userOrders.length > 0 ? (
-                    <div className="flex flex-col gap-4">
-                      {userOrders.map((order, idx) => (
-                        <div key={idx} className="flex flex-col gap-2 p-4 rounded-2xl bg-[#f7faf7] border border-[#006e2f]/10">
-                          <div className="flex justify-between items-center">
-                            <span className="text-xs font-bold text-gray-500">
-                              {new Date(order.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </span>
-                            <span className={`text-[10px] font-bold px-2 py-1 rounded-md uppercase tracking-wider ${
-                              order.status === 'redeemed' 
-                                ? 'bg-emerald-100 text-emerald-800' 
-                                : 'bg-amber-100 text-amber-800'
-                            }`}>
-                              {order.status.replace('_', ' ')}
-                            </span>
-                          </div>
-                          <div className="text-sm font-black text-[#12240f]">
-                            ₹{order.totalAmount} • {order.items?.length || 0} items
-                          </div>
-                          {order.status === 'pending_redemption' && order.redeemCode && (
-                            <div className="mt-2 bg-[#006e2f] text-white text-xs font-black py-2 rounded-xl text-center tracking-widest">
-                              CODE: {order.redeemCode.split('-')[1]}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
                   ) : (
-                    <div className="text-center py-6">
-                      <ShoppingBag className="w-8 h-8 text-gray-300 mx-auto mb-2" />
-                      <p className="text-xs font-bold text-gray-400">
-                        {lang === 'en' ? 'No orders yet.' : 'कोई आदेश नहीं.'}
-                      </p>
+                    <div className="flex flex-col gap-4">
+                      {/* Debt Alert Block */}
+                      {pendingDebt && pendingDebt.hasDebt && (
+                        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-200 flex flex-col gap-3">
+                          <div className="flex justify-between items-start">
+                            <div className="flex flex-col">
+                              <span className="text-sm font-black text-rose-700">🚨 Unpaid Emergency Order</span>
+                              <span className="text-xs font-bold text-rose-500 mt-1">
+                                {new Date(pendingDebt.date).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                              </span>
+                            </div>
+                            <span className="text-sm font-black text-rose-700 bg-rose-100 px-2 py-1 rounded-md">
+                              ₹{pendingDebt.amount}
+                            </span>
+                          </div>
+                          <button
+                            onClick={handleRazorpayDebtPayment}
+                            className="w-full h-10 rounded-xl bg-rose-600 text-white font-black text-xs shadow-md active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+                          >
+                            <CreditCard size={16} />
+                            Pay Emergency Debt
+                          </button>
+                        </div>
+                      )}
+
+                      {userOrders.length > 0 ? userOrders.map((order, idx) => {
+                        const orderDate = new Date(order.date || order.createdAt || Date.now());
+                        const isInvalid = isNaN(orderDate.getTime());
+                        const displayDate = isInvalid ? 'Recent' : orderDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+                        
+                        // Formatting status
+                        let statusColor = 'bg-gray-100 text-gray-600';
+                        let statusText = (order.status || 'unknown').replace('_', ' ').toUpperCase();
+                        
+                        if (order.status === 'redeemed' || order.status === 'paid') {
+                          statusColor = 'bg-emerald-100 text-emerald-800';
+                        } else if (order.status === 'pending_redemption') {
+                          statusColor = 'bg-blue-100 text-blue-800';
+                          statusText = 'PENDING REDEEM';
+                        } else if (order.status === 'unpaid' || order.type === 'emergency') {
+                          statusColor = 'bg-amber-100 text-amber-800';
+                          if (order.type === 'emergency') statusText = 'EMERGENCY';
+                        }
+
+                        return (
+                          <div key={idx} className="flex flex-col gap-2 p-4 rounded-2xl bg-[#f7faf7] border border-[#006e2f]/10">
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs font-bold text-gray-500">
+                                {displayDate}
+                              </span>
+                              <span className={`text-[10px] font-bold px-2 py-1 rounded-md tracking-wider ${statusColor}`}>
+                                {statusText}
+                              </span>
+                            </div>
+                            <div className="text-sm font-black text-[#12240f]">
+                              ₹{order.totalAmount} • {order.items?.length || 0} items
+                            </div>
+                            
+                            {/* Redeem Code Display */}
+                            {order.redeemCode && (
+                              <div className={`mt-2 text-xs font-black py-2 rounded-xl text-center tracking-widest ${order.status === 'redeemed' ? 'bg-gray-200 text-gray-500 line-through' : 'bg-[#006e2f] text-white shadow-md'}`}>
+                                {order.status === 'redeemed' ? 'REDEEMED' : `CODE: ${order.redeemCode.split('-')[1] || order.redeemCode}`}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      }) : !pendingDebt && (
+                        <div className="text-center py-6">
+                          <ShoppingBag className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-xs font-bold text-gray-400">
+                            {lang === 'en' ? 'No orders yet.' : 'कोई आदेश नहीं.'}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
