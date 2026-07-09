@@ -17,13 +17,13 @@ const KIOSK_API = 'https://kiosk12.netlify.app';
 
 // Initialize Firebase
 const firebaseConfig = {
-  apiKey: process.env.VITE_FIREBASE_API_KEY,
-  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.VITE_FIREBASE_APP_ID,
-  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: process.env.VITE_FIREBASE_API_KEY || "AIzaSyBX4Bla_hbRja6N7iTaEkNCL3M3AAdjZnY",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN || "kiosk-6b105.firebaseapp.com",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID || "kiosk-6b105",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET || "kiosk-6b105.firebasestorage.app",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "700718255587",
+  appId: process.env.VITE_FIREBASE_APP_ID || "1:700718255587:web:376866215716ceddf7e4d6",
+  measurementId: process.env.VITE_FIREBASE_MEASUREMENT_ID || "G-2HKF6JKTY7",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);

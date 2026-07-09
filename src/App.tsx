@@ -252,7 +252,7 @@ export default function App() {
     const totalAmount = getCartTotal();
     if (totalAmount <= 0) return;
 
-    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID;
+    const keyId = import.meta.env.VITE_RAZORPAY_KEY_ID || "rzp_test_T909ZVJnRZ8gmE";
     if (!keyId) {
       alert("Razorpay Key ID is not configured in .env file.");
       return;
